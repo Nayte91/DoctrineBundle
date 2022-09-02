@@ -809,8 +809,9 @@ class DoctrineExtensionTest extends TestCase
 
         $messengerTransportDoctrineFactory = $container->getDefinition('messenger.transport.doctrine.factory');
 
-        $this->assertCount(1, $messengerTransportDoctrineFactory->getArguments());
+        $this->assertCount(2, $messengerTransportDoctrineFactory->getArguments());
         $this->assertSame('doctrine', (string) $messengerTransportDoctrineFactory->getArgument(0));
+        $this->assertSame('messenger.transport.doctrine.pg_notify_on_idle_listener', (string) $messengerTransportDoctrineFactory->getArgument(1));
 
         $this->assertSame(DoctrineTransportFactory::class, $messengerTransportDoctrineFactory->getClass());
 

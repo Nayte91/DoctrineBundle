@@ -62,6 +62,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Messenger\Bridge\Doctrine\EventListener\PostgreSqlNotifyOnIdleListener;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -1433,6 +1434,10 @@ final class DoctrineExtension extends Extension
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('messenger.php');
+
+        if (! class_exists(PostgreSqlNotifyOnIdleListener::class)) {
+            $container->removeDefinition('messenger.transport.doctrine.pg_notify_on_idle_listener');
+        }
 
         /**
          * The Doctrine transport component (symfony/doctrine-messenger) is optional.
