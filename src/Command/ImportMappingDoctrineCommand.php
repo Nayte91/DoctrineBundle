@@ -109,6 +109,7 @@ EOT);
             }
         }
 
+        /* @phpstan-ignore class.notFound */
         $cme      = new ClassMetadataExporter();
         $exporter = $cme->getExporter($type);
         $exporter->setOverwriteExistingFiles($input->getOption('force'));
@@ -126,6 +127,7 @@ EOT);
         $emName = $input->getOption('em');
         $emName = $emName ? $emName : 'default';
 
+        /* @phpstan-ignore class.notFound */
         $cmf = new DisconnectedClassMetadataFactory();
         $cmf->setEntityManager($em);
         $metadata = $cmf->getAllMetadata();

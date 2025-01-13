@@ -34,6 +34,7 @@ abstract class DoctrineCommand extends Command
      */
     protected function getEntityGenerator()
     {
+        /** @phpstan-ignore class.notFound */
         $entityGenerator = new EntityGenerator();
         $entityGenerator->setGenerateAnnotations(false);
         $entityGenerator->setGenerateStubMethods(true);
