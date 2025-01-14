@@ -936,7 +936,7 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container = $this->loadContainer('orm_hydration_mode');
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
-        /** @psalm-suppress UndefinedClass */
+        /* @phpstan-ignore class.notFound */
         $this->assertDICDefinitionMethodCallOnce($definition, 'addCustomHydrationMode', ['test_hydrator', TestHydrator::class]);
     }
 

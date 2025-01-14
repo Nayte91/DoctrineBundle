@@ -30,7 +30,7 @@ class ServiceEntityRepositoryTest extends TestCase
         $this->expectExceptionMessage(<<<'EXCEPTION'
 Could not find the entity manager for class "Doctrine\Bundle\DoctrineBundle\Tests\Repository\TestEntity". Check your Doctrine configuration to make sure it is configured to load this entity’s metadata.
 EXCEPTION);
-        /** @psalm-suppress UndefinedClass */
+        /* @phpstan-ignore class.notFound */
         $repo = new ServiceEntityRepository($registry, TestEntity::class);
         $repo->getClassName();
     }
@@ -41,7 +41,7 @@ EXCEPTION);
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
         $this->expectException(LogicException::class);
 
-        /** @psalm-suppress UndefinedClass */
+        /* @phpstan-ignore class.notFound */
         new class ($registry, TestEntity::class) extends ServiceEntityRepository implements LazyObjectInterface {
             use LazyGhostTrait;
         };

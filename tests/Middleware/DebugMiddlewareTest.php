@@ -15,7 +15,6 @@ use function class_exists;
 use function sprintf;
 use function strpos;
 
-/** @psalm-suppress MissingDependency */
 class DebugMiddlewareTest extends TestCase
 {
     protected function setUp(): void

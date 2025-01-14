@@ -53,10 +53,12 @@ class Registry extends ManagerRegistry implements ResetInterface
             try {
                 /** @psalm-suppress UndefinedMethod ORM < 3 specific */
                 return $objectManager->getConfiguration()->getEntityNamespace($alias);
+            /* @phpstan-ignore class.notFound */
             } catch (ORMException $e) {
             }
         }
 
+        /* @phpstan-ignore class.notFound */
         throw ORMException::unknownEntityNamespace($alias);
     }
 
