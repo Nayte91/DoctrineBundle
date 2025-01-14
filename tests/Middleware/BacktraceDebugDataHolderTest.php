@@ -12,12 +12,6 @@ use function count;
 use function sprintf;
 use function strpos;
 
-/**
- * @psalm-suppress UndefinedClass
- * @psalm-suppress MissingDependency
- * @psalm-suppress InternalMethod
- * @psalm-suppress InternalClass
- */
 class BacktraceDebugDataHolderTest extends TestCase
 {
     protected function setUp(): void

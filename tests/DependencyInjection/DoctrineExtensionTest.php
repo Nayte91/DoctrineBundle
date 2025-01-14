@@ -433,19 +433,25 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals(EntityManager::class, $container->getParameter('doctrine.orm.entity_manager.class'));
         $this->assertEquals('Proxies', $container->getParameter('doctrine.orm.proxy_namespace'));
         /** @psalm-suppress UndefinedClass Remove in doctrine/doctrine-bundle 3.0 */
+        /* @phpstan-ignore class.notFound */
         $this->assertEquals(ArrayCache::class, $container->getParameter('doctrine.orm.cache.array.class'));
         /** @psalm-suppress UndefinedClass Remove in doctrine/doctrine-bundle 3.0 */
+        /* @phpstan-ignore class.notFound */
         $this->assertEquals(ApcCache::class, $container->getParameter('doctrine.orm.cache.apc.class'));
         /** @psalm-suppress UndefinedClass Remove in doctrine/doctrine-bundle 3.0 */
+        /* @phpstan-ignore class.notFound */
         $this->assertEquals(MemcacheCache::class, $container->getParameter('doctrine.orm.cache.memcache.class'));
         $this->assertEquals('localhost', $container->getParameter('doctrine.orm.cache.memcache_host'));
         $this->assertEquals('11211', $container->getParameter('doctrine.orm.cache.memcache_port'));
         $this->assertEquals('Memcache', $container->getParameter('doctrine.orm.cache.memcache_instance.class'));
         /** @psalm-suppress UndefinedClass Remove in doctrine/doctrine-bundle 3.0 */
+        /* @phpstan-ignore class.notFound */
         $this->assertEquals(XcacheCache::class, $container->getParameter('doctrine.orm.cache.xcache.class'));
         $this->assertEquals(MappingDriverChain::class, $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
+        /* @phpstan-ignore class.notFound */
         $this->assertEquals(AnnotationDriver::class, $container->getParameter('doctrine.orm.metadata.annotation.class'));
         $this->assertEquals(SimplifiedXmlDriver::class, $container->getParameter('doctrine.orm.metadata.xml.class'));
+        /* @phpstan-ignore class.notFound */
         $this->assertEquals(SimplifiedYamlDriver::class, $container->getParameter('doctrine.orm.metadata.yml.class'));
 
         // second-level cache
