@@ -3,7 +3,7 @@
 namespace Doctrine\Bundle\DoctrineBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\EntityGenerator;
 use Doctrine\Persistence\ManagerRegistry;
 use InvalidArgumentException;
@@ -51,7 +51,7 @@ abstract class DoctrineCommand extends Command
      * @param string   $name
      * @param int|null $shardId
      *
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
     protected function getEntityManager($name, $shardId = null)
     {
@@ -61,7 +61,7 @@ abstract class DoctrineCommand extends Command
             throw new InvalidArgumentException('Shards are not supported anymore using doctrine/dbal >= 3');
         }
 
-        assert($manager instanceof EntityManager);
+        assert($manager instanceof EntityManagerInterface);
 
         return $manager;
     }
