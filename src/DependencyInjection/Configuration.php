@@ -272,6 +272,8 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array');
         $this->configureDbalDriverNode($replicaNode);
 
+        assert($node instanceof ArrayNodeDefinition);
+
         return $node;
     }
 
@@ -802,6 +804,8 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        assert($node instanceof ArrayNodeDefinition);
+
         return $node;
     }
 
@@ -827,6 +831,8 @@ class Configuration implements ConfigurationInterface
         if ($name !== 'metadata_cache_driver') {
             $node->addDefaultsIfNotSet();
         }
+
+        assert($node instanceof ArrayNodeDefinition);
 
         return $node;
     }
