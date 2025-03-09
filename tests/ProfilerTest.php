@@ -120,5 +120,8 @@ class ProfilerTest extends BaseTestCase
             '.*',
             preg_quote('SELECT * FROM foo WHERE bar IN ( ? , ? )'),
         ) . '/', $output));
+
+        $this->assertStringContainsString('Managed entities', $output);
+        $this->assertStringContainsString('No managed entities.', $output);
     }
 }

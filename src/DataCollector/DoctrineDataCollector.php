@@ -17,6 +17,7 @@ use Throwable;
 
 use function array_map;
 use function array_sum;
+use function arsort;
 use function assert;
 use function count;
 use function usort;
@@ -42,12 +43,15 @@ use function usort;
  *    errors: array<string, array<class-string, list<string>>>,
  *    managers: list<string>,
  *    queries: array<string, list<QueryType>>,
+ *    entityCounts: array<string, array<class-string, int>>
  * }
  * @psalm-property DataType $data
  */
 class DoctrineDataCollector extends BaseCollector
 {
     private int|null $invalidEntityCount = null;
+
+    private int|null $managedEntityCount = null;
 
     /**
      * @var mixed[][]|null
@@ -68,9 +72,10 @@ class DoctrineDataCollector extends BaseCollector
     {
         parent::collect($request, $response, $exception);
 
-        $errors   = [];
-        $entities = [];
-        $caches   = [
+        $errors       = [];
+        $entities     = [];
+        $entityCounts = [];
+        $caches       = [
             'enabled' => false,
             'log_enabled' => false,
             'counts' => [
@@ -113,6 +118,14 @@ class DoctrineDataCollector extends BaseCollector
                     $errors[$name][$class->getName()] = $classErrors;
                 }
             }
+
+            $entityCounts[$name] = [];
+            foreach ($em->getUnitOfWork()->getIdentityMap() as $className => $entityList) {
+                $entityCounts[$name][$className] = count($entityList);
+            }
+
+            // Sort entities by count (in descending order)
+            arsort($entityCounts[$name]);
 
             $emConfig   = $em->getConfiguration();
             $slcEnabled = $emConfig->isSecondLevelCacheEnabled();
@@ -165,10 +178,11 @@ class DoctrineDataCollector extends BaseCollector
             }
         }
 
-        $this->data['entities'] = $entities;
-        $this->data['errors']   = $errors;
-        $this->data['caches']   = $caches;
-        $this->groupedQueries   = null;
+        $this->data['entities']     = $entities;
+        $this->data['errors']       = $errors;
+        $this->data['caches']       = $caches;
+        $this->data['entityCounts'] = $entityCounts;
+        $this->groupedQueries       = null;
     }
 
     /** @return array<string, array<class-string, array{class: class-string, file: false|string, line: false|int}>> */
@@ -226,6 +240,26 @@ class DoctrineDataCollector extends BaseCollector
     public function getInvalidEntityCount()
     {
         return $this->invalidEntityCount ??= array_sum(array_map('count', $this->data['errors']));
+    }
+
+    public function getManagedEntityCount(): int
+    {
+        if ($this->managedEntityCount === null) {
+            $total = 0;
+            foreach ($this->data['entityCounts'] as $entities) {
+                $total += array_sum($entities);
+            }
+
+            $this->managedEntityCount = $total;
+        }
+
+        return $this->managedEntityCount;
+    }
+
+    /** @return array<string, array<class-string, int>> */
+    public function getManagedEntityCountByClass(): array
+    {
+        return $this->data['entityCounts'];
     }
 
     /**
