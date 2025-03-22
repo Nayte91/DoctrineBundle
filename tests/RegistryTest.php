@@ -116,6 +116,7 @@ class RegistryTest extends TestCase
         $registry->resetManager('default');
     }
 
+    /** @group legacy */
     public function testReset(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
