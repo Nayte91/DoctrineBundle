@@ -221,6 +221,8 @@ Configuration Reference
                 proxy_namespace:              Proxies
                 # Enables the new implementation of proxies based on lazy ghosts instead of using the legacy implementation
                 enable_lazy_ghost_objects:    false
+                identity_generation_preferences:
+                    Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
 
                 entity_managers:
 
