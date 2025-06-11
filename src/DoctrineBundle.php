@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Proxy\Autoloader;
 use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\DoctrineValidationPass;
+use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterDatePointTypePass;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterUidTypePass;
 use Symfony\Bridge\Doctrine\DependencyInjection\Security\UserProvider\EntityFactory;
@@ -27,6 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use function assert;
+use function class_exists;
 use function clearstatcache;
 use function dirname;
 use function spl_autoload_unregister;
@@ -72,6 +74,12 @@ class DoctrineBundle extends Bundle
         $container->addCompilerPass(new RemoveLoggingMiddlewarePass());
         $container->addCompilerPass(new MiddlewaresPass());
         $container->addCompilerPass(new RegisterUidTypePass());
+
+        if (! class_exists(RegisterDatePointTypePass::class)) {
+            return;
+        }
+
+        $container->addCompilerPass(new RegisterDatePointTypePass());
     }
 
     public function boot(): void
