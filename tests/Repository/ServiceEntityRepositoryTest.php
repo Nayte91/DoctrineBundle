@@ -35,7 +35,10 @@ EXCEPTION);
         $repo->getClassName();
     }
 
-    /** @requires function \Symfony\Component\VarExporter\ProxyHelper::generateLazyGhost */
+    /**
+     * @requires function \Symfony\Component\VarExporter\ProxyHelper::generateLazyGhost
+     * @requires PHP < 8.4
+     */
     public function testConstructInitializesWhenImplementingLazyObjectInterface(): void
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();

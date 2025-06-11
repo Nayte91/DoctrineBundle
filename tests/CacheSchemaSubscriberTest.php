@@ -49,6 +49,8 @@ class CacheSchemaSubscriberTest extends TestCase
         $extension->load([
             'framework' => [
                 'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
                 'cache' => [
                     'pools' => [
                         'my_cache_adapter' => ['adapter' => 'cache.adapter.doctrine_dbal'],
