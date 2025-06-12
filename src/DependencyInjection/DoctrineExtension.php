@@ -307,7 +307,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             ]);
 
         $container
-            ->registerAliasForArgument($connectionId, Connection::class, sprintf('%sConnection', $name))
+            ->registerAliasForArgument($connectionId, Connection::class, sprintf('%s.connection', $name))
             ->setPublic(false);
 
         // Set class in case "wrapper_class" option was used to assist IDEs
@@ -779,7 +779,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             ->setConfigurator([new Reference($managerConfiguratorName), 'configure']);
 
         $container
-            ->registerAliasForArgument($entityManagerId, EntityManagerInterface::class, sprintf('%sEntityManager', $entityManager['name']))
+            ->registerAliasForArgument($entityManagerId, EntityManagerInterface::class, sprintf('%s.entity_manager', $entityManager['name']))
             ->setPublic(false);
 
         $container->setAlias(
