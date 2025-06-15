@@ -20,6 +20,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
+use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Doctrine\ORM\Proxy\ProxyFactory;
 use Generator;
 use InvalidArgumentException;
@@ -55,6 +56,7 @@ use function sys_get_temp_dir;
 use function uniqid;
 
 use const DIRECTORY_SEPARATOR;
+use const PHP_VERSION_ID;
 
 abstract class AbstractDoctrineExtensionTestCase extends TestCase
 {
@@ -1431,6 +1433,86 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container           = $this->loadContainer('dbal_collect_schema_errors_disable_no_profiling');
         $collectorDefinition = $container->getDefinition('data_collector.doctrine');
         $this->assertFalse($collectorDefinition->getArguments()[1]);
+    }
+
+    public function testNativeLazyObjectsWithoutConfig(): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        if (! class_exists(LegacyReflectionFields::class)) {
+            self::markTestSkipped('This test requires ORM 3.4+');
+        }
+
+        if (PHP_VERSION_ID < 80400) {
+            self::markTestSkipped('This test requires PHP 8.4+');
+        }
+
+        $container     = $this->loadContainer('orm_filters');
+        $entityManager = $container->get('doctrine.orm.entity_manager');
+
+        $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
+    }
+
+    public function testNativeLazyObjectsWithConfigTrue(): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        if (! class_exists(LegacyReflectionFields::class)) {
+            self::markTestSkipped('This test requires ORM 3.4+');
+        }
+
+        if (PHP_VERSION_ID < 80400) {
+            self::markTestSkipped('This test requires PHP 8.4+');
+        }
+
+        $container     = $this->loadContainer('orm_native_lazy_objects_enable');
+        $entityManager = $container->get('doctrine.orm.entity_manager');
+
+        $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
+    }
+
+    public function testNativeLazyObjectsWithConfigFalse(): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        if (! class_exists(LegacyReflectionFields::class)) {
+            self::markTestSkipped('This test requires ORM 3.4+');
+        }
+
+        if (PHP_VERSION_ID < 80400) {
+            self::markTestSkipped('This test requires PHP 8.4+');
+        }
+
+        $container     = $this->loadContainer('orm_native_lazy_objects_disable');
+        $entityManager = $container->get('doctrine.orm.entity_manager');
+
+        $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
+    }
+
+    public function testNativeLazyObjectsWithBadPHP(): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        if (! class_exists(LegacyReflectionFields::class)) {
+            self::markTestSkipped('This test requires ORM 3.4+');
+        }
+
+        if (PHP_VERSION_ID >= 80400) {
+            self::markTestSkipped('This test requires PHP 8.3 or less');
+        }
+
+        $container     = $this->loadContainer('orm_native_lazy_objects_enable');
+        $entityManager = $container->get('doctrine.orm.entity_manager');
+
+        $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
     }
 
     /** @param list<string> $bundles */

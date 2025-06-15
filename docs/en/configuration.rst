@@ -254,6 +254,8 @@ Configuration Reference
                         class_metadata_factory_name:  Doctrine\ORM\Mapping\ClassMetadataFactory
                         default_repository_class:     Doctrine\ORM\EntityRepository
                         auto_mapping:                 false
+                        # Opt-in to PHP native lazy objects
+                        enable_native_lazy_objects:   false
                         # Opt-in to new mapping driver mode as of Doctrine ORM 2.16, https://github.com/doctrine/orm/pull/10455
                         report_fields_where_declared: false
                         # 0pt-in to the new mapping driver mode as of Doctrine ORM 2.14. See https://github.com/doctrine/orm/pull/6728.
