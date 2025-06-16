@@ -8,9 +8,12 @@ branches:
     - "2.11.x"
     - "2.12.x"
     - "2.13.x"
+    - "2.14.x"
+    - "2.15.x"
+    - "2.16.x"
 maintained_branches:
-    - "2.12.x"
-    - "2.13.x"
+    - "2.15.x"
+    - "2.16.x"
 doc_dir: { "2.12.x": "docs/", "2.13.x": "docs/en/" }
-current_branch: "2.12.x"
-dev_branch: "2.13.x"
+current_branch: "2.15.x"
+dev_branch: "2.16.x"
