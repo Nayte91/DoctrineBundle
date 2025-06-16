@@ -1,0 +1,9 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname: db
+
+    orm:
+        enable_native_lazy_objects: true

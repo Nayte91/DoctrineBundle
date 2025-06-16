@@ -29,6 +29,7 @@ use Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver;
 use Doctrine\ORM\Mapping\Driver\StaticPHPDriver as LegacyStaticPHPDriver;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\ORM\Proxy\Autoloader;
 use Doctrine\ORM\Proxy\ProxyFactory;
@@ -77,6 +78,8 @@ use function reset;
 use function sprintf;
 use function str_replace;
 use function trigger_deprecation;
+
+use const PHP_VERSION_ID;
 
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
@@ -697,6 +700,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'setLazyGhostObjectEnabled' => '%doctrine.orm.enable_lazy_ghost_objects%',
             'setIdentityGenerationPreferences' => $entityManager['identity_generation_preferences'],
         ];
+
+        if (PHP_VERSION_ID >= 80400 && class_exists(LegacyReflectionFields::class)) {
+            $methods['enableNativeLazyObjects'] = $entityManager['enable_native_lazy_objects'];
+        }
 
         if (isset($entityManager['fetch_mode_subselect_batch_size'])) {
             $methods['setEagerFetchBatchSize'] = $entityManager['fetch_mode_subselect_batch_size'];
