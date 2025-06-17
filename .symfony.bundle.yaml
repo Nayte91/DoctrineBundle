@@ -14,6 +14,6 @@ branches:
 maintained_branches:
     - "2.15.x"
     - "2.16.x"
-doc_dir: { "2.12.x": "docs/", "2.13.x": "docs/en/" }
+doc_dir: "docs/en/"
 current_branch: "2.15.x"
 dev_branch: "2.16.x"
