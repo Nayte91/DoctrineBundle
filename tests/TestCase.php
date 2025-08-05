@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibili
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\Configuration;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -15,8 +16,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use function class_exists;
+use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
+
+use const PHP_VERSION_ID;
 
 class TestCase extends BaseTestCase
 {
@@ -72,6 +76,8 @@ class TestCase extends BaseTestCase
                         ],
                     ],
                     'resolve_target_entities' => [UserInterface::class => 'stdClass'],
+                    /** @phpstan-ignore function.alreadyNarrowedType */
+                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
                 ],
             ],
         ], $container);

@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibili
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -22,8 +23,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use function class_exists;
 use function interface_exists;
+use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
+
+use const PHP_VERSION_ID;
 
 class ServiceRepositoryTest extends TestCase
 {
@@ -87,6 +91,8 @@ class ServiceRepositoryTest extends TestCase
                 'orm' => [
                     'report_fields_where_declared' => true,
                     'enable_lazy_ghost_objects' => true,
+                    /** @phpstan-ignore function.alreadyNarrowedType */
+                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
                     'mappings' => [
                         'RepositoryServiceBundle' => [
                             'type' => 'attribute',

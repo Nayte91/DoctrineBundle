@@ -60,12 +60,15 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(EntityManager::class, $container->get('doctrine.orm.entity_manager'));
         $this->assertInstanceOf(EventManager::class, $container->get('doctrine.orm.default_entity_manager.event_manager'));
         $this->assertInstanceOf(EventManager::class, $container->get('doctrine.dbal.event_manager'));
-        $this->assertInstanceOf(ProxyCacheWarmer::class, $container->get('doctrine.orm.proxy_cache_warmer'));
         $this->assertInstanceOf(ManagerRegistry::class, $container->get('doctrine'));
         $this->assertInstanceOf(UniqueEntityValidator::class, $container->get('doctrine.orm.validator.unique'));
         $this->assertInstanceOf(InfoCommand::class, $container->get('doctrine.mapping_info_command'));
         $this->assertInstanceOf(MappingDescribeCommand::class, $container->get('doctrine.mapping_describe_command'));
         $this->assertInstanceOf(UpdateCommand::class, $container->get('doctrine.schema_update_command'));
+
+        if (! $container->getParameter('doctrine.orm.enable_native_lazy_objects')) {
+            $this->assertInstanceOf(ProxyCacheWarmer::class, $container->get('doctrine.orm.proxy_cache_warmer'));
+        }
 
         $this->assertTrue(Type::hasType('test'));
 

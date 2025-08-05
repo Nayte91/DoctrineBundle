@@ -587,6 +587,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
                     'Native lazy objects are not supported with your installed version of the ORM. Please upgrade to "doctrine/orm:^3.4".',
                 );
             }
+
+            $container->removeDefinition('doctrine.orm.proxy_cache_warmer');
         } elseif (! class_exists(AnnotationDriver::class)) {
             // Only emit the deprecation notice for ORM 3 users
             trigger_deprecation('doctrine/doctrine-bundle', '2.16', 'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.');

@@ -3,6 +3,7 @@
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\ORM\Configuration;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -11,8 +12,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 
 use function md5;
+use function method_exists;
 use function mt_rand;
 use function sys_get_temp_dir;
+
+use const PHP_VERSION_ID;
 
 class TestKernel extends Kernel
 {
@@ -51,6 +55,8 @@ class TestKernel extends Kernel
                     'report_fields_where_declared' => true,
                     'auto_generate_proxy_classes' => true,
                     'enable_lazy_ghost_objects' => true,
+                    /** @phpstan-ignore function.alreadyNarrowedType */
+                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
                     'mappings' => [
                         'RepositoryServiceBundle' => [
                             'type' => 'attribute',

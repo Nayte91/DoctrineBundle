@@ -1,2 +1,3 @@
 %"doctrine.orm.controller_resolver.auto_mapping" will be changed from `true` to `false`.%
 %Enabling the controller resolver automapping feature has been deprecated.%
+%Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.%
