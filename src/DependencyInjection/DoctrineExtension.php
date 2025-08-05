@@ -18,6 +18,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
+use Doctrine\ORM\Configuration as ORMConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Id\AbstractIdGenerator;
@@ -71,8 +72,10 @@ use Symfony\Component\VarExporter\ProxyHelper;
 use function array_intersect_key;
 use function array_keys;
 use function array_merge;
+use function assert;
 use function class_exists;
 use function interface_exists;
+use function is_bool;
 use function is_dir;
 use function method_exists;
 use function reset;
@@ -577,7 +580,19 @@ class DoctrineExtension extends AbstractDoctrineExtension
             trigger_deprecation('doctrine/doctrine-bundle', '2.11', 'Not setting "doctrine.orm.enable_lazy_ghost_objects" to true is deprecated.');
         }
 
-        $options = ['auto_generate_proxy_classes', 'enable_lazy_ghost_objects', 'proxy_dir', 'proxy_namespace'];
+        if ($config['enable_native_lazy_objects'] ?? false) {
+            /** @phpstan-ignore function.alreadyNarrowedType */
+            if (! method_exists(ORMConfiguration::class, 'enableNativeLazyObjects')) {
+                throw new LogicException(
+                    'Native lazy objects are not supported with your installed version of the ORM. Please upgrade to "doctrine/orm:^3.4".',
+                );
+            }
+        } elseif (! class_exists(AnnotationDriver::class)) {
+            // Only emit the deprecation notice for ORM 3 users
+            trigger_deprecation('doctrine/doctrine-bundle', '2.16', 'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.');
+        }
+
+        $options = ['auto_generate_proxy_classes', 'enable_lazy_ghost_objects', 'enable_native_lazy_objects', 'proxy_dir', 'proxy_namespace'];
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.' . $key, $config[$key]);
         }
@@ -703,11 +718,15 @@ class DoctrineExtension extends AbstractDoctrineExtension
         ];
 
         if (PHP_VERSION_ID >= 80400 && class_exists(LegacyReflectionFields::class)) {
-            $methods['enableNativeLazyObjects'] = $entityManager['enable_native_lazy_objects'];
+            $enableNativeLazyObjects = $container->getParameter('doctrine.orm.enable_native_lazy_objects');
+
+            assert(is_bool($enableNativeLazyObjects));
+
+            $methods['enableNativeLazyObjects'] = $enableNativeLazyObjects;
 
             // Do not set deprecated proxy configurations when native lazy objects are enabled with `doctrine/orm:^3.5`
             /** @phpstan-ignore function.alreadyNarrowedType */
-            if ($entityManager['enable_native_lazy_objects'] && method_exists(ORMSetup::class, 'createAttributeMetadataConfig')) {
+            if ($enableNativeLazyObjects && method_exists(ORMSetup::class, 'createAttributeMetadataConfig')) {
                 unset(
                     $methods['setProxyDir'],
                     $methods['setProxyNamespace'],
