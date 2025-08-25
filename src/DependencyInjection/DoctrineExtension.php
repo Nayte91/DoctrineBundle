@@ -588,6 +588,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 );
             }
 
+            if (PHP_VERSION_ID < 80400) {
+                throw new LogicException('Using native lazy objects require PHP 8.4 or higher.');
+            }
+
             $container->removeDefinition('doctrine.orm.proxy_cache_warmer');
         } elseif (! class_exists(AnnotationDriver::class)) {
             // Only emit the deprecation notice for ORM 3 users
