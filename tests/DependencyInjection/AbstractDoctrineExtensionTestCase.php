@@ -1509,10 +1509,9 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires PHP 8.3 or less');
         }
 
-        $container     = $this->loadContainer('orm_native_lazy_objects_enable');
-        $entityManager = $container->get('doctrine.orm.entity_manager');
-
-        $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Using native lazy objects requires PHP 8.4 or higher.');
+        $this->loadContainer('orm_native_lazy_objects_enable');
     }
 
     /** @param list<string> $bundles */

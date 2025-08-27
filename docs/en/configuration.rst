@@ -220,6 +220,8 @@ Configuration Reference
                 proxy_namespace:              Proxies
                 # Enables the new implementation of proxies based on lazy ghosts instead of using the legacy implementation
                 enable_lazy_ghost_objects:    false
+                # Enables the new native implementation of PHP lazy objects instead of generated proxies
+                enable_native_lazy_objects:   false
                 identity_generation_preferences:
                     Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
 
@@ -257,8 +259,6 @@ Configuration Reference
                         class_metadata_factory_name:  Doctrine\ORM\Mapping\ClassMetadataFactory
                         default_repository_class:     Doctrine\ORM\EntityRepository
                         auto_mapping:                 false
-                        # Opt-in to PHP native lazy objects
-                        enable_native_lazy_objects:   false
                         # Opt-in to new mapping driver mode as of Doctrine ORM 2.16, https://github.com/doctrine/orm/pull/10455
                         report_fields_where_declared: false
                         # 0pt-in to the new mapping driver mode as of Doctrine ORM 2.14. See https://github.com/doctrine/orm/pull/6728.

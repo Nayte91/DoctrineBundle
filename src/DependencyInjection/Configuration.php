@@ -428,6 +428,7 @@ class Configuration implements ConfigurationInterface
             'default_entity_manager' => true,
             'auto_generate_proxy_classes' => true,
             'enable_lazy_ghost_objects' => true,
+            'enable_native_lazy_objects' => true,
             'proxy_dir' => true,
             'proxy_namespace' => true,
             'resolve_target_entities' => true,
@@ -505,6 +506,10 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('enable_lazy_ghost_objects')
                             ->defaultValue(! method_exists(ProxyFactory::class, 'resetUninitializedProxy'))
                             ->info('Enables the new implementation of proxies based on lazy ghosts instead of using the legacy implementation')
+                        ->end()
+                        ->booleanNode('enable_native_lazy_objects')
+                            ->defaultFalse()
+                            ->info('Enables the new native implementation of PHP lazy objects instead of generated proxies')
                         ->end()
                         ->scalarNode('proxy_dir')
                             ->defaultValue('%kernel.build_dir%/doctrine/orm/Proxies')
@@ -658,10 +663,6 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('class_metadata_factory_name')->defaultValue(ClassMetadataFactory::class)->end()
                     ->scalarNode('default_repository_class')->defaultValue(EntityRepository::class)->end()
                     ->scalarNode('auto_mapping')->defaultFalse()->end()
-                    ->booleanNode('enable_native_lazy_objects')
-                        ->defaultFalse()
-                        ->info('Enables the new native implementation of PHP lazy objects instead of generated proxies')
-                    ->end()
                     ->scalarNode('naming_strategy')->defaultValue('doctrine.orm.naming_strategy.default')->end()
                     ->scalarNode('quote_strategy')->defaultValue('doctrine.orm.quote_strategy.default')->end()
                     ->scalarNode('typed_field_mapper')->defaultValue('doctrine.orm.typed_field_mapper.default')->end()
