@@ -230,7 +230,7 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('doctrine.orm.naming_strategy.underscore_number_aware', param('doctrine.orm.naming_strategy.underscore.class'))
             ->args([
-                'CASE_LOWER',
+                CASE_LOWER,
                 true,
             ])
 
