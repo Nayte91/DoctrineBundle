@@ -7,14 +7,11 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
-use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 
 use function array_intersect_key;
 
 class ConnectionFactoryTest extends TestCase
 {
-    use VerifyDeprecations;
-
     private Configuration $configuration;
 
     protected function setUp(): void
@@ -58,29 +55,6 @@ class ConnectionFactoryTest extends TestCase
         $this->assertSame(
             'utf8mb4_unicode_ci',
             $connection->getParams()['defaultTableOptions']['collation'],
-        );
-    }
-
-    /** @group legacy */
-    public function testCollateMapsToCollationForMySql(): void
-    {
-        $factory = new ConnectionFactory([]);
-        $this->expectDeprecationWithIdentifier(
-            'https://github.com/doctrine/dbal/issues/5214',
-        );
-        $connection = $factory->createConnection(
-            [
-                'driver' => 'pdo_mysql',
-                'defaultTableOptions' => ['collate' => 'my_collation'],
-            ],
-            $this->configuration,
-        );
-
-        $tableOptions = $connection->getParams()['defaultTableOptions'];
-        $this->assertArrayNotHasKey('collate', $tableOptions);
-        $this->assertSame(
-            'my_collation',
-            $tableOptions['collation'],
         );
     }
 

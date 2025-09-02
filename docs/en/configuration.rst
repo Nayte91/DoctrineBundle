@@ -135,7 +135,6 @@ Configuration Reference
                             # Affects schema-tool. If absent, DBAL chooses defaults
                             # based on the platform. Examples here are for MySQL.
                             # charset:      utf8mb4
-                            # collate:      utf8mb4_unicode_ci # When using doctrine/dbal 2.x
                             # collation:    utf8mb4_unicode_ci # When using doctrine/dbal 3.x
                             # engine:       InnoDB
 
@@ -447,9 +446,6 @@ Configuration Reference
 
                         <!-- example -->
                         <doctrine:default-table-option name="charset">utf8mb4</doctrine:default-table-option>
-                        <!-- when using doctrine/dbal 2.x -->
-                        <doctrine:default-table-option name="collate">utf8mb4_unicode_ci</doctrine:default-table-option>
-                        <!-- when using doctrine/dbal 3.x -->
                         <doctrine:default-table-option name="collation">utf8_unicode_ci</doctrine:default-table-option>
                         <doctrine:default-table-option name="engine">InnoDB</doctrine:default-table-option>
 
@@ -896,8 +892,7 @@ can configure. The following block shows all possible configuration keys:
                     # based on the platform. These defaults might be
                     # sub-optimal for backward compatibility reasons.
                     charset:              utf8mb4
-                    collate:              utf8mb4_unicode_ci # when using doctrine/dbal 2.x
-                    collation:            utf8mb4_unicode_ci # when using doctrine/dbal 3.x
+                    collation:            utf8mb4_unicode_ci
                     engine:               InnoDB
 
     .. code-block:: xml
@@ -982,9 +977,6 @@ can configure. The following block shows all possible configuration keys:
                     <doctrine:option key="foo">bar</doctrine:option>
                     <doctrine:mapping-type name="enum">string</doctrine:mapping-type>
                     <doctrine:default-table-option name="charset">utf8mb4</doctrine:default-table-option>
-                    <!-- when using doctrine/dbal 2.x -->
-                    <doctrine:default-table-option name="collate">utf8mb4_unicode_ci</doctrine:default-table-option>
-                    <!-- when using doctrine/dbal 3.x -->
                     <doctrine:default-table-option name="collation">utf8_unicode_ci</doctrine:default-table-option>
                     <doctrine:default-table-option name="engine">InnoDB</doctrine:default-table-option>
                     <doctrine:type name="custom">Acme\HelloBundle\MyCustomType</doctrine:type>
