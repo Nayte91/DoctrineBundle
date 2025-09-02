@@ -4,6 +4,10 @@ UPGRADE FROM 2.x to 3.0
 Configuration
 -------------
 
+### The `doctrine.dbal.default_table_options.collate` default table option is removed
+
+Use `doctrine.dbal.default_table_options.collation` instead.
+
 ### Controller resolver auto mapping can no longer be configured
 
 The `doctrine.orm.controller_resolver.auto_mapping` option now only accepts `false` as value, to disallow the usage of the controller resolver auto mapping feature by default. The configuration option will be fully removed in 4.0.

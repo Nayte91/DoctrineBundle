@@ -26,7 +26,6 @@ use function assert;
 use function class_exists;
 use function constant;
 use function count;
-use function defined;
 use function implode;
 use function in_array;
 use function is_array;
@@ -186,10 +185,6 @@ class Configuration implements ConfigurationInterface
 
         $this->configureDbalDriverNode($connectionNode);
 
-        $collationKey = defined('Doctrine\DBAL\Connection::PARAM_ASCII_STR_ARRAY')
-            ? 'collate'
-            : 'collation';
-
         $connectionNode
             ->fixXmlConfig('option')
             ->fixXmlConfig('mapping_type')
@@ -239,10 +234,9 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('default_table_options')
-                ->info(sprintf(
-                    "This option is used by the schema-tool and affects generated SQL. Possible keys include 'charset','%s', and 'engine'.",
-                    $collationKey,
-                ))
+                ->info(
+                    "This option is used by the schema-tool and affects generated SQL. Possible keys include 'charset','collation', and 'engine'.",
+                )
                     ->useAttributeAsKey('name')
                     ->prototype('scalar')->end()
                 ->end()
