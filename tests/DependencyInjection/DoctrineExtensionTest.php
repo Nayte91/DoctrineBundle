@@ -6,16 +6,10 @@ use Closure;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\Bundle\DoctrineBundle\CacheWarmer\DoctrineMetadataCacheWarmer;
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibilityPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\Builder\BundleConfigurationBuilder;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EntityListener;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EventListener;
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Cache\MemcacheCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Cache\CacheConfiguration;
 use Doctrine\ORM\Cache\DefaultCacheFactory;
@@ -433,21 +427,6 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals(Configuration::class, $container->getParameter('doctrine.orm.configuration.class'));
         $this->assertEquals(EntityManager::class, $container->getParameter('doctrine.orm.entity_manager.class'));
         $this->assertEquals('Proxies', $container->getParameter('doctrine.orm.proxy_namespace'));
-        /** @psalm-suppress UndefinedClass Remove in doctrine/doctrine-bundle 3.0 */
-        /* @phpstan-ignore class.notFound */
-        $this->assertEquals(ArrayCache::class, $container->getParameter('doctrine.orm.cache.array.class'));
-        /** @psalm-suppress UndefinedClass Remove in doctrine/doctrine-bundle 3.0 */
-        /* @phpstan-ignore class.notFound */
-        $this->assertEquals(ApcCache::class, $container->getParameter('doctrine.orm.cache.apc.class'));
-        /** @psalm-suppress UndefinedClass Remove in doctrine/doctrine-bundle 3.0 */
-        /* @phpstan-ignore class.notFound */
-        $this->assertEquals(MemcacheCache::class, $container->getParameter('doctrine.orm.cache.memcache.class'));
-        $this->assertEquals('localhost', $container->getParameter('doctrine.orm.cache.memcache_host'));
-        $this->assertEquals('11211', $container->getParameter('doctrine.orm.cache.memcache_port'));
-        $this->assertEquals('Memcache', $container->getParameter('doctrine.orm.cache.memcache_instance.class'));
-        /** @psalm-suppress UndefinedClass Remove in doctrine/doctrine-bundle 3.0 */
-        /* @phpstan-ignore class.notFound */
-        $this->assertEquals(XcacheCache::class, $container->getParameter('doctrine.orm.cache.xcache.class'));
         $this->assertEquals(MappingDriverChain::class, $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
         /* @phpstan-ignore class.notFound */
         $this->assertEquals(AnnotationDriver::class, $container->getParameter('doctrine.orm.metadata.annotation.class'));
@@ -1576,10 +1555,6 @@ class DoctrineExtensionTest extends TestCase
         $container->setDefinition('cache.system', (new Definition(ArrayAdapter::class))->setPublic(true));
         $container->setDefinition('cache.app', (new Definition(ArrayAdapter::class))->setPublic(true));
         $container->setDefinition('my_pool', (new Definition(ArrayAdapter::class))->setPublic(true));
-        $container->setDefinition('my_cache', (new Definition(Cache::class))->setPublic(true));
-        $container->setDefinition('service_target_metadata', (new Definition(Cache::class))->setPublic(true));
-        $container->setDefinition('service_target_query', (new Definition(Cache::class))->setPublic(true));
-        $container->setDefinition('service_target_result', (new Definition(Cache::class))->setPublic(true));
         $container->setDefinition('service_target_metadata_psr6', (new Definition(ArrayAdapter::class))->setPublic(true));
 
         return $container;
@@ -1643,7 +1618,6 @@ class DoctrineExtensionTest extends TestCase
     {
         $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
-        $container->addCompilerPass(new CacheCompatibilityPass());
         $container->compile();
     }
 }

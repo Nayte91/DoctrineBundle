@@ -3,18 +3,15 @@
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\Dbal\BlacklistSchemaAssetFilter;
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibilityPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DbalSchemaFilterPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\InvokableEntityListener;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
-use Doctrine\ORM\Configuration as OrmConfiguration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -780,50 +777,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             'cacheGetter' => 'getMetadataCache',
         ];
 
-        yield 'metadata_cache_service_doctrine' => [
-            'expectedClass' => ArrayAdapter::class,
-            'entityManagerName' => 'metadata_cache_service_doctrine',
-            'cacheGetter' => 'getMetadataCache',
-        ];
-
-        if (method_exists(OrmConfiguration::class, 'getQueryCacheImpl')) {
-            yield 'query_cache_pool' => [
-                'expectedClass' => DoctrineProvider::class,
-                'entityManagerName' => 'query_cache_pool',
-                'cacheGetter' => 'getQueryCacheImpl',
-            ];
-
-            yield 'query_cache_service_psr6' => [
-                'expectedClass' => DoctrineProvider::class,
-                'entityManagerName' => 'query_cache_service_psr6',
-                'cacheGetter' => 'getQueryCacheImpl',
-            ];
-
-            yield 'query_cache_service_doctrine' => [
-                'expectedClass' => DoctrineProvider::class,
-                'entityManagerName' => 'query_cache_service_doctrine',
-                'cacheGetter' => 'getQueryCacheImpl',
-            ];
-
-            yield 'result_cache_pool' => [
-                'expectedClass' => DoctrineProvider::class,
-                'entityManagerName' => 'result_cache_pool',
-                'cacheGetter' => 'getResultCacheImpl',
-            ];
-
-            yield 'result_cache_service_psr6' => [
-                'expectedClass' => DoctrineProvider::class,
-                'entityManagerName' => 'result_cache_service_psr6',
-                'cacheGetter' => 'getResultCacheImpl',
-            ];
-
-            yield 'result_cache_service_doctrine' => [
-                'expectedClass' => DoctrineProvider::class,
-                'entityManagerName' => 'result_cache_service_doctrine',
-                'cacheGetter' => 'getResultCacheImpl',
-            ];
-        }
-
         yield 'second_level_cache_pool' => [
             'expectedClass' => null,
             'entityManagerName' => 'second_level_cache_pool',
@@ -833,12 +786,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         yield 'second_level_cache_service_psr6' => [
             'expectedClass' => null,
             'entityManagerName' => 'second_level_cache_service_psr6',
-            'cacheGetter' => null,
-        ];
-
-        yield 'second_level_cache_service_doctrine' => [
-            'expectedClass' => null,
-            'entityManagerName' => 'second_level_cache_service_doctrine',
             'cacheGetter' => null,
         ];
     }
@@ -1678,7 +1625,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $passConfig = $container->getCompilerPassConfig();
         $passConfig->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
         $passConfig->setRemovingPasses([]);
-        $passConfig->addPass(new CacheCompatibilityPass());
         $container->compile();
     }
 }
