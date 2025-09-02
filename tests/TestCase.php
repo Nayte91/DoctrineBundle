@@ -2,7 +2,6 @@
 
 namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibilityPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -90,7 +89,6 @@ class TestCase extends BaseTestCase
 
         $compilerPassConfig->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
         $compilerPassConfig->setRemovingPasses([]);
-        $compilerPassConfig->addPass(new CacheCompatibilityPass());
         // make all Doctrine services public, so we can fetch them in the test
         $compilerPassConfig->addPass(new TestCaseAllPublicCompilerPass());
         $container->compile();

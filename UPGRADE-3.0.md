@@ -1,6 +1,12 @@
 UPGRADE FROM 2.x to 3.0
 =======================
 
+Compatibility
+-------------
+
+Configuring caching options to use services backed by `doctrine/cache` is no
+longer supported. Migrate to PSR-6 services instead.
+
 Configuration
 -------------
 

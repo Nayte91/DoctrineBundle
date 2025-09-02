@@ -2,7 +2,6 @@
 
 namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibilityPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -113,7 +112,6 @@ class ServiceRepositoryTest extends TestCase
         $def->setAutoconfigured(true);
 
         $container->addCompilerPass(new ServiceRepositoryCompilerPass());
-        $container->addCompilerPass(new CacheCompatibilityPass());
         $container->compile();
 
         $em = $container->get('doctrine.orm.default_entity_manager');

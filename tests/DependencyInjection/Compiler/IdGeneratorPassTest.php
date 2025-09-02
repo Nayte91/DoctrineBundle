@@ -2,7 +2,6 @@
 
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Compiler;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibilityPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\IdGeneratorPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\CustomIdGenerator;
@@ -102,7 +101,6 @@ class IdGeneratorPassTest extends TestCase
 
         $def->setAutoconfigured(true);
 
-        $container->addCompilerPass(new CacheCompatibilityPass());
         $container->addCompilerPass(new IdGeneratorPass());
         $container->compile();
 
