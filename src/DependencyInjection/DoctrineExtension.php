@@ -505,19 +505,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $controllerResolverDefaults['disabled'] = true;
         }
 
-        if ($config['controller_resolver']['auto_mapping'] === null) {
-            trigger_deprecation('doctrine/doctrine-bundle', '2.12', 'The default value of "doctrine.orm.controller_resolver.auto_mapping" will be changed from `true` to `false`. Explicitly configure `true` to keep existing behaviour.');
-            $config['controller_resolver']['auto_mapping'] = true;
-        }
-
-        if ($config['controller_resolver']['auto_mapping'] === true) {
-            trigger_deprecation('doctrine/doctrine-bundle', '2.13', 'Enabling the controller resolver automapping feature has been deprecated. Symfony Mapped Route Parameters should be used as replacement.');
-        }
-
-        if (! $config['controller_resolver']['auto_mapping']) {
-            $controllerResolverDefaults['mapping'] = [];
-        }
-
         if ($config['controller_resolver']['evict_cache']) {
             $controllerResolverDefaults['evict_cache'] = true;
         }
@@ -527,7 +514,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             null,
             null,
             null,
-            $controllerResolverDefaults['mapping'] ?? null,
+            null,
             null,
             null,
             null,

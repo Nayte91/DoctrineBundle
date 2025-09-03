@@ -1478,7 +1478,6 @@ class DoctrineExtensionTest extends TestCase
             $config['orm'] = [];
         }
 
-        $config['orm']['controller_resolver']     = ['auto_mapping' => true];
         $config['orm']['resolve_target_entities'] = ['Throwable' => 'stdClass'];
 
         $extension->load([$config], $container);
@@ -1506,14 +1505,13 @@ class DoctrineExtensionTest extends TestCase
 
         $config['orm']['controller_resolver'] = [
             'enabled' => false,
-            'auto_mapping' => false,
             'evict_cache' => true,
         ];
         $extension->load([$config], $container);
 
         $container->setDefinition('controller_resolver_defaults', $container->getDefinition('doctrine.orm.entity_value_resolver')->getArgument(2))->setPublic(true);
         $container->compile();
-        $this->assertEquals(new MapEntity(null, null, null, [], null, null, null, true, true), $container->get('controller_resolver_defaults'));
+        $this->assertEquals(new MapEntity(null, null, null, null, null, null, null, true, true), $container->get('controller_resolver_defaults'));
     }
 
     // phpcs:enable
