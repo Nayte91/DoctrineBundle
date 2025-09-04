@@ -35,8 +35,6 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Proxy\Autoloader;
 use Doctrine\ORM\Proxy\ProxyFactory;
-use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
-use Doctrine\ORM\Tools\Console\Command\EnsureProductionSettingsCommand;
 use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
@@ -524,15 +522,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         // Symfony 7.3 and higher expose type alias support in the EntityValueResolver
         $valueResolverDefinition->setArgument(3, $config['resolve_target_entities']);
-
-        // not available in Doctrine ORM 3.0 and higher
-        if (! class_exists(ConvertMappingCommand::class)) {
-            $container->removeDefinition('doctrine.mapping_convert_command');
-        }
-
-        if (! class_exists(EnsureProductionSettingsCommand::class)) {
-            $container->removeDefinition('doctrine.ensure_production_settings_command');
-        }
 
         if (! class_exists(ClassMetadataExporter::class)) {
             $container->removeDefinition('doctrine.mapping_import_command');
