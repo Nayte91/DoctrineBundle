@@ -3,7 +3,6 @@
 namespace Doctrine\Bundle\DoctrineBundle\DependencyInjection;
 
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
-use Doctrine\Deprecations\Deprecation;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -669,26 +668,6 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('repository_factory')->defaultValue('doctrine.orm.container_repository_factory')->end()
                     ->arrayNode('schema_ignore_classes')
                         ->prototype('scalar')->end()
-                    ->end()
-                    ->booleanNode('report_fields_where_declared')
-                        ->beforeNormalization()
-                            ->ifTrue(static fn ($v): bool => isset($v))
-                            ->then(static function ($v) {
-                                Deprecation::trigger(
-                                    'doctrine/doctrine-bundle',
-                                    'https://github.com/doctrine/DoctrineBundle/pull/1962',
-                                    'The "report_fields_where_declared" configuration option is deprecated and will be removed in DoctrineBundle 3.0. When using ORM 3, report_fields_where_declared will always be true.',
-                                );
-
-                                return $v;
-                            })
-                        ->end()
-                        ->defaultValue(true)
-                        ->info('Set to "true" to opt-in to the new mapping driver mode that was added in Doctrine ORM 2.16 and will be mandatory in ORM 3.0. See https://github.com/doctrine/orm/pull/10455.')
-                        ->validate()
-                            ->ifTrue(static fn (bool $v): bool => ! $v)
-                            ->thenInvalid('The setting "report_fields_where_declared" cannot be disabled for ORM 3.')
-                        ->end()
                     ->end()
                     ->booleanNode('validate_xml_mapping')->defaultFalse()->info('Set to "true" to opt-in to the new mapping driver mode that was added in Doctrine ORM 2.14 and will be mandatory in ORM 3.0. See https://github.com/doctrine/orm/pull/6728.')->end()
                 ->end()

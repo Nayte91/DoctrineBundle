@@ -41,6 +41,10 @@ and does not have a replacement.
 Configuration
 -------------
 
+### The `doctrine.orm.entity_managers.some_em.report_fields_where_declared` configuration option has been removed
+
+This option is a no-op when using `doctrine/orm` 3 and has been removed.
+
 ### The `doctrine.dbal.default_table_options.collate` default table option is removed
 
 Use `doctrine.dbal.default_table_options.collation` instead.

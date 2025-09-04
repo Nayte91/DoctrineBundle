@@ -871,14 +871,12 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $mappingService   = $this->getObjectManagerElementName($entityManager['name'] . '_' . $driverType . '_metadata_driver');
             $mappingDriverDef = $container->getDefinition($mappingService);
             $args             = $mappingDriverDef->getArguments();
-            if ($driverType === 'attribute') {
-                $args[1] = $entityManager['report_fields_where_declared'];
-            } elseif ($driverType === 'xml') {
-                $args[1] ??= SimplifiedXmlDriver::DEFAULT_FILE_EXTENSION;
-                $args[2]   = $entityManager['validate_xml_mapping'];
-            } else {
+            if ($driverType !== 'xml') {
                 continue;
             }
+
+            $args[1] ??= SimplifiedXmlDriver::DEFAULT_FILE_EXTENSION;
+            $args[2]   = $entityManager['validate_xml_mapping'];
 
             $mappingDriverDef->setArguments($args);
         }
