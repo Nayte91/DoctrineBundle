@@ -6,8 +6,7 @@ parameters:
       - tests
 
    ignoreErrors:
-    # Available in doctrine/persistence < 4 only
-    - message: '#((Annotation|SimplifiedYaml)Driver|(ConvertMapping|EnsureProductionSettings)Command|ManagerRegistry)#'
+    - message: '#(Annotation|SimplifiedYaml)Driver#'
       identifier: class.notFound
     # phpstan has no array shape intersection support https://github.com/phpstan/phpstan/issues/12414
     - message: '#unresolvable type.#'

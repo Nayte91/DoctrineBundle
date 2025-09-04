@@ -12,7 +12,6 @@ use Doctrine\Bundle\DoctrineBundle\Dbal\ManagerRegistryAwareConnectionProvider;
 use Doctrine\Bundle\DoctrineBundle\Dbal\SchemaAssetsFilterManager;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension;
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
@@ -36,7 +35,6 @@ return static function (ContainerConfigurator $container): void {
 
         ->alias(Connection::class, 'database_connection')
         ->alias(ManagerRegistry::class, 'doctrine')
-        ->alias(LegacyManagerRegistry::class, 'doctrine')
 
         ->set('data_collector.doctrine', param('doctrine.data_collector.class'))
             ->args([
