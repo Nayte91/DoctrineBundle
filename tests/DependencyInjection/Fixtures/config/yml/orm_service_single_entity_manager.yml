@@ -18,4 +18,4 @@ doctrine:
                 connection: default
                 default_repository_class: Acme\Doctrine\Repository
                 mappings:
-                    YamlBundle: ~
+                    XmlBundle: ~

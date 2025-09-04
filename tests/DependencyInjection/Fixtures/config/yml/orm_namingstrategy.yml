@@ -10,9 +10,9 @@ doctrine:
         entity_managers:
             em1:
                 mappings:
-                    YamlBundle: ~
+                    XmlBundle: ~
                 naming_strategy: doctrine.orm.naming_strategy.default
             em2:
                 mappings:
-                    YamlBundle: ~
+                    XmlBundle: ~
                 naming_strategy: doctrine.orm.naming_strategy.underscore

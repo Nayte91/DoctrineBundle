@@ -13,7 +13,7 @@
 
         <orm default-entity-manager="default">
             <entity-manager name="default" typed-field-mapper="doctrine.orm.typed_field_mapper.default">
-                <mapping name="YamlBundle" />
+                <mapping name="XmlBundle" />
             </entity-manager>
         </orm>
     </config>
