@@ -5,9 +5,25 @@ on:
   pull_request:
     branches:
       - "*.x"
+    paths:
+      - .github/workflows/continuous-integration.yml
+      - config/**
+      - composer.*
+      - phpunit.xml.dist
+      - src/**
+      - templates/**
+      - tests/**
   push:
     branches:
       - "*.x"
+    paths:
+      - .github/workflows/continuous-integration.yml
+      - config/**
+      - composer.*
+      - phpunit.xml.dist
+      - src/**
+      - templates/**
+      - tests/**
 
 jobs:
   phpunit:

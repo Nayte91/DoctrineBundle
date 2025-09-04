@@ -126,7 +126,7 @@ class DoctrineExtensionTest extends TestCase
         }
 
         $container = $this->getContainer([
-            'YamlBundle',
+            'NewXmlBundle',
             'XmlBundle',
         ]);
         $extension = new DoctrineExtension();
@@ -136,10 +136,10 @@ class DoctrineExtensionTest extends TestCase
             ->addEntityManager([
                 'entity_managers' => [
                     'default' => [
-                        'mappings' => ['YamlBundle' => []],
+                        'mappings' => ['XmlBundle' => []],
                     ],
                     'purchase_logs' => [
-                        'mappings' => ['XmlBundle' => []],
+                        'mappings' => ['NewXmlBundle' => []],
                     ],
                 ],
             ])
@@ -258,12 +258,9 @@ class DoctrineExtensionTest extends TestCase
             [
                 [
                     'em1' => [
-                        'mappings' => ['YamlBundle' => null],
-                    ],
-                    'em2' => [
                         'mappings' => ['XmlBundle' => null],
                     ],
-                    'em3' => [
+                    'em2' => [
                         'mappings' => ['NewXmlBundle' => null],
                     ],
                 ],
@@ -272,9 +269,6 @@ class DoctrineExtensionTest extends TestCase
                 [
                     'em1' => ['auto_mapping' => true],
                     'em2' => [
-                        'mappings' => ['XmlBundle' => null],
-                    ],
-                    'em3' => [
                         'mappings' => ['NewXmlBundle' => null],
                     ],
                 ],
@@ -283,12 +277,9 @@ class DoctrineExtensionTest extends TestCase
                 [
                     'em1' => [
                         'auto_mapping' => true,
-                        'mappings' => ['YamlBundle' => null],
-                    ],
-                    'em2' => [
                         'mappings' => ['XmlBundle' => null],
                     ],
-                    'em3' => [
+                    'em2' => [
                         'mappings' => ['NewXmlBundle' => null],
                     ],
                 ],
@@ -310,7 +301,6 @@ class DoctrineExtensionTest extends TestCase
         $extension = new DoctrineExtension();
 
         $container = self::getContainer([
-            'YamlBundle',
             'XmlBundle',
             'NewXmlBundle',
         ]);
@@ -333,13 +323,12 @@ class DoctrineExtensionTest extends TestCase
 
         $configEm1 = $container->getDefinition('doctrine.orm.em1_configuration');
         $configEm2 = $container->getDefinition('doctrine.orm.em2_configuration');
-        $configEm3 = $container->getDefinition('doctrine.orm.em3_configuration');
 
         self::assertContains(
             [
                 'setEntityNamespaces',
                 [
-                    ['YamlBundle' => 'Fixtures\Bundles\YamlBundle\Entity'],
+                    ['XmlBundle' => 'Fixtures\Bundles\XmlBundle\Entity'],
                 ],
             ],
             $configEm1->getMethodCalls(),
@@ -349,20 +338,10 @@ class DoctrineExtensionTest extends TestCase
             [
                 'setEntityNamespaces',
                 [
-                    ['XmlBundle' => 'Fixtures\Bundles\XmlBundle\Entity'],
-                ],
-            ],
-            $configEm2->getMethodCalls(),
-        );
-
-        self::assertContains(
-            [
-                'setEntityNamespaces',
-                [
                     ['NewXmlBundle' => 'Fixtures\Bundles\NewXmlBundle\Entity'],
                 ],
             ],
-            $configEm3->getMethodCalls(),
+            $configEm2->getMethodCalls(),
         );
     }
 
@@ -448,7 +427,7 @@ class DoctrineExtensionTest extends TestCase
                 'default_entity_manager' => 'default',
                 'entity_managers' => [
                     'default' => [
-                        'mappings' => ['YamlBundle' => []],
+                        'mappings' => ['XmlBundle' => []],
                     ],
                 ],
             ])
@@ -487,7 +466,7 @@ class DoctrineExtensionTest extends TestCase
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $calls      = array_values($definition->getMethodCalls());
-        $this->assertEquals(['YamlBundle' => 'Fixtures\Bundles\YamlBundle\Entity'], $calls[0][1][0]);
+        $this->assertEquals(['XmlBundle' => 'Fixtures\Bundles\XmlBundle\Entity'], $calls[0][1][0]);
         $this->assertEquals('doctrine.orm.default_metadata_cache', (string) $calls[1][1][0]);
         $this->assertEquals('doctrine.orm.default_query_cache', (string) $calls[2][1][0]);
         $this->assertEquals('doctrine.orm.default_result_cache', (string) $calls[3][1][0]);
@@ -566,7 +545,7 @@ class DoctrineExtensionTest extends TestCase
                 'default_entity_manager' => 'default',
                 'entity_managers' => [
                     'default' => [
-                        'mappings' => ['YamlBundle' => []],
+                        'mappings' => ['XmlBundle' => []],
                     ],
                 ],
             ])
@@ -669,7 +648,7 @@ class DoctrineExtensionTest extends TestCase
                 'regions' => [
                     'hour_region' => ['lifetime' => 3600],
                 ],
-                'factory' => 'YamlBundle\Cache\MyCacheFactory',
+                'factory' => 'XmlBundle\Cache\MyCacheFactory',
             ])
             ->build();
 
@@ -686,7 +665,7 @@ class DoctrineExtensionTest extends TestCase
         ]);
 
         $slcDefinition = $container->getDefinition('doctrine.orm.default_second_level_cache.default_cache_factory');
-        $this->assertEquals('YamlBundle\Cache\MyCacheFactory', $slcDefinition->getClass());
+        $this->assertEquals('XmlBundle\Cache\MyCacheFactory', $slcDefinition->getClass());
     }
 
     public function testBundleEntityAliases(): void
@@ -701,14 +680,14 @@ class DoctrineExtensionTest extends TestCase
         $config        = BundleConfigurationBuilder::createBuilder()
              ->addBaseConnection()
              ->build();
-        $config['orm'] = ['default_entity_manager' => 'default', 'entity_managers' => ['default' => ['mappings' => ['YamlBundle' => []]]]];
+        $config['orm'] = ['default_entity_manager' => 'default', 'entity_managers' => ['default' => ['mappings' => ['XmlBundle' => []]]]];
         $extension->load([$config], $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce(
             $definition,
             'setEntityNamespaces',
-            [['YamlBundle' => 'Fixtures\Bundles\YamlBundle\Entity']],
+            [['XmlBundle' => 'Fixtures\Bundles\XmlBundle\Entity']],
         );
     }
 
@@ -724,14 +703,14 @@ class DoctrineExtensionTest extends TestCase
         $config        = BundleConfigurationBuilder::createBuilder()
              ->addBaseConnection()
              ->build();
-        $config['orm'] = ['default_entity_manager' => 'default', 'entity_managers' => ['default' => ['mappings' => ['YamlBundle' => ['alias' => 'yml']]]]];
+        $config['orm'] = ['default_entity_manager' => 'default', 'entity_managers' => ['default' => ['mappings' => ['XmlBundle' => ['alias' => 'xml']]]]];
         $extension->load([$config], $container);
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $this->assertDICDefinitionMethodCallOnce(
             $definition,
             'setEntityNamespaces',
-            [['yml' => 'Fixtures\Bundles\YamlBundle\Entity']],
+            [['xml' => 'Fixtures\Bundles\XmlBundle\Entity']],
         );
     }
 
@@ -745,7 +724,7 @@ class DoctrineExtensionTest extends TestCase
         $extension = new DoctrineExtension();
 
         $extension->load([
-            ['dbal' => [], 'orm' => ['default_entity_manager' => 'app', 'entity_managers' => ['app' => ['mappings' => ['YamlBundle' => ['alias' => 'yml']]]]]],
+            ['dbal' => [], 'orm' => ['default_entity_manager' => 'app', 'entity_managers' => ['app' => ['mappings' => ['XmlBundle' => ['alias' => 'xml']]]]]],
             ['orm' => ['metadata_cache_driver' => ['type' => 'pool', 'pool' => 'doctrine.system_cache_pool']]],
         ], $container);
 
@@ -763,7 +742,16 @@ class DoctrineExtensionTest extends TestCase
 
         $config = BundleConfigurationBuilder::createBuilder()
             ->addBaseConnection()
-            ->addBaseEntityManager()
+            ->addEntityManager([
+                'default_entity_manager' => 'default',
+                'entity_managers' => [
+                    'default' => [
+                        'mappings' => [
+                            'YamlBundle' => [],
+                        ],
+                    ],
+                ],
+            ])
             ->build();
         $extension->load([$config], $container);
 
@@ -1482,7 +1470,7 @@ class DoctrineExtensionTest extends TestCase
     // phpcs:enable
 
     /** @param list<string> $bundles */
-    private static function getContainer(array $bundles = ['YamlBundle'], string $vendor = ''): ContainerBuilder
+    private static function getContainer(array $bundles = ['XmlBundle'], string $vendor = ''): ContainerBuilder
     {
         $map         = [];
         $metadataMap = [];
