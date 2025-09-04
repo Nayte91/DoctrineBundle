@@ -24,7 +24,6 @@ use Doctrine\ORM\Id\AbstractIdGenerator;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\PHPDriver as LegacyPHPDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
-use Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver;
 use Doctrine\ORM\Mapping\Driver\StaticPHPDriver as LegacyStaticPHPDriver;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
@@ -840,11 +839,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *  doctrine.orm:
      *     mappings:
      *         MyBundle1: ~
-     *         MyBundle2: yml
+     *         MyBundle2: xml
      *         MyBundle3: { type: xml, dir: Resources/config/doctrine/mapping }
      *         MyBundle4: { type: attribute, dir: Entities/ }
      *         MyBundle5:
-     *             type: yml
+     *             type: xml
      *             dir: bundle-mappings/
      *             alias: BundleAlias
      *         arbitrary_key:
@@ -1155,10 +1154,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
             case 'xml':
                 return SimplifiedXmlDriver::class;
-
-            case 'yml':
-                /* @phpstan-ignore class.notFound */
-                return SimplifiedYamlDriver::class;
 
             case 'php':
                 /* @phpstan-ignore class.notFound */

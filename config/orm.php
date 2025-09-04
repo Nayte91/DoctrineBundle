@@ -22,7 +22,6 @@ use Doctrine\ORM\Mapping\DefaultQuoteStrategy;
 use Doctrine\ORM\Mapping\DefaultTypedFieldMapper;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
-use Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\Tools\AttachEntityListenersListener;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\CollectionRegionCommand;
@@ -67,7 +66,6 @@ return static function (ContainerConfigurator $container): void {
         // metadata drivers
         ->set('doctrine.orm.metadata.driver_chain.class', MappingDriverChain::class)
         ->set('doctrine.orm.metadata.xml.class', SimplifiedXmlDriver::class)
-        ->set('doctrine.orm.metadata.yml.class', SimplifiedYamlDriver::class)
         ->set('doctrine.orm.metadata.php.class', PHPDriver::class)
         ->set('doctrine.orm.metadata.staticphp.class', StaticPHPDriver::class)
         ->set('doctrine.orm.metadata.attribute.class', AttributeDriver::class)

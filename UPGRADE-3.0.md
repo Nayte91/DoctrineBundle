@@ -22,6 +22,8 @@ More details below
 This makes `DisconnectedMetadataFactory` redundant, as it relies on code
 available only in `doctrine/orm` 2. It has been removed.
 
+Support for the YML and annotation metadata drivers has been dropped.
+
 Commands
 --------
 

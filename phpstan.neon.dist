@@ -6,8 +6,6 @@ parameters:
       - tests
 
    ignoreErrors:
-    - message: '#(Annotation|SimplifiedYaml)Driver#'
-      identifier: class.notFound
     # phpstan has no array shape intersection support https://github.com/phpstan/phpstan/issues/12414
     - message: '#unresolvable type.#'
       path: src/DataCollector/DoctrineDataCollector.php
