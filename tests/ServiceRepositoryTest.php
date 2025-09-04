@@ -4,7 +4,6 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -20,7 +19,6 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
-use function class_exists;
 use function interface_exists;
 use function method_exists;
 use function sys_get_temp_dir;
@@ -63,17 +61,12 @@ class ServiceRepositoryTest extends TestCase
             'debug.file_link_format' => null,
         ]));
 
-        if (class_exists(AnnotationReader::class)) {
-            $container->set('annotation_reader', new AnnotationReader());
-        }
-
         $extension = new FrameworkExtension();
         $container->registerExtension($extension);
         $extension->load([
             'framework' => [
                 'http_method_override' => false,
                 'php_errors' => ['log' => true],
-                'annotations' => ['enabled' => false],
                 'handle_all_throwables' => true,
             ],
         ], $container);

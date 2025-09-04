@@ -72,7 +72,6 @@ class IdGeneratorPassTest extends TestCase
         $extension->load([
             'framework' => [
                 'http_method_override' => false,
-                'annotations' => ['enabled' => false],
                 'php_errors' => ['log' => true],
                 'handle_all_throwables' => true,
             ],

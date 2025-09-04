@@ -15,7 +15,6 @@ use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Doctrine\ORM\Proxy\ProxyFactory;
@@ -560,7 +559,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             [
                 __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'Bundles' . DIRECTORY_SEPARATOR . 'AttributesBundle' . DIRECTORY_SEPARATOR . 'Entity',
             ],
-            ! class_exists(AnnotationDriver::class),
+            true,
         ]);
 
         $ymlDef = $container->getDefinition('doctrine.orm.default_yml_metadata_driver');
@@ -927,10 +926,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
     {
         if (! interface_exists(EntityManagerInterface::class)) {
             self::markTestSkipped('This test requires ORM');
-        }
-
-        if (class_exists(AnnotationDriver::class)) {
-            self::markTestSkipped('This test requires ORM 3.');
         }
 
         $this->expectException(InvalidConfigurationException::class);

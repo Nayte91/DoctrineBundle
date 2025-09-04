@@ -20,7 +20,6 @@ use Doctrine\ORM\Mapping\AnsiQuoteStrategy;
 use Doctrine\ORM\Mapping\DefaultNamingStrategy;
 use Doctrine\ORM\Mapping\DefaultQuoteStrategy;
 use Doctrine\ORM\Mapping\DefaultTypedFieldMapper;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver;
@@ -67,7 +66,6 @@ return static function (ContainerConfigurator $container): void {
 
         // metadata drivers
         ->set('doctrine.orm.metadata.driver_chain.class', MappingDriverChain::class)
-        ->set('doctrine.orm.metadata.annotation.class', AnnotationDriver::class)
         ->set('doctrine.orm.metadata.xml.class', SimplifiedXmlDriver::class)
         ->set('doctrine.orm.metadata.yml.class', SimplifiedYamlDriver::class)
         ->set('doctrine.orm.metadata.php.class', PHPDriver::class)
@@ -117,8 +115,6 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
 
         ->alias(EntityManagerInterface::class, 'doctrine.orm.entity_manager')
-
-        ->alias('doctrine.orm.metadata.annotation_reader', 'annotation_reader')
 
         ->set('doctrine.orm.proxy_cache_warmer', param('doctrine.orm.proxy_cache_warmer.class'))
             ->tag('kernel.cache_warmer')
