@@ -7,6 +7,14 @@ Compatibility
 Configuring caching options to use services backed by `doctrine/cache` is no
 longer supported. Migrate to PSR-6 services instead.
 
+Support for the following major versions of the following packages has been dropped:
+
+- `doctrine/dbal` 3
+- `doctrine/persistence` 3
+- `doctrine/orm` 2
+- `psr/log` 1 and 2
+- `twig/twig` 2
+
 Configuration
 -------------
 
