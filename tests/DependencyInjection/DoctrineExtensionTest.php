@@ -22,7 +22,6 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver;
@@ -428,8 +427,6 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals(EntityManager::class, $container->getParameter('doctrine.orm.entity_manager.class'));
         $this->assertEquals('Proxies', $container->getParameter('doctrine.orm.proxy_namespace'));
         $this->assertEquals(MappingDriverChain::class, $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
-        /* @phpstan-ignore class.notFound */
-        $this->assertEquals(AnnotationDriver::class, $container->getParameter('doctrine.orm.metadata.annotation.class'));
         $this->assertEquals(SimplifiedXmlDriver::class, $container->getParameter('doctrine.orm.metadata.xml.class'));
         /* @phpstan-ignore class.notFound */
         $this->assertEquals(SimplifiedYamlDriver::class, $container->getParameter('doctrine.orm.metadata.yml.class'));
@@ -901,38 +898,6 @@ class DoctrineExtensionTest extends TestCase
                 break;
             }
         }
-    }
-
-    public function testAnnotationsBundleMappingDetectionWithVendorNamespace(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        $container = $this->getContainer(['AnnotationsBundle'], 'Vendor');
-        $extension = new DoctrineExtension();
-
-        $config = BundleConfigurationBuilder::createBuilder()
-            ->addBaseConnection()
-            ->addEntityManager([
-                'default_entity_manager' => 'default',
-                'entity_managers' => [
-                    'default' => [
-                        'mappings' => [
-                            'AnnotationsBundle' => [],
-                        ],
-                    ],
-                ],
-            ])
-            ->build();
-        $extension->load([$config], $container);
-
-        $calls = $container->getDefinition('doctrine.orm.default_metadata_driver')->getMethodCalls();
-        $this->assertEquals(
-            sprintf('doctrine.orm.default_%s_metadata_driver', 'attribute'),
-            (string) $calls[0][1][0],
-        );
-        $this->assertEquals('Fixtures\Bundles\Vendor\AnnotationsBundle\Entity', $calls[0][1][1]);
     }
 
     public function testMessengerIntegration(): void

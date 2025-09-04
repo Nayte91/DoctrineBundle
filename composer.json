@@ -43,7 +43,6 @@
         "symfony/service-contracts": "^3"
     },
     "require-dev": {
-        "doctrine/annotations": "^2",
         "doctrine/coding-standard": "^13",
         "doctrine/deprecations": "^1.0",
         "doctrine/orm": "^3.1",
@@ -69,7 +68,6 @@
         "twig/twig": "^3.0.4"
     },
     "conflict": {
-        "doctrine/annotations": ">=3.0",
         "doctrine/orm": "<3.0 || >=4.0",
         "symfony/var-exporter": "< 6.4.1 || 7.0.0",
         "twig/twig": "<3.0.4"

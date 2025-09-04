@@ -13,7 +13,6 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\IdGeneratorPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
 use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
@@ -22,7 +21,6 @@ use Doctrine\ORM\Configuration as ORMConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Id\AbstractIdGenerator;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\PHPDriver as LegacyPHPDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
@@ -481,10 +479,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $container->getDefinition('form.type.entity')->addTag('kernel.reset', ['method' => 'reset']);
         }
 
-        if (! class_exists(Annotation::class)) {
-            $container->removeAlias('doctrine.orm.metadata.annotation_reader');
-        }
-
         if (! class_exists(UlidGenerator::class)) {
             $container->removeDefinition('doctrine.ulid_generator');
         }
@@ -569,7 +563,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             }
 
             $container->removeDefinition('doctrine.orm.proxy_cache_warmer');
-        } elseif (! class_exists(AnnotationDriver::class)) {
+        } else {
             // Only emit the deprecation notice for ORM 3 users
             trigger_deprecation('doctrine/doctrine-bundle', '2.16', 'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.');
         }
@@ -847,10 +841,9 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *     mappings:
      *         MyBundle1: ~
      *         MyBundle2: yml
-     *         MyBundle3: { type: annotation, dir: Entities/ }
-     *         MyBundle4: { type: xml, dir: Resources/config/doctrine/mapping }
-     *         MyBundle5: { type: attribute, dir: Entities/ }
-     *         MyBundle6:
+     *         MyBundle3: { type: xml, dir: Resources/config/doctrine/mapping }
+     *         MyBundle4: { type: attribute, dir: Entities/ }
+     *         MyBundle5:
      *             type: yml
      *             dir: bundle-mappings/
      *             alias: BundleAlias
@@ -878,9 +871,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $mappingService   = $this->getObjectManagerElementName($entityManager['name'] . '_' . $driverType . '_metadata_driver');
             $mappingDriverDef = $container->getDefinition($mappingService);
             $args             = $mappingDriverDef->getArguments();
-            if ($driverType === 'annotation') {
-                $args[2] = $entityManager['report_fields_where_declared'];
-            } elseif ($driverType === 'attribute') {
+            if ($driverType === 'attribute') {
                 $args[1] = $entityManager['report_fields_where_declared'];
             } elseif ($driverType === 'xml') {
                 $args[1] ??= SimplifiedXmlDriver::DEFAULT_FILE_EXTENSION;
@@ -1161,13 +1152,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
         switch ($driverType) {
             case 'driver_chain':
                 return MappingDriverChain::class;
-
-            case 'annotation':
-                if (! class_exists(AnnotationDriver::class)) {
-                    throw new LogicException('The annotation driver is only available in doctrine/orm v2.');
-                }
-
-                return AnnotationDriver::class;
 
             case 'xml':
                 return SimplifiedXmlDriver::class;

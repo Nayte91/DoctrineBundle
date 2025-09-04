@@ -4,7 +4,6 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType;
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Configuration;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -14,7 +13,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use function class_exists;
 use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
@@ -36,10 +34,6 @@ class TestCase extends BaseTestCase
             'kernel.bundles_metadata' => [],
             'container.build_id' => uniqid(),
         ]));
-
-        if (class_exists(AnnotationReader::class)) {
-            $container->set('annotation_reader', new AnnotationReader());
-        }
 
         $extension = new DoctrineExtension();
         $container->registerExtension($extension);

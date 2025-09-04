@@ -3,7 +3,6 @@
 namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\Orm\ManagerRegistryAwareEntityManagerProvider;
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Connection;
@@ -37,10 +36,6 @@ class ContainerTest extends TestCase
         }
 
         $container = $this->createXmlBundleTestContainer();
-
-        if (interface_exists(Reader::class)) {
-            $this->assertInstanceOf(Reader::class, $container->get('doctrine.orm.metadata.annotation_reader'));
-        }
 
         if (class_exists(EntityValueResolver::class)) {
             $this->assertInstanceOf(EntityValueResolver::class, $container->get('doctrine.orm.entity_value_resolver'));
