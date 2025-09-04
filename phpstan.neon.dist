@@ -9,8 +9,6 @@ parameters:
     # Available in DBAL < 4 only
     - message: '#((Mysql|Oracle)SessionInit|LegacySchemaManagerFactory)#'
       identifier: class.notFound
-    # Available in ORM < 3 only
-    - '#Doctrine\\ORM\\Tools\\DisconnectedClassMetadataFactory.#'
     # Available in doctrine/persistence < 4 only
     - message: '#((Annotation|SimplifiedYaml)Driver|(ConvertMapping|EnsureProductionSettings)Command|ManagerRegistry)#'
       identifier: class.notFound
