@@ -681,7 +681,7 @@ Oracle DB
 
 If the environment format configured in oracle does not meet doctrine requirements,
 you need to use a middleware so that doctrine is aware of the format
-used by Oracle DB. With ``doctrine/dbal``, the same could be done with
+used by Oracle DB. With ``doctrine/dbal`` 3, the same could be done with
 an event listener.
 
 You can do so easily with
@@ -689,12 +689,12 @@ You can do so easily with
 .. code-block:: yaml
 
     services:
-        # DBAL 3
+        # DBAL 4
         oracle.middleware:
             class: Doctrine\DBAL\Driver\OCI8\Middleware\InitializeSession
             tags:
                 - { name: doctrine.middleware, connection: default }
-        # DBAL 2
+        # DBAL 3
         oracle.listener:
             class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
             tags:
