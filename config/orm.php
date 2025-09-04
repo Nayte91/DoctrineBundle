@@ -26,7 +26,6 @@ use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\Tools\AttachEntityListenersListener;
-use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\CollectionRegionCommand;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\EntityRegionCommand;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\MetadataCommand;
@@ -40,6 +39,7 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand;
 use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
 use Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand;
 use Doctrine\ORM\Tools\Console\Command\ValidateSchemaCommand;
+use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
 use Doctrine\Persistence\Mapping\Driver\StaticPHPDriver;
@@ -56,6 +56,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Bridge\Doctrine\Validator\DoctrineInitializer;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
+use const CASE_LOWER;
 
 return static function (ContainerConfigurator $container): void {
     $container->parameters()
@@ -110,8 +112,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('doctrine.orm.second_level_cache.logger_chain.class', CacheLoggerChain::class)
         ->set('doctrine.orm.second_level_cache.logger_statistics.class', StatisticsCacheLogger::class)
         ->set('doctrine.orm.second_level_cache.cache_configuration.class', CacheConfiguration::class)
-        ->set('doctrine.orm.second_level_cache.regions_configuration.class', RegionsConfiguration::class)
-    ;
+        ->set('doctrine.orm.second_level_cache.regions_configuration.class', RegionsConfiguration::class);
 
     $container->services()
 
@@ -320,7 +321,5 @@ return static function (ContainerConfigurator $container): void {
             ->args([
                 service('doctrine.orm.command.entity_manager_provider'),
             ])
-            ->tag('console.command', ['command' => 'doctrine:schema:validate'])
-
-        ;
+            ->tag('console.command', ['command' => 'doctrine:schema:validate']);
 };

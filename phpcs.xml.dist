@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<ruleset>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         name="PHP_CodeSniffer"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
     <arg name="basepath" value="."/>
     <arg name="extensions" value="php"/>
     <arg name="parallel" value="80"/>
@@ -11,6 +13,7 @@
 
     <config name="php_version" value="80100"/>
 
+    <file>config</file>
     <file>src</file>
     <file>tests</file>
 

@@ -35,8 +35,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('doctrine.dbal.events.oracle_session_init.class', OracleSessionInit::class)
         ->set('doctrine.class', Registry::class)
         ->set('doctrine.entity_managers', [])
-        ->set('doctrine.default_entity_manager', null)
-    ;
+        ->set('doctrine.default_entity_manager', null);
 
     $container->services()
 
@@ -48,7 +47,7 @@ return static function (ContainerConfigurator $container): void {
             ->args([
                 service('doctrine'),
                 true,
-                service('doctrine.debug_data_holder')->nullOnInvalid()
+                service('doctrine.debug_data_holder')->nullOnInvalid(),
             ])
             ->tag('data_collector', ['template' => '@Doctrine/Collector/db.html.twig', 'id' => 'db', 'priority' => 250])
 
@@ -133,7 +132,5 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('doctrine.dbal.default_schema_manager_factory', DefaultSchemaManagerFactory::class)
 
-        ->set('doctrine.dbal.legacy_schema_manager_factory', LegacySchemaManagerFactory::class)
-
-        ;
+        ->set('doctrine.dbal.legacy_schema_manager_factory', LegacySchemaManagerFactory::class);
 };
