@@ -8,4 +8,4 @@ doctrine:
     orm:
         default_entity_manager: default
         mappings:
-            YamlBundle: ~
+            XmlBundle: ~

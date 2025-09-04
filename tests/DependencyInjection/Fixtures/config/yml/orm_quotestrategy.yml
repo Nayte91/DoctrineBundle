@@ -10,9 +10,9 @@ doctrine:
         entity_managers:
             em1:
                 mappings:
-                    YamlBundle: ~
+                    XmlBundle: ~
                 quote_strategy: doctrine.orm.quote_strategy.default
             em2:
                 mappings:
-                    YamlBundle: ~
+                    XmlBundle: ~
                 quote_strategy: doctrine.orm.quote_strategy.ansi
