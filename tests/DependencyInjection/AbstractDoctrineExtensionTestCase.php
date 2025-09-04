@@ -14,6 +14,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
+use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\ORM\Configuration as OrmConfiguration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -60,6 +61,8 @@ use const PHP_VERSION_ID;
 
 abstract class AbstractDoctrineExtensionTestCase extends TestCase
 {
+    use VerifyDeprecations;
+
     abstract protected function loadFromFile(ContainerBuilder $container, string $file): void;
 
     public function testDbalLoadFromXmlMultipleConnections(): void
@@ -966,6 +969,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->loadContainer('orm_no_lazy_ghost');
     }
 
+    /** @group legacy */
     public function testDisablingReportFieldsWhereDeclaredOnOrm3Throws(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -979,6 +983,35 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "doctrine.orm.entity_managers.default.report_fields_where_declared": The setting "report_fields_where_declared" cannot be disabled for ORM 3.');
         $this->loadContainer('orm_no_report_fields');
+    }
+
+    /** @group legacy */
+    public function testEnablingReportFieldsWhereDeclaredOnOrm3IsDeprecated(): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        if (class_exists(AnnotationDriver::class)) {
+            self::markTestSkipped('This test requires ORM 3.');
+        }
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/1962');
+        $this->loadContainer('orm_report_fields');
+    }
+
+    public function testEnablingReportFieldsWhereDeclaredOnOrm2IsFine(): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        if (! class_exists(AnnotationDriver::class)) {
+            self::markTestSkipped('This test requires ORM 2.');
+        }
+
+        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/1962');
+        $this->loadContainer('orm_report_fields');
     }
 
     public function testResolveTargetEntity(): void
