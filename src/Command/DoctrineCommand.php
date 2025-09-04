@@ -4,7 +4,6 @@ namespace Doctrine\Bundle\DoctrineBundle\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\EntityGenerator;
 use Doctrine\Persistence\ManagerRegistry;
 use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
@@ -22,24 +21,6 @@ abstract class DoctrineCommand extends Command
         private readonly ManagerRegistry $doctrine,
     ) {
         parent::__construct();
-    }
-
-    /**
-     * get a doctrine entity generator
-     *
-     * @return EntityGenerator
-     */
-    protected function getEntityGenerator()
-    {
-        $entityGenerator = new EntityGenerator();
-        $entityGenerator->setGenerateAnnotations(false);
-        $entityGenerator->setGenerateStubMethods(true);
-        $entityGenerator->setRegenerateEntityIfExists(false);
-        $entityGenerator->setUpdateEntityIfExists(true);
-        $entityGenerator->setNumSpaces(4);
-        $entityGenerator->setAnnotationPrefix('ORM\\');
-
-        return $entityGenerator;
     }
 
     /**
