@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Doctrine\Bundle\DoctrineBundle\Command\ImportMappingDoctrineCommand;
 use Doctrine\Bundle\DoctrineBundle\ManagerConfigurator;
 use Doctrine\Bundle\DoctrineBundle\Mapping\ContainerEntityListenerResolver;
 use Doctrine\Bundle\DoctrineBundle\Orm\ManagerRegistryAwareEntityManagerProvider;
@@ -34,8 +33,6 @@ use Doctrine\ORM\Tools\Console\Command\ClearCache\MetadataCommand;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\QueryCommand;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\QueryRegionCommand;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\ResultCommand;
-use Doctrine\ORM\Tools\Console\Command\ConvertMappingCommand;
-use Doctrine\ORM\Tools\Console\Command\EnsureProductionSettingsCommand;
 use Doctrine\ORM\Tools\Console\Command\InfoCommand;
 use Doctrine\ORM\Tools\Console\Command\MappingDescribeCommand;
 use Doctrine\ORM\Tools\Console\Command\RunDqlCommand;
@@ -271,12 +268,6 @@ return static function (ContainerConfigurator $container): void {
             ])
             ->tag('console.command', ['command' => 'doctrine:cache:clear-collection-region'])
 
-        ->set('doctrine.mapping_convert_command', ConvertMappingCommand::class)
-            ->args([
-                service('doctrine.orm.command.entity_manager_provider'),
-            ])
-            ->tag('console.command', ['command' => 'doctrine:mapping:convert'])
-
         ->set('doctrine.schema_create_command', CreateCommand::class)
             ->args([
                 service('doctrine.orm.command.entity_manager_provider'),
@@ -288,12 +279,6 @@ return static function (ContainerConfigurator $container): void {
                 service('doctrine.orm.command.entity_manager_provider'),
             ])
             ->tag('console.command', ['command' => 'doctrine:schema:drop'])
-
-        ->set('doctrine.ensure_production_settings_command', EnsureProductionSettingsCommand::class)
-            ->args([
-                service('doctrine.orm.command.entity_manager_provider'),
-            ])
-            ->tag('console.command', ['command' => 'doctrine:ensure-production-settings'])
 
         ->set('doctrine.clear_entity_region_command', EntityRegionCommand::class)
             ->args([
@@ -336,13 +321,6 @@ return static function (ContainerConfigurator $container): void {
                 service('doctrine.orm.command.entity_manager_provider'),
             ])
             ->tag('console.command', ['command' => 'doctrine:schema:validate'])
-
-        ->set('doctrine.mapping_import_command', ImportMappingDoctrineCommand::class)
-            ->args([
-                service('doctrine'),
-                param('kernel.bundles'),
-            ])
-            ->tag('console.command', ['command' => 'doctrine:mapping:import'])
 
         ;
 };

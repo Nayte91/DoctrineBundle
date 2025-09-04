@@ -15,6 +15,26 @@ Support for the following major versions of the following packages has been drop
 - `psr/log` 1 and 2
 - `twig/twig` 2
 
+More details below
+
+### Support for `doctrine/dbal` 3 is dropped
+
+Commands
+--------
+
+All command _classes_ in the `Doctrine\Bundle\DoctrineBundle\Command\Proxy`
+namespace have been removed. Use the original commands provided by Doctrine
+DBAL and ORM directly.
+
+`doctrine:query:sql` has been removed. Use `dbal:run-sql` instead. All other
+commands use the original command classes directly.
+
+`doctrine:mapping:convert` and `doctrine:ensure-production-settings` have been
+removed and do not have replacements.
+
+`Doctrine\Bundle\DoctrineBundle\Command\ImportMappingCommand` has been removed
+and does not have a replacement.
+
 Configuration
 -------------
 

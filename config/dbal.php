@@ -4,7 +4,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\Bundle\DoctrineBundle\Command\CreateDatabaseDoctrineCommand;
 use Doctrine\Bundle\DoctrineBundle\Command\DropDatabaseDoctrineCommand;
-use Doctrine\Bundle\DoctrineBundle\Command\Proxy\RunSqlDoctrineCommand;
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\Controller\ProfilerController;
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
@@ -110,12 +109,6 @@ return static function (ContainerConfigurator $container): void {
                 service('doctrine'),
             ])
             ->tag('console.command', ['command' => 'doctrine:database:drop'])
-
-        ->set('doctrine.query_sql_command', RunSqlDoctrineCommand::class)
-            ->args([
-                service(ManagerRegistryAwareConnectionProvider::class)->nullOnInvalid(),
-            ])
-            ->tag('console.command', ['command' => 'doctrine:query:sql'])
 
         ->set(RunSqlCommand::class)
             ->args([
