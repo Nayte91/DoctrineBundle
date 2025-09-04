@@ -13,7 +13,7 @@
 
         <orm default-entity-manager="default">
             <entity-manager name="default">
-                <mapping name="YamlBundle" />
+                <mapping name="XmlBundle" />
                 <dql>
                     <string-function name="test_string">Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestStringFunction</string-function>
                     <numeric-function name="test_numeric">Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestNumericFunction</numeric-function>

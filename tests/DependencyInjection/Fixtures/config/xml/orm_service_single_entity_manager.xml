@@ -26,7 +26,7 @@
                 auto-generate-proxy-classes="true"
             >
             <entity-manager name="default" connection="default" default-repository-class="Acme\Doctrine\Repository">
-                <mapping name="YamlBundle" />
+                <mapping name="XmlBundle" />
             </entity-manager>
         </orm>
     </config>

@@ -16,7 +16,7 @@
             default-entity-manager="default"
         >
             <entity-manager name="default">
-                <mapping name="YamlBundle" />
+                <mapping name="XmlBundle" />
             </entity-manager>
         </orm>
     </config>
