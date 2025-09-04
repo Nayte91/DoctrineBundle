@@ -39,7 +39,7 @@ class BundleConfigurationBuilder
             'entity_managers' => [
                 'default' => [
                     'mappings' => [
-                        'YamlBundle' => [],
+                        'XmlBundle' => [],
                     ],
                 ],
             ],
