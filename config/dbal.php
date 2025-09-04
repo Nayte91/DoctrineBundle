@@ -15,10 +15,7 @@ use Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension;
 use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Event\Listeners\MysqlSessionInit;
-use Doctrine\DBAL\Event\Listeners\OracleSessionInit;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
-use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
 use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
 use Doctrine\DBAL\Tools\DsnParser;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,8 +28,6 @@ return static function (ContainerConfigurator $container): void {
         ->set('doctrine.data_collector.class', DoctrineDataCollector::class)
         ->set('doctrine.dbal.connection.event_manager.class', ContainerAwareEventManager::class)
         ->set('doctrine.dbal.connection_factory.class', ConnectionFactory::class)
-        ->set('doctrine.dbal.events.mysql_session_init.class', MysqlSessionInit::class)
-        ->set('doctrine.dbal.events.oracle_session_init.class', OracleSessionInit::class)
         ->set('doctrine.class', Registry::class)
         ->set('doctrine.entity_managers', [])
         ->set('doctrine.default_entity_manager', null);
@@ -130,7 +125,5 @@ return static function (ContainerConfigurator $container): void {
             ])
             ->tag('kernel.event_subscriber')
 
-        ->set('doctrine.dbal.default_schema_manager_factory', DefaultSchemaManagerFactory::class)
-
-        ->set('doctrine.dbal.legacy_schema_manager_factory', LegacySchemaManagerFactory::class);
+        ->set('doctrine.dbal.default_schema_manager_factory', DefaultSchemaManagerFactory::class);
 };
