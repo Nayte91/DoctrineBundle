@@ -12,7 +12,7 @@
         </dbal>
 
         <orm default-entity-manager="default">
-            <mapping name="YamlBundle" />
+            <mapping name="XmlBundle" />
         </orm>
     </config>
 </srv:container>

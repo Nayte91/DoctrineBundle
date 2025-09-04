@@ -10,5 +10,5 @@ doctrine:
         entity_managers:
             default:
                 mappings:
-                    YamlBundle: ~
+                    XmlBundle: ~
                 typed_field_mapper: doctrine.orm.typed_field_mapper.default

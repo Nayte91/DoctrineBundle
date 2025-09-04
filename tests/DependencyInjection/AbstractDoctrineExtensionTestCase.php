@@ -549,8 +549,8 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         ]);
 
         $this->assertDICDefinitionMethodCallAt(1, $definition, 'addDriver', [
-            new Reference('doctrine.orm.default_yml_metadata_driver'),
-            'Fixtures\Bundles\YamlBundle\Entity',
+            new Reference('doctrine.orm.default_xml_metadata_driver'),
+            'Fixtures\Bundles\XmlBundle\Entity',
         ]);
 
         $this->assertDICDefinitionMethodCallAt(2, $definition, 'addDriver', [
@@ -564,11 +564,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
                 __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'Bundles' . DIRECTORY_SEPARATOR . 'AttributesBundle' . DIRECTORY_SEPARATOR . 'Entity',
             ],
             ! class_exists(AnnotationDriver::class),
-        ]);
-
-        $ymlDef = $container->getDefinition('doctrine.orm.default_yml_metadata_driver');
-        $this->assertDICConstructorArguments($ymlDef, [
-            [__DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'Bundles' . DIRECTORY_SEPARATOR . 'YamlBundle' . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'doctrine' => 'Fixtures\Bundles\YamlBundle\Entity'],
         ]);
 
         $xmlDef = $container->getDefinition('doctrine.orm.default_xml_metadata_driver');
@@ -599,18 +594,13 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         ]);
 
         $this->assertDICDefinitionMethodCallAt(0, $def2, 'addDriver', [
-            new Reference('doctrine.orm.em2_yml_metadata_driver'),
-            'Fixtures\Bundles\YamlBundle\Entity',
+            new Reference('doctrine.orm.em2_xml_metadata_driver'),
+            'Fixtures\Bundles\XmlBundle\Entity',
         ]);
 
         $this->assertDICDefinitionMethodCallAt(1, $def2, 'addDriver', [
             new Reference('doctrine.orm.em2_xml_metadata_driver'),
             'Fixtures\Bundles\XmlBundle',
-        ]);
-
-        $ymlDef = $container->getDefinition('doctrine.orm.em2_yml_metadata_driver');
-        $this->assertDICConstructorArguments($ymlDef, [
-            [__DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'Bundles' . DIRECTORY_SEPARATOR . 'YamlBundle' . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'doctrine' => 'Fixtures\Bundles\YamlBundle\Entity'],
         ]);
 
         $xmlDef = $container->getDefinition('doctrine.orm.em2_xml_metadata_driver');
@@ -1222,7 +1212,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->loadContainer('orm_entity_listener_resolver', ['YamlBundle'], new EntityListenerPass());
+        $container = $this->loadContainer('orm_entity_listener_resolver', ['XmlBundle'], new EntityListenerPass());
 
         $definition = $container->getDefinition('doctrine.orm.em1_configuration');
         $this->assertDICDefinitionMethodCallOnce($definition, 'setEntityListenerResolver', ['doctrine.orm.em1_entity_listener_resolver']);
@@ -1279,7 +1269,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->getContainer(['YamlBundle']);
+        $container = $this->getContainer(['XmlBundle']);
         $loader    = new DoctrineExtension();
         $container->registerExtension($loader);
         $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass('doctrine.connections', 'doctrine.dbal.%s_connection.event_manager', 'doctrine'));
@@ -1517,7 +1507,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
     /** @param list<string> $bundles */
     private function loadContainer(
         string $fixture,
-        array $bundles = ['YamlBundle'],
+        array $bundles = ['XmlBundle'],
         CompilerPassInterface|null $compilerPass = null,
     ): ContainerBuilder {
         $container = $this->getContainer($bundles);

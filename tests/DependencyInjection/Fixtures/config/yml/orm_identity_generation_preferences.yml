@@ -10,11 +10,11 @@ doctrine:
         entity_managers:
             em1:
                 mappings:
-                    YamlBundle: ~
+                    XmlBundle: ~
                 identity_generation_preferences:
                     Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
             em2:
                 mappings:
-                    YamlBundle: ~
+                    XmlBundle: ~
                 identity_generation_preferences:
                     Doctrine\DBAL\Platforms\PostgreSQLPlatform: sequence

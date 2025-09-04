@@ -10,9 +10,9 @@ doctrine:
         mappings:
             AttributesBundle:
                 type: attribute
-            YamlBundle:
+            XmlBundle:
                 dir: Resources/config/doctrine
-                alias: yml
+                alias: xml
             manual:
                 type: xml
                 prefix: Fixtures\Bundles\XmlBundle

@@ -13,10 +13,10 @@
 
         <orm default-entity-manager="em1">
             <entity-manager name="em1" naming-strategy="doctrine.orm.naming_strategy.default">
-                <mapping name="YamlBundle" />
+                <mapping name="XmlBundle" />
             </entity-manager>
             <entity-manager name="em2" naming-strategy="doctrine.orm.naming_strategy.underscore">
-                <mapping name="YamlBundle" />
+                <mapping name="XmlBundle" />
             </entity-manager>
         </orm>
     </config>

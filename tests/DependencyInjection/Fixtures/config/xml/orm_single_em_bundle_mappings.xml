@@ -13,7 +13,7 @@
 
         <orm validate-xml-mapping="true">
             <mapping name="AttributesBundle" type="attribute" />
-            <mapping name="YamlBundle" dir="Resources/config/doctrine" alias="yml" />
+            <mapping name="XmlBundle" dir="Resources/config/doctrine" alias="yml" />
             <mapping name="manual" type="xml" prefix="Fixtures\Bundles\XmlBundle"
                 dir="%kernel.root_dir%/tests/DependencyInjection/Fixtures/Bundles/XmlBundle/Resources/config/doctrine"
                 alias="TestAlias"
