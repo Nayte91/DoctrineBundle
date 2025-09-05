@@ -31,7 +31,6 @@ use function is_bool;
 use function is_int;
 use function is_string;
 use function key;
-use function method_exists;
 use function reset;
 use function sprintf;
 use function strlen;
@@ -496,7 +495,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->booleanNode('enable_lazy_ghost_objects')
-                            ->defaultValue(! method_exists(ProxyFactory::class, 'resetUninitializedProxy'))
+                            ->defaultValue(true)
                             ->info('Enables the new implementation of proxies based on lazy ghosts instead of using the legacy implementation')
                         ->end()
                         ->booleanNode('enable_native_lazy_objects')

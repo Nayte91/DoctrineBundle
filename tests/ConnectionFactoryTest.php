@@ -8,10 +8,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
-use InvalidArgumentException;
 
 use function array_intersect_key;
-use function method_exists;
 
 class ConnectionFactoryTest extends TestCase
 {
@@ -138,34 +136,6 @@ class ConnectionFactoryTest extends TestCase
 
         $this->assertSame('primary_test', $parsedParams['primary']['dbname']);
         $this->assertSame('replica_test', $parsedParams['replica']['replica1']['dbname']);
-    }
-
-    public function testItThrowsWhenPassingMappingTypesTwice(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        (new ConnectionFactory())->createConnection(['driver' => 'pdo_sqlite'], null, [], []);
-    }
-
-    /** @group legacy */
-    public function testPassingMappingTypesAsFourthArgumentIsDeprecatedWithDbal4(): void
-    {
-        if (method_exists(Connection::class, 'getEventManager')) {
-            $this->markTestSkipped('DBAL 3 does not trigger the deprecation.');
-        }
-
-        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/1976');
-        (new ConnectionFactory())->createConnection(['driver' => 'pdo_sqlite'], null, null, []);
-    }
-
-    public function testPassingMappingTypesAsFourthArgumentIsFineWithDbal3(): void
-    {
-        if (! method_exists(Connection::class, 'getEventManager')) {
-            $this->markTestSkipped('DBAL 4 triggers the deprecation.');
-        }
-
-        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/1976');
-        (new ConnectionFactory())->createConnection(['driver' => 'pdo_sqlite'], null, null, []);
     }
 }
 

@@ -441,10 +441,6 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals('localhost', $args[0]['host']);
         $this->assertEquals('root', $args[0]['user']);
         $this->assertEquals('doctrine.dbal.default_connection.configuration', (string) $args[1]);
-        if (method_exists(Connection::class, 'getEventManager')) {
-            $this->assertEquals('doctrine.dbal.default_connection.event_manager', (string) $args[2]);
-        }
-
         $this->assertCount(0, $definition->getMethodCalls());
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
@@ -513,16 +509,8 @@ class DoctrineExtensionTest extends TestCase
             ],
         ], $container);
 
-        $isUsingDBAL3 = method_exists(Connection::class, 'getEventManager');
-
         $calls = $container->getDefinition('doctrine.dbal.default_connection')->getMethodCalls();
-        $this->assertCount((int) $isUsingDBAL3, $calls);
-        if (! $isUsingDBAL3) {
-            return;
-        }
-
-        $this->assertEquals('setNestTransactionsWithSavepoints', $calls[0][0]);
-        $this->assertTrue($calls[0][1][0]);
+        $this->assertCount(0, $calls);
     }
 
     public function testAutoGenerateProxyClasses(): void

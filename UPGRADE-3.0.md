@@ -62,6 +62,17 @@ Auto mapping used any route parameter that matches with a field name of the Enti
 
 If you were relying on this functionality, you will need to update your code to use explicit mapped route parameters instead.
 
+ConnectionFactory::createConnection() signature change
+------------------------------------------------------
+
+The signature of `ConnectionFactory::createConnection()` changed.
+You should use stop passing an event manager argument.
+
+```diff
+- $connectionFactory->createConnection($params, $config, $eventManager, $mappingTypes)
++ $connectionFactory->createConnection($params, $config, $mappingTypes)
+```
+
 Types
 -----
 
