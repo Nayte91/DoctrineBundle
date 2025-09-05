@@ -15,10 +15,10 @@
             <srv:argument>3600</srv:argument>
         </srv:service>
 
-        <srv:service id="my_service_region_driver" class="Doctrine\Common\Cache\ArrayCache" />
+        <srv:service id="my_service_region_driver" class="Symfony\Component\Cache\Adapter\ArrayAdapter" />
 
         <srv:service id="my_factory_config" class="Doctrine\ORM\Cache\CacheConfiguration"/>
-        <srv:service id="my_factory_driver" class="Doctrine\Common\Cache\ArrayCache"/>
+        <srv:service id="my_factory_driver" class="Symfony\Component\Cache\Adapter\ArrayAdapter"/>
         <srv:service id="my_factory" class="Doctrine\ORM\Cache\DefaultCacheFactory">
             <srv:argument type="service" id="my_factory_config"/>
             <srv:argument type="service" id="my_factory_driver"/>
