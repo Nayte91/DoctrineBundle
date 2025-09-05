@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\QueryBuilder;
 use Fixtures\Bundles\RepositoryServiceBundle\Entity\TestCustomClassRepoEntity;
 use Fixtures\Bundles\RepositoryServiceBundle\Entity\TestCustomServiceRepoEntity;
@@ -19,6 +20,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
+use function class_exists;
 use function interface_exists;
 use function method_exists;
 use function sys_get_temp_dir;
@@ -81,7 +83,6 @@ class ServiceRepositoryTest extends TestCase
                     'schema_manager_factory' => 'doctrine.dbal.default_schema_manager_factory',
                 ],
                 'orm' => [
-                    'report_fields_where_declared' => true,
                     'enable_lazy_ghost_objects' => true,
                     /** @phpstan-ignore function.alreadyNarrowedType */
                     'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
@@ -92,7 +93,7 @@ class ServiceRepositoryTest extends TestCase
                             'prefix' => 'Fixtures\Bundles\RepositoryServiceBundle\Entity',
                         ],
                     ],
-                ],
+                ] + (class_exists(AnnotationDriver::class) ? ['report_fields_where_declared' => true] : []),
             ],
         ], $container);
 
