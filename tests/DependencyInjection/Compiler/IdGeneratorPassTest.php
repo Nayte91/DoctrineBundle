@@ -7,7 +7,6 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\CustomIdGenerator;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Fixtures\Bundles\AttributesBundle\AttributesBundle;
 use Fixtures\Bundles\AttributesBundle\Entity\TestCustomIdGeneratorEntity as AttributeCustomIdGeneratorEntity;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use function assert;
-use function class_exists;
 use function interface_exists;
 use function method_exists;
 use function sys_get_temp_dir;
@@ -93,7 +91,7 @@ class IdGeneratorPassTest extends TestCase
                     'enable_lazy_ghost_objects' => true,
                     /** @phpstan-ignore function.alreadyNarrowedType */
                     'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
-                ] + (class_exists(AnnotationDriver::class) ? ['report_fields_where_declared' => true] : []),
+                ],
             ],
         ], $container);
 

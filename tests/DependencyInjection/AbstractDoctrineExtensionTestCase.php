@@ -12,7 +12,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
-use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -28,7 +27,6 @@ use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListen
 use Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -57,8 +55,6 @@ use const PHP_VERSION_ID;
 
 abstract class AbstractDoctrineExtensionTestCase extends TestCase
 {
-    use VerifyDeprecations;
-
     abstract protected function loadFromFile(ContainerBuilder $container, string $file): void;
 
     public function testDbalLoadFromXmlMultipleConnections(): void
@@ -562,7 +558,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             [
                 __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'Bundles' . DIRECTORY_SEPARATOR . 'AttributesBundle' . DIRECTORY_SEPARATOR . 'Entity',
             ],
-            true,
         ]);
 
         $xmlDef = $container->getDefinition('doctrine.orm.default_xml_metadata_driver');
@@ -913,33 +908,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Lazy ghost objects cannot be disabled for ORM 3.');
         $this->loadContainer('orm_no_lazy_ghost');
-    }
-
-    /** @group legacy */
-    public function testDisablingReportFieldsWhereDeclaredOnOrm3Throws(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "doctrine.orm.entity_managers.default.report_fields_where_declared": The setting "report_fields_where_declared" cannot be disabled for ORM 3.');
-        $this->loadContainer('orm_no_report_fields');
-    }
-
-    /** @group legacy */
-    public function testEnablingReportFieldsWhereDeclaredOnOrm3IsDeprecated(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        if (class_exists(AnnotationDriver::class)) {
-            self::markTestSkipped('This test requires ORM 3.');
-        }
-
-        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/1962');
-        $this->loadContainer('orm_report_fields');
     }
 
     public function testResolveTargetEntity(): void

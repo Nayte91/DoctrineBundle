@@ -258,8 +258,6 @@ Configuration Reference
                         class_metadata_factory_name:  Doctrine\ORM\Mapping\ClassMetadataFactory
                         default_repository_class:     Doctrine\ORM\EntityRepository
                         auto_mapping:                 false
-                        # Opt-in to new mapping driver mode as of Doctrine ORM 2.16, https://github.com/doctrine/orm/pull/10455
-                        report_fields_where_declared: false
                         # 0pt-in to the new mapping driver mode as of Doctrine ORM 2.14. See https://github.com/doctrine/orm/pull/6728.
                         validate_xml_mapping: false
                         naming_strategy:              doctrine.orm.naming_strategy.default
@@ -513,7 +511,6 @@ Configuration Reference
                         class-metadata-factory-name="Doctrine\ORM\Mapping\ClassMetadataFactory"
                         default-repository-class="Doctrine\ORM\EntityRepository"
                         auto-mapping="false"
-                        report-fields-where-declared="false"
                         naming-strategy="doctrine.orm.naming_strategy.default"
                         quote-strategy="doctrine.orm.quote_strategy.default"
                         typed-field-mapper="doctrine.orm.typed_field_mapper.default"
@@ -671,7 +668,6 @@ the ORM resolves to:
             metadata_cache_driver: ~
             query_cache_driver: ~
             result_cache_driver: ~
-            report_fields_where_declared: false
 
 There are lots of other configuration options that you can use to overwrite
 certain classes, but those are for very advanced use-cases only.

@@ -811,7 +811,7 @@ class DoctrineExtensionTest extends TestCase
                         'mappings' => [
                             'AttributesBundle' => ['type' => 'attribute'],
                         ],
-                    ] + (class_exists(AnnotationDriver::class) ? ['report_fields_where_declared' => true] : []),
+                    ],
                 ],
             ])
             ->build();

@@ -4,7 +4,6 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -12,7 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 
-use function class_exists;
 use function md5;
 use function method_exists;
 use function mt_rand;
@@ -64,7 +62,7 @@ class TestKernel extends Kernel
                             'prefix' => 'Fixtures\Bundles\RepositoryServiceBundle\Entity',
                         ],
                     ],
-                ] + (class_exists(AnnotationDriver::class) ? ['report_fields_where_declared' => true] : []),
+                ],
             ]);
 
             // Register a NullLogger to avoid getting the stderr default logger of FrameworkBundle
