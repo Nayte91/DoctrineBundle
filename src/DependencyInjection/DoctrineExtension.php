@@ -16,7 +16,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
-use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
 use Doctrine\ORM\Configuration as ORMConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
@@ -338,12 +337,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
         if (isset($connection['result_cache'])) {
             $configuration->addMethodCall('setResultCache', [new Reference($connection['result_cache'])]);
         }
-
-        if (class_exists(LegacySchemaManagerFactory::class)) {
-            return;
-        }
-
-        $container->removeDefinition('doctrine.dbal.legacy_schema_manager_factory');
     }
 
     /**

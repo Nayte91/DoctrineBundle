@@ -11,7 +11,6 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -281,11 +280,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertDICDefinitionMethodCallOnce(
             $container->getDefinition('doctrine.dbal.default_schema_manager_factory_connection.configuration'),
             'setSchemaManagerFactory',
-            [
-                new Reference(class_exists(LegacySchemaManagerFactory::class)
-                ? 'doctrine.dbal.legacy_schema_manager_factory'
-                : 'doctrine.dbal.default_schema_manager_factory'),
-            ],
+            [new Reference('doctrine.dbal.default_schema_manager_factory')],
         );
 
         $this->assertDICDefinitionMethodCallOnce(
