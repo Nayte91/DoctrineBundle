@@ -23,8 +23,6 @@ use function trigger_deprecation;
  */
 final class ContainerRepositoryFactory implements RepositoryFactory
 {
-    use RepositoryFactoryCompatibility;
-
     /** @var array<string, ObjectRepository> */
     private array $managedRepositories = [];
 
@@ -32,6 +30,20 @@ final class ContainerRepositoryFactory implements RepositoryFactory
     public function __construct(
         private readonly ContainerInterface $container,
     ) {
+    }
+
+    /**
+     * Gets the repository for an entity class.
+     *
+     * @param class-string<T> $entityName
+     *
+     * @return EntityRepository<T>
+     *
+     * @template T of object
+     */
+    public function getRepository(EntityManagerInterface $entityManager, string $entityName): EntityRepository
+    {
+        return $this->doGetRepository($entityManager, $entityName, true);
     }
 
     /**

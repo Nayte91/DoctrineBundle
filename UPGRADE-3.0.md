@@ -24,6 +24,9 @@ available only in `doctrine/orm` 2. It has been removed.
 
 Support for the YML and annotation metadata drivers has been dropped.
 
+`Doctrine\Bundle\DoctrineBundle\Repository\LazyServiceEntityRepository` has
+been removed without replacement.
+
 Commands
 --------
 
