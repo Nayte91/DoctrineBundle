@@ -305,13 +305,12 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $def = $container
             ->setDefinition($connectionId, new ChildDefinition('doctrine.dbal.connection'))
             ->setPublic(true)
-            ->setArguments([
-                $options,
-                new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
-                // event manager is only supported on DBAL < 4
-                method_exists(Connection::class, 'getEventManager') ? new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name)) : null,
-                $connection['mapping_types'],
-            ]);
+            ->setArguments(array_merge(
+                [$options, new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name))],
+                // event manager must only be passed for DBAL < 4
+                method_exists(Connection::class, 'getEventManager') ? [new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name))] : [],
+                [$connection['mapping_types']],
+            ));
 
         $container
             ->registerAliasForArgument($connectionId, Connection::class, sprintf('%s.connection', $name))
