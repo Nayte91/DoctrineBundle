@@ -334,9 +334,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $configuration->addMethodCall('setSchemaManagerFactory', [new Reference($connection['schema_manager_factory'])]);
 
-        if (isset($connection['result_cache'])) {
-            $configuration->addMethodCall('setResultCache', [new Reference($connection['result_cache'])]);
+        if (! isset($connection['result_cache'])) {
+            return;
         }
+
+        $configuration->addMethodCall('setResultCache', [new Reference($connection['result_cache'])]);
     }
 
     /**
