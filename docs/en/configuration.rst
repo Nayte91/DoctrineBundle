@@ -135,7 +135,7 @@ Configuration Reference
                             # Affects schema-tool. If absent, DBAL chooses defaults
                             # based on the platform. Examples here are for MySQL.
                             # charset:      utf8mb4
-                            # collation:    utf8mb4_unicode_ci # When using doctrine/dbal 3.x
+                            # collation:    utf8mb4_unicode_ci
                             # engine:       InnoDB
 
                         # Service identifier of a Psr\Cache\CacheItemPoolInterface implementation
