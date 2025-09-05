@@ -232,26 +232,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertEquals(['engine' => 'InnoDB'], $param['defaultTableOptions']);
     }
 
-    public function testDbalLoadSavepointsForNestedTransactions(): void
-    {
-        if (! method_exists(Connection::class, 'getEventManager')) {
-            self::markTestSkipped('This test requires DBAL < 4');
-        }
-
-        $container = $this->loadContainer('dbal_savepoints');
-
-        $calls = $container->getDefinition('doctrine.dbal.savepoints_connection')->getMethodCalls();
-        $this->assertCount(1, $calls);
-        $this->assertEquals('setNestTransactionsWithSavepoints', $calls[0][0]);
-        $this->assertTrue($calls[0][1][0]);
-
-        $calls = $container->getDefinition('doctrine.dbal.nosavepoints_connection')->getMethodCalls();
-        $this->assertCount(0, $calls);
-
-        $calls = $container->getDefinition('doctrine.dbal.notset_connection')->getMethodCalls();
-        $this->assertCount(0, $calls);
-    }
-
     public function testDbalLoadDisableTypeComments(): void
     {
         $container = $this->loadContainer('dbal_disable_type_comments');
