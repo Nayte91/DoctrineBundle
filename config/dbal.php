@@ -29,7 +29,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('doctrine.dbal.connection_factory.class', ConnectionFactory::class)
         ->set('doctrine.class', Registry::class)
         ->set('doctrine.entity_managers', [])
-        ->set('doctrine.default_entity_manager', null);
+        ->set('doctrine.default_entity_manager', '');
 
     $container->services()
 
