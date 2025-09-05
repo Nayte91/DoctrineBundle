@@ -1,6 +1,6 @@
 services:
     my_service_region_driver:
-        class: Doctrine\Common\Cache\ArrayCache
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
 
     my_service_logger1:
         class: Doctrine\ORM\Cache\Logging\StatisticsCacheLogger
@@ -16,7 +16,7 @@ services:
         class: Doctrine\ORM\Cache\CacheConfiguration
 
     my_factory_driver:
-        class: Doctrine\Common\Cache\ArrayCache
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
 
     my_factory:
         class: Doctrine\ORM\Cache\DefaultCacheFactory
