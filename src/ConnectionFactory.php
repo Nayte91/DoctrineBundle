@@ -113,13 +113,9 @@ class ConnectionFactory
             $connection = DriverManager::getConnection($params, $config);
             $params     = $this->addDatabaseSuffix(array_merge($connection->getParams(), $overriddenOptions));
             $driver     = $connection->getDriver();
-            /** @phpstan-ignore arguments.count (DBAL < 4.x doesn't accept an argument) */
-            $platform = $driver->getDatabasePlatform(
-                ...(class_exists(StaticServerVersionProvider::class)
-                    ? [new StaticServerVersionProvider($params['serverVersion'] ?? $params['primary']['serverVersion'] ?? '')]
-                    : []
-                ),
-            );
+            $platform   = $driver->getDatabasePlatform(new StaticServerVersionProvider(
+                $params['serverVersion'] ?? $params['primary']['serverVersion'] ?? '',
+            ));
 
             if (! isset($params['charset'])) {
                 if ($platform instanceof AbstractMySQLPlatform) {
@@ -168,10 +164,7 @@ class ConnectionFactory
         try {
             return $connection->getDatabasePlatform();
         } catch (DriverException $driverException) {
-            $class = class_exists(DBALException::class) ? DBALException::class : ConnectionException::class;
-
-            /* @phpstan-ignore new.interface */
-            throw new $class(
+            throw new ConnectionException(
                 'An exception occurred while establishing a connection to figure out your platform version.' . PHP_EOL .
                 "You can circumvent this by setting a 'server_version' configuration value" . PHP_EOL . PHP_EOL .
                 'For further information have a look at:' . PHP_EOL .
@@ -264,11 +257,7 @@ class ConnectionFactory
         // If a schemeless connection URL is given, we require a default driver or default custom driver
         // as connection parameter.
         if (! isset($params['driverClass']) && ! isset($params['driver'])) {
-            if (class_exists(DriverRequired::class)) {
-                throw DriverRequired::new($params['url']);
-            }
-
-            throw DBALException::driverRequired($params['url']);
+            throw DriverRequired::new($params['url']);
         }
 
         unset($params['url']);

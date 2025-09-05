@@ -30,7 +30,6 @@ use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Proxy\Autoloader;
-use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
@@ -502,10 +501,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         // Symfony 7.3 and higher expose type alias support in the EntityValueResolver
         $valueResolverDefinition->setArgument(3, $config['resolve_target_entities']);
-
-        if (! class_exists(ClassMetadataExporter::class)) {
-            $container->removeDefinition('doctrine.mapping_import_command');
-        }
 
         $entityManagers = [];
         foreach (array_keys($config['entity_managers']) as $name) {
