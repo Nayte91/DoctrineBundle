@@ -534,7 +534,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->loadContainer('orm_single_em_bundle_mappings', ['YamlBundle', 'XmlBundle', 'AttributesBundle']);
+        $container = $this->loadContainer('orm_single_em_bundle_mappings', ['XmlBundle', 'AttributesBundle']);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
 
@@ -574,7 +574,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->loadContainer('orm_multiple_em_bundle_mappings', ['YamlBundle', 'XmlBundle', 'AttributesBundle']);
+        $container = $this->loadContainer('orm_multiple_em_bundle_mappings', ['XmlBundle', 'AttributesBundle']);
 
         $this->assertEquals(['em1' => 'doctrine.orm.em1_entity_manager', 'em2' => 'doctrine.orm.em2_entity_manager'], $container->getParameter('doctrine.entity_managers'), 'Set of the existing EntityManagers names is incorrect.');
         $this->assertEquals('%doctrine.entity_managers%', $container->getDefinition('doctrine')->getArgument(2), 'Set of the existing EntityManagers names is incorrect.');
@@ -611,7 +611,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->loadContainer('orm_single_em_default_table_options', ['YamlBundle', 'XmlBundle', 'AttributesBundle']);
+        $container = $this->loadContainer('orm_single_em_default_table_options', ['XmlBundle', 'AttributesBundle']);
 
         $param = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 

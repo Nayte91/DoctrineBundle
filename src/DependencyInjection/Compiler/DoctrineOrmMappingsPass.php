@@ -4,7 +4,6 @@ namespace Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler;
 
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
-use Doctrine\ORM\Mapping\Driver\YamlDriver;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
 use Doctrine\Persistence\Mapping\Driver\StaticPHPDriver;
 use Doctrine\Persistence\Mapping\Driver\SymfonyFileLocator;
@@ -68,28 +67,6 @@ class DoctrineOrmMappingsPass extends RegisterMappingsPass
     {
         $locator = new Definition(SymfonyFileLocator::class, [$namespaces, '.orm.xml']);
         $driver  = new Definition(XmlDriver::class, [$locator, XmlDriver::DEFAULT_FILE_EXTENSION, $enableXsdValidation]);
-
-        return new DoctrineOrmMappingsPass($driver, $namespaces, $managerParameters, $enabledParameter, $aliasMap);
-    }
-
-    /**
-     * @param string[]     $namespaces        Hashmap of directory path to namespace
-     * @param string[]     $managerParameters List of parameters that could which object manager name
-     *                                        your bundle uses. This compiler pass will automatically
-     *                                        append the parameter name for the default entity manager
-     *                                        to this list.
-     * @param string|false $enabledParameter  Service container parameter that must be present to
-     *                                        enable the mapping. Set to false to not do any check,
-     *                                        optional.
-     * @param string[]     $aliasMap          Map of alias to namespace.
-     *
-     * @return self
-     */
-    public static function createYamlMappingDriver(array $namespaces, array $managerParameters = [], $enabledParameter = false, array $aliasMap = [])
-    {
-        $locator = new Definition(SymfonyFileLocator::class, [$namespaces, '.orm.yml']);
-        /* @phpstan-ignore class.notFound */
-        $driver = new Definition(YamlDriver::class, [$locator]);
 
         return new DoctrineOrmMappingsPass($driver, $namespaces, $managerParameters, $enabledParameter, $aliasMap);
     }

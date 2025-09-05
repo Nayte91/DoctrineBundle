@@ -24,7 +24,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
-use Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
@@ -407,8 +406,6 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals('Proxies', $container->getParameter('doctrine.orm.proxy_namespace'));
         $this->assertEquals(MappingDriverChain::class, $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
         $this->assertEquals(SimplifiedXmlDriver::class, $container->getParameter('doctrine.orm.metadata.xml.class'));
-        /* @phpstan-ignore class.notFound */
-        $this->assertEquals(SimplifiedYamlDriver::class, $container->getParameter('doctrine.orm.metadata.yml.class'));
 
         // second-level cache
         $this->assertEquals(DefaultCacheFactory::class, $container->getParameter('doctrine.orm.second_level_cache.default_cache_factory.class'));
@@ -729,37 +726,6 @@ class DoctrineExtensionTest extends TestCase
         ], $container);
 
         $this->assertEquals('app', $container->getParameter('doctrine.default_entity_manager'));
-    }
-
-    public function testYamlBundleMappingDetection(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        $container = $this->getContainer(['YamlBundle']);
-        $extension = new DoctrineExtension();
-
-        $config = BundleConfigurationBuilder::createBuilder()
-            ->addBaseConnection()
-            ->addEntityManager([
-                'default_entity_manager' => 'default',
-                'entity_managers' => [
-                    'default' => [
-                        'mappings' => [
-                            'YamlBundle' => [],
-                        ],
-                    ],
-                ],
-            ])
-            ->build();
-        $extension->load([$config], $container);
-
-        $definition = $container->getDefinition('doctrine.orm.default_metadata_driver');
-        $this->assertDICDefinitionMethodCallOnce($definition, 'addDriver', [
-            new Reference('doctrine.orm.default_yml_metadata_driver'),
-            'Fixtures\Bundles\YamlBundle\Entity',
-        ]);
     }
 
     public function testXmlBundleMappingDetection(): void
