@@ -7,7 +7,6 @@ use Doctrine\Bundle\DoctrineBundle\Tests\TestCase;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\ORM\Cache\Region;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -80,7 +79,7 @@ class CacheCompatibilityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    #[DoesNotPerformAssertions]
+    /** @doesNotPerformAssertions */
     public function testMetadataCacheConfigUsingPsr6ServiceDefinedByApplication(): void
     {
         (new class (false) extends TestKernel {
@@ -101,8 +100,10 @@ class CacheCompatibilityPassTest extends TestCase
         })->boot();
     }
 
-    /** @group legacy */
-    #[DoesNotPerformAssertions]
+    /**
+     * @group legacy
+     * @doesNotPerformAssertions
+     */
     public function testMetadataCacheConfigUsingNonPsr6ServiceDefinedByApplication(): void
     {
         $this->expectDeprecation('Since doctrine/doctrine-bundle 2.4: Configuring doctrine/cache is deprecated. Please update the cache service "custom_cache_service" to use a PSR-6 cache.');

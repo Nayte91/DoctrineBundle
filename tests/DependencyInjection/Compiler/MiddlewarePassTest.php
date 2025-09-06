@@ -25,7 +25,7 @@ use function sprintf;
 class MiddlewarePassTest extends TestCase
 {
     /** @return array<string, array{0: class-string, 1: bool}> */
-    public function provideAddMiddleware(): array
+    public static function provideAddMiddleware(): array
     {
         return [
             'not connection name aware' => [PHP7Middleware::class, false],
@@ -97,7 +97,7 @@ class MiddlewarePassTest extends TestCase
     }
 
     /** @return array<string, array{0: class-string, 1: bool}> */
-    public function provideAddMiddlewareWithAttributeForAutoconfiguration(): array
+    public static function provideAddMiddlewareWithAttributeForAutoconfiguration(): array
     {
         return [
             'without specifying connection' => [AutoconfiguredMiddleware::class, true],

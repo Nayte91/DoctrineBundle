@@ -108,7 +108,7 @@ class DropDatabaseDoctrineTest extends TestCase
         );
     }
 
-    public function provideForceOption(): Generator
+    public static function provideForceOption(): Generator
     {
         yield 'full name' => [
             ['--force' => true],
@@ -119,7 +119,7 @@ class DropDatabaseDoctrineTest extends TestCase
         ];
     }
 
-    public function provideIncompatibleDriverOptions(): Generator
+    public static function provideIncompatibleDriverOptions(): Generator
     {
         yield 'full name' => [
             [
