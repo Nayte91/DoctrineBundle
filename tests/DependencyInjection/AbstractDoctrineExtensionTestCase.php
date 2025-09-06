@@ -149,7 +149,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container = $this->loadContainer('dbal_allow_url_override');
         $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
-        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8', $config['url']);
+        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
 
         $expectedOverrides = [
             'dbname' => 'main_test',
@@ -178,7 +178,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         ];
 
         $this->assertEquals($expectedDefaults, array_intersect_key($config, $expectedDefaults));
-        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8', $config['url']);
+        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
         $this->assertCount(1, $config['connection_override_options']);
         $this->assertSame('main_test', $config['connection_override_options']['dbname']);
         $this->assertFalse(isset($config['override_url']));
@@ -189,7 +189,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container = $this->loadContainer('dbal_dbname_suffix');
         $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
-        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8', $config['url']);
+        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
         $this->assertSame('_test', $config['dbname_suffix']);
     }
 
