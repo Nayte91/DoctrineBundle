@@ -48,9 +48,13 @@ and does not have a replacement.
 Configuration
 -------------
 
-### The `doctrine.orm.entity_managers.some_em.report_fields_where_declared` configuration option has been removed
+### no-op configuration options removed
 
-This option is a no-op when using `doctrine/orm` 3 and has been removed.
+The following configuration options are no-ops when using `doctrine/orm` 3 and
+have been removed:
+
+- `doctrine.orm.entity_managers.some_em.report_fields_where_declared`
+- `doctrine.orm.enable_lazy_ghost_objects`
 
 ### The `doctrine.dbal.default_table_options.collate` default table option is removed
 

@@ -418,7 +418,6 @@ class Configuration implements ConfigurationInterface
         $excludedKeys = [
             'default_entity_manager' => true,
             'auto_generate_proxy_classes' => true,
-            'enable_lazy_ghost_objects' => true,
             'enable_native_lazy_objects' => true,
             'proxy_dir' => true,
             'proxy_namespace' => true,
@@ -493,10 +492,6 @@ class Configuration implements ConfigurationInterface
                                 ->ifString()
                                 ->then(static fn (string $v) => constant('Doctrine\ORM\Proxy\ProxyFactory::AUTOGENERATE_' . strtoupper($v)))
                             ->end()
-                        ->end()
-                        ->booleanNode('enable_lazy_ghost_objects')
-                            ->defaultValue(true)
-                            ->info('Enables the new implementation of proxies based on lazy ghosts instead of using the legacy implementation')
                         ->end()
                         ->booleanNode('enable_native_lazy_objects')
                             ->defaultFalse()
