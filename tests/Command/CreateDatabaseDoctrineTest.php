@@ -3,6 +3,7 @@
 namespace Doctrine\Bundle\DoctrineBundle\Tests\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Command\CreateDatabaseDoctrineCommand;
+use Doctrine\Bundle\DoctrineBundle\Tests\Polyfill\SymfonyApp;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -10,7 +11,6 @@ use Doctrine\DBAL\Schema\SchemaManagerFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -37,8 +37,8 @@ class CreateDatabaseDoctrineTest extends TestCase
 
         $container = $this->getMockContainer($connectionName, $params);
 
-        $application = new Application();
-        $application->add(new CreateDatabaseDoctrineCommand($container->get('doctrine')));
+        $application = new SymfonyApp();
+        $application->addCommand(new CreateDatabaseDoctrineCommand($container->get('doctrine')));
 
         $command = $application->find('doctrine:database:create');
 
