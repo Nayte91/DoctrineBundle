@@ -514,12 +514,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->setParameter('doctrine.default_entity_manager', $config['default_entity_manager']);
 
-        if (! ($config['enable_lazy_ghost_objects'] ?? false)) {
-            throw new LogicException(
-                'Lazy ghost objects cannot be disabled for ORM 3.',
-            );
-        }
-
         if (! class_exists(ProxyHelper::class)) {
             throw new LogicException(
                 'Lazy ghost objects cannot be enabled because the "symfony/var-exporter" library'
@@ -541,7 +535,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             trigger_deprecation('doctrine/doctrine-bundle', '2.16', 'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.');
         }
 
-        $options = ['auto_generate_proxy_classes', 'enable_lazy_ghost_objects', 'enable_native_lazy_objects', 'proxy_dir', 'proxy_namespace'];
+        $options = ['auto_generate_proxy_classes', 'enable_native_lazy_objects', 'proxy_dir', 'proxy_namespace'];
         foreach ($options as $key) {
             $container->setParameter('doctrine.orm.' . $key, $config[$key]);
         }
@@ -662,7 +656,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'setQuoteStrategy' => new Reference($entityManager['quote_strategy']),
             'setTypedFieldMapper' => new Reference($entityManager['typed_field_mapper']),
             'setEntityListenerResolver' => new Reference(sprintf('doctrine.orm.%s_entity_listener_resolver', $entityManager['name'])),
-            'setLazyGhostObjectEnabled' => '%doctrine.orm.enable_lazy_ghost_objects%',
             'setIdentityGenerationPreferences' => $entityManager['identity_generation_preferences'],
         ];
 

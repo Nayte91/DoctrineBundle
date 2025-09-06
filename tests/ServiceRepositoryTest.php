@@ -79,7 +79,6 @@ class ServiceRepositoryTest extends TestCase
                     'schema_manager_factory' => 'doctrine.dbal.default_schema_manager_factory',
                 ],
                 'orm' => [
-                    'enable_lazy_ghost_objects' => true,
                     /** @phpstan-ignore function.alreadyNarrowedType */
                     'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
                     'mappings' => [

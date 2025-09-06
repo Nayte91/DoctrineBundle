@@ -50,7 +50,6 @@ class TestKernel extends Kernel
                 ],
                 'orm' => [
                     'auto_generate_proxy_classes' => true,
-                    'enable_lazy_ghost_objects' => true,
                     /** @phpstan-ignore function.alreadyNarrowedType */
                     'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
                     'mappings' => [

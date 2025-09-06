@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Generator;
 use InvalidArgumentException;
-use LogicException;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
@@ -851,17 +850,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $entityManager = $container->get('doctrine.orm.entity_manager');
         assert($entityManager instanceof EntityManagerInterface);
         $this->assertCount(2, $entityManager->getFilters()->getEnabledFilters());
-    }
-
-    public function testDisablingLazyGhostOnOrm3Throws(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Lazy ghost objects cannot be disabled for ORM 3.');
-        $this->loadContainer('orm_no_lazy_ghost');
     }
 
     public function testResolveTargetEntity(): void

@@ -217,8 +217,6 @@ Configuration Reference
                 auto_generate_proxy_classes:  false
                 proxy_dir:                    "%kernel.cache_dir%/doctrine/orm/Proxies"
                 proxy_namespace:              Proxies
-                # Enables the new implementation of proxies based on lazy ghosts instead of using the legacy implementation
-                enable_lazy_ghost_objects:    false
                 # Enables the new native implementation of PHP lazy objects instead of generated proxies
                 enable_native_lazy_objects:   false
                 identity_generation_preferences:

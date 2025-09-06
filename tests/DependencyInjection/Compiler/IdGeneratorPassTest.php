@@ -86,7 +86,6 @@ class IdGeneratorPassTest extends TestCase
                 ],
                 'orm' => [
                     'mappings' => $mappings,
-                    'enable_lazy_ghost_objects' => true,
                     /** @phpstan-ignore function.alreadyNarrowedType */
                     'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
                 ],
