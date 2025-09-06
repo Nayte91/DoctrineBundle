@@ -172,11 +172,6 @@ class RegistryTest extends TestCase
         (new Registry($container, [], $entityManagers, 'default', 'default'))->reset();
     }
 
-    /**
-     * The legacy group should be removed after https://github.com/doctrine/orm/pull/11853 is merged
-     *
-     * @group legacy
-     */
     public function testIdentityMapsStayConsistentAfterReset(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
