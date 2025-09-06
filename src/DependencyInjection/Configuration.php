@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\DependencyInjection;
 
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;

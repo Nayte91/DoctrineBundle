@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
