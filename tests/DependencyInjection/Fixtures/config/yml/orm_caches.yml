@@ -12,6 +12,7 @@ doctrine:
         connections:
             default:
                 dbname: db
+                server_version: 9.4.0
 
     orm:
         default_entity_manager: metadata_cache_none

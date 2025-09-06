@@ -140,7 +140,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertEquals('mysql_user', $config['user']);
         $this->assertEquals('mysql_db', $config['dbname']);
         $this->assertEquals('/path/to/mysqld.sock', $config['unix_socket']);
-        $this->assertEquals('5.6.20', $config['serverVersion']);
+        $this->assertEquals('9.4.0', $config['serverVersion']);
     }
 
     /** @group legacy */
