@@ -79,6 +79,7 @@ class CacheCompatibilityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /** @doesNotPerformAssertions */
     public function testMetadataCacheConfigUsingPsr6ServiceDefinedByApplication(): void
     {
         (new class (false) extends TestKernel {
@@ -99,7 +100,10 @@ class CacheCompatibilityPassTest extends TestCase
         })->boot();
     }
 
-    /** @group legacy */
+    /**
+     * @group legacy
+     * @doesNotPerformAssertions
+     */
     public function testMetadataCacheConfigUsingNonPsr6ServiceDefinedByApplication(): void
     {
         $this->expectDeprecation('Since doctrine/doctrine-bundle 2.4: Configuring doctrine/cache is deprecated. Please update the cache service "custom_cache_service" to use a PSR-6 cache.');

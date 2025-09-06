@@ -2,6 +2,6 @@
 
 namespace Fixtures\Bundles\XmlBundle\Entity;
 
-class Test
+class TestClass
 {
 }

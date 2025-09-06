@@ -2,7 +2,7 @@
 
 namespace Fixtures\Bundles\YamlBundle\Entity;
 
-class Test
+class TestClass
 {
     /** @phpstan-ignore property.unused */
     private mixed $id;
