@@ -16,7 +16,7 @@
 
     <config>
         <dbal default-connection="default">
-            <connection name="default" dbname="db" />
+            <connection name="default" dbname="db" server-version="9.4.0" />
         </dbal>
 
         <orm default-entity-manager="metadata_cache_none">

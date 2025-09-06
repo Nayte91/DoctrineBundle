@@ -7,6 +7,6 @@
                         http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
 
     <config>
-        <dbal override-url="true" dbname="main_test" url="mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8" />
+    <dbal override-url="true" dbname="main_test" url="mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1" />
     </config>
 </srv:container>
