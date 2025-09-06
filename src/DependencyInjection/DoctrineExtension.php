@@ -30,8 +30,6 @@ use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Proxy\Autoloader;
-use Doctrine\ORM\Proxy\ProxyFactory;
-use Doctrine\ORM\Tools\Export\ClassMetadataExporter;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
@@ -299,12 +297,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $def = $container
             ->setDefinition($connectionId, new ChildDefinition('doctrine.dbal.connection'))
             ->setPublic(true)
-            ->setArguments(array_merge(
-                [$options, new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name))],
-                // event manager must only be passed for DBAL < 4
-                method_exists(Connection::class, 'getEventManager') ? [new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name))] : [],
-                [$connection['mapping_types']],
-            ));
+            ->setArguments([
+                $options,
+                new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
+                $connection['mapping_types'],
+            ]);
 
         $container
             ->registerAliasForArgument($connectionId, Connection::class, sprintf('%s.connection', $name))
@@ -316,13 +313,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         }
 
         if (isset($connection['use_savepoints'])) {
-            // DBAL >= 4 always has savepoints enabled. So we only need to call "setNestTransactionsWithSavepoints" for DBAL < 4
-            if (method_exists(Connection::class, 'getEventManager')) {
-                if ($connection['use_savepoints']) {
-                    $def->addMethodCall('setNestTransactionsWithSavepoints', [$connection['use_savepoints']]);
-                }
-            } elseif (! $connection['use_savepoints']) {
-                throw new LogicException('The "use_savepoints" option can only be set to "true" and should ideally not be set when using DBAL >= 4');
+            if (! $connection['use_savepoints']) {
+                throw new LogicException('The "use_savepoints" option can only be set to "true" and should ideally not be set');
             }
         }
 
@@ -510,10 +502,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
         // Symfony 7.3 and higher expose type alias support in the EntityValueResolver
         $valueResolverDefinition->setArgument(3, $config['resolve_target_entities']);
 
-        if (! class_exists(ClassMetadataExporter::class)) {
-            $container->removeDefinition('doctrine.mapping_import_command');
-        }
-
         $entityManagers = [];
         foreach (array_keys($config['entity_managers']) as $name) {
             $entityManagers[$name] = sprintf('doctrine.orm.%s_entity_manager', $name);
@@ -528,19 +516,17 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->setParameter('doctrine.default_entity_manager', $config['default_entity_manager']);
 
-        if ($config['enable_lazy_ghost_objects'] ?? false) {
-            if (! class_exists(ProxyHelper::class)) {
-                throw new LogicException(
-                    'Lazy ghost objects cannot be enabled because the "symfony/var-exporter" library'
-                    . ' is not installed. Please run "composer require symfony/var-exporter".',
-                );
-            }
-        } elseif (! method_exists(ProxyFactory::class, 'resetUninitializedProxy')) {
+        if (! ($config['enable_lazy_ghost_objects'] ?? false)) {
             throw new LogicException(
                 'Lazy ghost objects cannot be disabled for ORM 3.',
             );
-        } else {
-            trigger_deprecation('doctrine/doctrine-bundle', '2.11', 'Not setting "doctrine.orm.enable_lazy_ghost_objects" to true is deprecated.');
+        }
+
+        if (! class_exists(ProxyHelper::class)) {
+            throw new LogicException(
+                'Lazy ghost objects cannot be enabled because the "symfony/var-exporter" library'
+                . ' is not installed. Please run "composer require symfony/var-exporter".',
+            );
         }
 
         if ($config['enable_native_lazy_objects'] ?? false) {
