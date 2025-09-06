@@ -13,7 +13,7 @@ use function array_map;
 
 final class ServiceRepositoryCompilerPass implements CompilerPassInterface
 {
-    public const REPOSITORY_SERVICE_TAG = 'doctrine.repository_service';
+    public const string REPOSITORY_SERVICE_TAG = 'doctrine.repository_service';
 
     public function process(ContainerBuilder $container): void
     {

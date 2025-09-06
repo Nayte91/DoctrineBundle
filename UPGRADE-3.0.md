@@ -7,6 +7,8 @@ Compatibility
 Configuring caching options to use services backed by `doctrine/cache` is no
 longer supported. Migrate to PSR-6 services instead.
 
+The minimum required PHP version is now 8.4.
+
 Support for the following major versions of the following packages has been dropped:
 
 - `doctrine/dbal` 3
@@ -72,6 +74,12 @@ You should use stop passing an event manager argument.
 - $connectionFactory->createConnection($params, $config, $eventManager, $mappingTypes)
 + $connectionFactory->createConnection($params, $config, $mappingTypes)
 ```
+
+Type declarations
+-----------------
+
+Native type declarations have been added to all constants, properties, and
+methods.
 
 Types
 -----

@@ -75,8 +75,6 @@ use function sprintf;
 use function str_replace;
 use function trigger_deprecation;
 
-use const PHP_VERSION_ID;
-
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
  *
@@ -163,7 +161,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param DBALConfig       $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function dbalLoad(array $config, ContainerBuilder $container)
+    protected function dbalLoad(array $config, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('dbal.php');
@@ -219,7 +217,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->registerForAutoconfiguration(MiddlewareInterface::class)->addTag('doctrine.middleware');
 
-        $container->registerAttributeForAutoconfiguration(AsMiddleware::class, static function (ChildDefinition $definition, AsMiddleware $attribute) {
+        $container->registerAttributeForAutoconfiguration(AsMiddleware::class, static function (ChildDefinition $definition, AsMiddleware $attribute): void {
             $priority = isset($attribute->priority) ? ['priority' => $attribute->priority] : [];
 
             if ($attribute->connections === []) {
@@ -252,7 +250,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param array<string, mixed> $connection A dbal connection configuration.
      * @param ContainerBuilder     $container  A ContainerBuilder instance
      */
-    protected function loadDbalConnection($name, array $connection, ContainerBuilder $container)
+    protected function loadDbalConnection(string $name, array $connection, ContainerBuilder $container): void
     {
         $configuration = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), new ChildDefinition('doctrine.dbal.connection.configuration'));
         unset($connection['logging']);
@@ -451,7 +449,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param array<string, mixed> $config    An array of configuration settings
      * @param ContainerBuilder     $container A ContainerBuilder instance
      */
-    protected function ormLoad(array $config, ContainerBuilder $container)
+    protected function ormLoad(array $config, ContainerBuilder $container): void
     {
         if (! class_exists(UnitOfWork::class)) {
             throw new LogicException('To configure the ORM layer, you must first install the doctrine/orm package.');
@@ -537,10 +535,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 );
             }
 
-            if (PHP_VERSION_ID < 80400) {
-                throw new LogicException('Using native lazy objects requires PHP 8.4 or higher.');
-            }
-
             $container->removeDefinition('doctrine.orm.proxy_cache_warmer');
         } else {
             // Only emit the deprecation notice for ORM 3 users
@@ -596,7 +590,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $container->registerForAutoconfiguration(AbstractIdGenerator::class)
             ->addTag(IdGeneratorPass::ID_GENERATOR_TAG);
 
-        $container->registerAttributeForAutoconfiguration(AsEntityListener::class, static function (ChildDefinition $definition, AsEntityListener $attribute) {
+        $container->registerAttributeForAutoconfiguration(AsEntityListener::class, static function (ChildDefinition $definition, AsEntityListener $attribute): void {
             $definition->addTag('doctrine.orm.entity_listener', [
                 'event'          => $attribute->event,
                 'method'         => $attribute->method,
@@ -606,7 +600,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 'priority'       => $attribute->priority,
             ]);
         });
-        $container->registerAttributeForAutoconfiguration(AsDoctrineListener::class, static function (ChildDefinition $definition, AsDoctrineListener $attribute) {
+        $container->registerAttributeForAutoconfiguration(AsDoctrineListener::class, static function (ChildDefinition $definition, AsDoctrineListener $attribute): void {
             $definition->addTag('doctrine.event_listener', [
                 'event'      => $attribute->event,
                 'priority'   => $attribute->priority,
@@ -614,13 +608,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
             ]);
         });
 
-        $container->registerAttributeForAutoconfiguration(Embeddable::class, static function (ChildDefinition $definition) {
+        $container->registerAttributeForAutoconfiguration(Embeddable::class, static function (ChildDefinition $definition): void {
             $definition->setAbstract(true)->addTag('container.excluded', ['source' => sprintf('with #[%s] attribute', Embeddable::class)]);
         });
-        $container->registerAttributeForAutoconfiguration(Entity::class, static function (ChildDefinition $definition) {
+        $container->registerAttributeForAutoconfiguration(Entity::class, static function (ChildDefinition $definition): void {
             $definition->setAbstract(true)->addTag('container.excluded', ['source' => sprintf('with #[%s] attribute', Entity::class)]);
         });
-        $container->registerAttributeForAutoconfiguration(MappedSuperclass::class, static function (ChildDefinition $definition) {
+        $container->registerAttributeForAutoconfiguration(MappedSuperclass::class, static function (ChildDefinition $definition): void {
             $definition->setAbstract(true)->addTag('container.excluded', ['source' => sprintf('with #[%s] attribute', MappedSuperclass::class)]);
         });
 
@@ -637,7 +631,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * @param array<string, mixed> $entityManager A configured ORM entity manager.
      * @param ContainerBuilder     $container     A ContainerBuilder instance
      */
-    protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container)
+    protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container): void
     {
         $ormConfigDef = $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $entityManager['name']), new ChildDefinition('doctrine.orm.configuration'));
         $ormConfigDef->addTag(IdGeneratorPass::CONFIGURATION_TAG);
@@ -672,7 +666,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'setIdentityGenerationPreferences' => $entityManager['identity_generation_preferences'],
         ];
 
-        if (PHP_VERSION_ID >= 80400 && class_exists(LegacyReflectionFields::class)) {
+        if (class_exists(LegacyReflectionFields::class)) {
             $enableNativeLazyObjects = $container->getParameter('doctrine.orm.enable_native_lazy_objects');
 
             assert(is_bool($enableNativeLazyObjects));
@@ -835,7 +829,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      * In the case of bundles everything is really optional (which leads to autodetection for this bundle) but
      * in the mappings key everything except alias is a required argument.
      */
-    protected function loadOrmEntityManagerMappingInformation(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container)
+    protected function loadOrmEntityManagerMappingInformation(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container): void
     {
         // reset state of drivers and alias map. They are only used by this methods and children.
         $this->drivers  = [];
@@ -893,7 +887,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *                      cache_driver:
      *                          type: apc
      */
-    protected function loadOrmSecondLevelCache(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container)
+    protected function loadOrmSecondLevelCache(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container): void
     {
         $driverId = null;
         $enabled  = $entityManager['second_level_cache']['enabled'];
@@ -1046,7 +1040,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
      *
      * @param array<string, mixed> $entityManager A configured ORM entity manager.
      */
-    protected function loadOrmCacheDrivers(array $entityManager, ContainerBuilder $container)
+    protected function loadOrmCacheDrivers(array $entityManager, ContainerBuilder $container): void
     {
         if (isset($entityManager['metadata_cache_driver'])) {
             $this->loadCacheDriver('metadata_cache', $entityManager['name'], $entityManager['metadata_cache_driver'], $container);

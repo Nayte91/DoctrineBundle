@@ -21,18 +21,13 @@ abstract class DoctrineCommand extends Command
 
     /**
      * Get a doctrine dbal connection by symfony name.
-     *
-     * @param string $name
-     *
-     * @return Connection
      */
-    protected function getDoctrineConnection($name)
+    protected function getDoctrineConnection(string $name): Connection
     {
         return $this->getDoctrine()->getConnection($name);
     }
 
-    /** @return ManagerRegistry */
-    protected function getDoctrine()
+    protected function getDoctrine(): ManagerRegistry
     {
         return $this->doctrine;
     }

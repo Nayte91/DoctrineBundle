@@ -20,8 +20,6 @@ use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
 
-use const PHP_VERSION_ID;
-
 class IdGeneratorPassTest extends TestCase
 {
     public static function setUpBeforeClass(): void
@@ -90,7 +88,7 @@ class IdGeneratorPassTest extends TestCase
                     'mappings' => $mappings,
                     'enable_lazy_ghost_objects' => true,
                     /** @phpstan-ignore function.alreadyNarrowedType */
-                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
+                    'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
                 ],
             ],
         ], $container);

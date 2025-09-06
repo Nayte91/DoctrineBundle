@@ -16,31 +16,27 @@ class ClassMetadataCollection
     }
 
     /** @return ClassMetadata[] */
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return $this->metadata;
     }
 
-    /** @param string $path */
-    public function setPath($path)
+    public function setPath(string $path): void
     {
         $this->path = $path;
     }
 
-    /** @return string|null */
-    public function getPath()
+    public function getPath(): string|null
     {
         return $this->path;
     }
 
-    /** @param string $namespace */
-    public function setNamespace($namespace)
+    public function setNamespace(string $namespace): void
     {
         $this->namespace = $namespace;
     }
 
-    /** @return string|null */
-    public function getNamespace()
+    public function getNamespace(): string|null
     {
         return $this->namespace;
     }

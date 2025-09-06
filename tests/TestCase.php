@@ -17,8 +17,6 @@ use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
 
-use const PHP_VERSION_ID;
-
 class TestCase extends BaseTestCase
 {
     public function createXmlBundleTestContainer(): ContainerBuilder
@@ -70,7 +68,7 @@ class TestCase extends BaseTestCase
                     ],
                     'resolve_target_entities' => [UserInterface::class => 'stdClass'],
                     /** @phpstan-ignore function.alreadyNarrowedType */
-                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
+                    'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
                 ],
             ],
         ], $container);

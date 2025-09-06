@@ -15,7 +15,6 @@ use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use LogicException;
-use Symfony\Component\VarExporter\LazyObjectInterface;
 
 use function sprintf;
 
@@ -46,11 +45,6 @@ class ServiceEntityRepository extends EntityRepository implements ServiceEntityR
         private readonly ManagerRegistry $registry,
         private readonly string $entityClass,
     ) {
-        if (! $this instanceof LazyObjectInterface) {
-            return;
-        }
-
-        $this->repository = $this->resolveRepository();
     }
 
     public function createQueryBuilder(string $alias, string|null $indexBy = null): QueryBuilder

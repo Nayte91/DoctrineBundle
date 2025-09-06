@@ -27,8 +27,7 @@ class EntityListenerPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    /** @return void */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $resolvers = $this->findAndSortTaggedServices('doctrine.orm.entity_listener', $container);
 
