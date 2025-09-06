@@ -4,7 +4,6 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -20,7 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use function interface_exists;
-use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
 
@@ -79,8 +77,6 @@ class ServiceRepositoryTest extends TestCase
                     'schema_manager_factory' => 'doctrine.dbal.default_schema_manager_factory',
                 ],
                 'orm' => [
-                    /** @phpstan-ignore function.alreadyNarrowedType */
-                    'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
                     'mappings' => [
                         'RepositoryServiceBundle' => [
                             'type' => 'attribute',

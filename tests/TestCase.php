@@ -4,7 +4,6 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType;
-use Doctrine\ORM\Configuration;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
@@ -13,7 +12,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
 
@@ -67,8 +65,6 @@ class TestCase extends BaseTestCase
                         ],
                     ],
                     'resolve_target_entities' => [UserInterface::class => 'stdClass'],
-                    /** @phpstan-ignore function.alreadyNarrowedType */
-                    'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
                 ],
             ],
         ], $container);

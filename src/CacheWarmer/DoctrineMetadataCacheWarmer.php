@@ -19,12 +19,9 @@ class DoctrineMetadataCacheWarmer extends AbstractPhpFileCacheWarmer
         parent::__construct($phpArrayFile);
     }
 
-    /**
-     * It must not be optional because it should be called before ProxyCacheWarmer which is not optional.
-     */
     public function isOptional(): bool
     {
-        return false;
+        return true;
     }
 
     protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter, string|null $buildDir = null): bool

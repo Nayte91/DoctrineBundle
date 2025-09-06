@@ -6,9 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\Proxy\ProxyFactory;
 use InvalidArgumentException;
-use ReflectionClass;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -27,16 +25,11 @@ use function count;
 use function implode;
 use function in_array;
 use function is_array;
-use function is_bool;
-use function is_int;
 use function is_string;
 use function key;
 use function reset;
 use function sprintf;
-use function strlen;
-use function strpos;
 use function strtoupper;
-use function substr;
 use function trigger_deprecation;
 
 /**
@@ -417,10 +410,7 @@ class Configuration implements ConfigurationInterface
         // Key that should not be rewritten to the entity-manager config
         $excludedKeys = [
             'default_entity_manager' => true,
-            'auto_generate_proxy_classes' => true,
             'enable_native_lazy_objects' => true,
-            'proxy_dir' => true,
-            'proxy_namespace' => true,
             'resolve_target_entities' => true,
             'resolve_target_entity' => true,
             'controller_resolver' => true,
@@ -464,46 +454,9 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->children()
                         ->scalarNode('default_entity_manager')->end()
-                        ->scalarNode('auto_generate_proxy_classes')->defaultValue(false)
-                            ->info('Auto generate mode possible values are: "NEVER", "ALWAYS", "FILE_NOT_EXISTS", "EVAL", "FILE_NOT_EXISTS_OR_CHANGED", this option is ignored when the "enable_native_lazy_objects" option is true')
-                            ->validate()
-                                ->ifTrue(function ($v) {
-                                    $generationModes = $this->getAutoGenerateModes();
-
-                                    if (is_int($v) && in_array($v, $generationModes['values']/*array(0, 1, 2, 3)*/)) {
-                                        return false;
-                                    }
-
-                                    if (is_bool($v)) {
-                                        return false;
-                                    }
-
-                                    if (is_string($v)) {
-                                        if (in_array(strtoupper($v), $generationModes['names']/*array('NEVER', 'ALWAYS', 'FILE_NOT_EXISTS', 'EVAL', 'FILE_NOT_EXISTS_OR_CHANGED')*/)) {
-                                            return false;
-                                        }
-                                    }
-
-                                    return true;
-                                })
-                                ->thenInvalid('Invalid auto generate mode value %s')
-                            ->end()
-                            ->validate()
-                                ->ifString()
-                                ->then(static fn (string $v) => constant('Doctrine\ORM\Proxy\ProxyFactory::AUTOGENERATE_' . strtoupper($v)))
-                            ->end()
-                        ->end()
                         ->booleanNode('enable_native_lazy_objects')
-                            ->defaultFalse()
-                            ->info('Enables the new native implementation of PHP lazy objects instead of generated proxies')
-                        ->end()
-                        ->scalarNode('proxy_dir')
-                            ->defaultValue('%kernel.build_dir%/doctrine/orm/Proxies')
-                            ->info('Configures the path where generated proxy classes are saved when using non-native lazy objects, this option is ignored when the "enable_native_lazy_objects" option is true')
-                        ->end()
-                        ->scalarNode('proxy_namespace')
-                            ->defaultValue('Proxies')
-                            ->info('Defines the root namespace for generated proxy classes when using non-native lazy objects, this option is ignored when the "enable_native_lazy_objects" option is true')
+                            ->defaultTrue()
+                            ->info('no-op, will be deprecated and removed in the future')
                         ->end()
                         ->arrayNode('controller_resolver')
                             ->canBeDisabled()
@@ -832,34 +785,5 @@ class Configuration implements ConfigurationInterface
         assert($node instanceof ArrayNodeDefinition);
 
         return $node;
-    }
-
-    /**
-     * Find proxy auto generate modes for their names and int values
-     *
-     * @return array{names: list<string>, values: list<int>}
-     */
-    private function getAutoGenerateModes(): array
-    {
-        $constPrefix = 'AUTOGENERATE_';
-        $prefixLen   = strlen($constPrefix);
-        $refClass    = new ReflectionClass(ProxyFactory::class);
-        $constsArray = $refClass->getConstants();
-        $namesArray  = [];
-        $valuesArray = [];
-
-        foreach ($constsArray as $key => $value) {
-            if (strpos($key, $constPrefix) !== 0) {
-                continue;
-            }
-
-            $namesArray[]  = substr($key, $prefixLen);
-            $valuesArray[] = (int) $value;
-        }
-
-        return [
-            'names' => $namesArray,
-            'values' => $valuesArray,
-        ];
     }
 }

@@ -146,9 +146,6 @@
         </xsd:choice>
 
         <xsd:attribute name="default-entity-manager" type="xsd:string" />
-        <xsd:attribute name="proxy-dir" type="xsd:string" />
-        <xsd:attribute name="proxy-namespace" type="xsd:string" />
-        <xsd:attribute name="auto-generate-proxy-classes" type="xsd:string" default="false" />
         <xsd:attribute name="enable-native-lazy-objects" type="xsd:boolean" />
         <xsd:attributeGroup ref="entity-manager-config" />
     </xsd:complexType>

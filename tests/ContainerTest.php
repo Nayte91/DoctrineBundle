@@ -16,7 +16,6 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
-use Symfony\Bridge\Doctrine\CacheWarmer\ProxyCacheWarmer;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
@@ -60,11 +59,6 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(InfoCommand::class, $container->get('doctrine.mapping_info_command'));
         $this->assertInstanceOf(MappingDescribeCommand::class, $container->get('doctrine.mapping_describe_command'));
         $this->assertInstanceOf(UpdateCommand::class, $container->get('doctrine.schema_update_command'));
-
-        if (! $container->getParameter('doctrine.orm.enable_native_lazy_objects')) {
-            $this->assertInstanceOf(ProxyCacheWarmer::class, $container->get('doctrine.orm.proxy_cache_warmer'));
-        }
-
         $this->assertTrue(Type::hasType('test'));
 
         $this->assertFalse($container->has('doctrine.dbal.default_connection.events.mysqlsessioninit'));

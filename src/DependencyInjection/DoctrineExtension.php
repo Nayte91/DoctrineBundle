@@ -16,7 +16,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
-use Doctrine\ORM\Configuration as ORMConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Id\AbstractIdGenerator;
@@ -26,9 +25,7 @@ use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\Driver\StaticPHPDriver as LegacyStaticPHPDriver;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Doctrine\ORM\Mapping\MappedSuperclass;
-use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Proxy\Autoloader;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
@@ -59,21 +56,16 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFacto
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-use Symfony\Component\VarExporter\ProxyHelper;
 
 use function array_intersect_key;
 use function array_keys;
 use function array_merge;
-use function assert;
 use function class_exists;
 use function interface_exists;
-use function is_bool;
 use function is_dir;
-use function method_exists;
 use function reset;
 use function sprintf;
 use function str_replace;
-use function trigger_deprecation;
 
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
@@ -514,32 +506,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $container->setParameter('doctrine.default_entity_manager', $config['default_entity_manager']);
 
-        if (! class_exists(ProxyHelper::class)) {
-            throw new LogicException(
-                'Lazy ghost objects cannot be enabled because the "symfony/var-exporter" library'
-                . ' is not installed. Please run "composer require symfony/var-exporter".',
-            );
-        }
-
-        if ($config['enable_native_lazy_objects'] ?? false) {
-            /** @phpstan-ignore function.alreadyNarrowedType */
-            if (! method_exists(ORMConfiguration::class, 'enableNativeLazyObjects')) {
-                throw new LogicException(
-                    'Native lazy objects are not supported with your installed version of the ORM. Please upgrade to "doctrine/orm >= 3.4".',
-                );
-            }
-
-            $container->removeDefinition('doctrine.orm.proxy_cache_warmer');
-        } else {
-            // Only emit the deprecation notice for ORM 3 users
-            trigger_deprecation('doctrine/doctrine-bundle', '2.16', 'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.');
-        }
-
-        $options = ['auto_generate_proxy_classes', 'enable_native_lazy_objects', 'proxy_dir', 'proxy_namespace'];
-        foreach ($options as $key) {
-            $container->setParameter('doctrine.orm.' . $key, $config[$key]);
-        }
-
         $container->setAlias('doctrine.orm.entity_manager', $defaultEntityManagerDefinitionId = sprintf('doctrine.orm.%s_entity_manager', $config['default_entity_manager']));
         $container->getAlias('doctrine.orm.entity_manager')->setPublic(true);
 
@@ -642,13 +608,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
         }
 
         $methods = [
+            'enableNativeLazyObjects' => true,
             'setMetadataCache' => new Reference(sprintf('doctrine.orm.%s_metadata_cache', $entityManager['name'])),
             'setQueryCache' => new Reference(sprintf('doctrine.orm.%s_query_cache', $entityManager['name'])),
             'setResultCache' => new Reference(sprintf('doctrine.orm.%s_result_cache', $entityManager['name'])),
             'setMetadataDriverImpl' => new Reference('doctrine.orm.' . $entityManager['name'] . '_metadata_driver'),
-            'setProxyDir' => '%doctrine.orm.proxy_dir%',
-            'setProxyNamespace' => '%doctrine.orm.proxy_namespace%',
-            'setAutoGenerateProxyClasses' => '%doctrine.orm.auto_generate_proxy_classes%',
             'setSchemaIgnoreClasses' => $entityManager['schema_ignore_classes'],
             'setClassMetadataFactoryName' => $entityManager['class_metadata_factory_name'],
             'setDefaultRepositoryClassName' => $entityManager['default_repository_class'],
@@ -658,24 +622,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'setEntityListenerResolver' => new Reference(sprintf('doctrine.orm.%s_entity_listener_resolver', $entityManager['name'])),
             'setIdentityGenerationPreferences' => $entityManager['identity_generation_preferences'],
         ];
-
-        if (class_exists(LegacyReflectionFields::class)) {
-            $enableNativeLazyObjects = $container->getParameter('doctrine.orm.enable_native_lazy_objects');
-
-            assert(is_bool($enableNativeLazyObjects));
-
-            $methods['enableNativeLazyObjects'] = $enableNativeLazyObjects;
-
-            // Do not set deprecated proxy configurations when native lazy objects are enabled with `doctrine/orm:^3.5`
-            /** @phpstan-ignore function.alreadyNarrowedType */
-            if ($enableNativeLazyObjects && method_exists(ORMSetup::class, 'createAttributeMetadataConfig')) {
-                unset(
-                    $methods['setProxyDir'],
-                    $methods['setProxyNamespace'],
-                    $methods['setAutoGenerateProxyClasses'],
-                );
-            }
-        }
 
         if (isset($entityManager['fetch_mode_subselect_batch_size'])) {
             $methods['setEagerFetchBatchSize'] = $entityManager['fetch_mode_subselect_batch_size'];
@@ -1058,7 +1004,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
             $container->register($cacheWarmerServiceId, DoctrineMetadataCacheWarmer::class)
                 ->setArguments([new Reference(sprintf('doctrine.orm.%s_entity_manager', $objectManagerName)), $phpArrayFile])
-                ->addTag('kernel.cache_warmer', ['priority' => 1000]); // priority should be higher than ProxyCacheWarmer
+                ->addTag('kernel.cache_warmer', ['priority' => 1000]);
 
             $cache = new Definition(PhpArrayAdapter::class, [$phpArrayFile, $cache]);
         }

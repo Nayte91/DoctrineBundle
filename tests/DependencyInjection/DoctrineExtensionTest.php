@@ -400,10 +400,8 @@ class DoctrineExtensionTest extends TestCase
 
         $extension->load([$config], $container);
 
-        $this->assertFalse($container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
         $this->assertEquals(Configuration::class, $container->getParameter('doctrine.orm.configuration.class'));
         $this->assertEquals(EntityManager::class, $container->getParameter('doctrine.orm.entity_manager.class'));
-        $this->assertEquals('Proxies', $container->getParameter('doctrine.orm.proxy_namespace'));
         $this->assertEquals(MappingDriverChain::class, $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
         $this->assertEquals(SimplifiedXmlDriver::class, $container->getParameter('doctrine.orm.metadata.xml.class'));
 
@@ -419,8 +417,6 @@ class DoctrineExtensionTest extends TestCase
         $config = BundleConfigurationBuilder::createBuilder()
             ->addBaseConnection()
             ->addEntityManager([
-                'proxy_namespace' => 'MyProxies',
-                'auto_generate_proxy_classes' => true,
                 'default_entity_manager' => 'default',
                 'entity_managers' => [
                     'default' => [
@@ -460,14 +456,14 @@ class DoctrineExtensionTest extends TestCase
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $calls      = array_values($definition->getMethodCalls());
         $this->assertEquals(['XmlBundle' => 'Fixtures\Bundles\XmlBundle\Entity'], $calls[0][1][0]);
-        $this->assertEquals('doctrine.orm.default_metadata_cache', (string) $calls[1][1][0]);
-        $this->assertEquals('doctrine.orm.default_query_cache', (string) $calls[2][1][0]);
-        $this->assertEquals('doctrine.orm.default_result_cache', (string) $calls[3][1][0]);
+        $this->assertEquals('doctrine.orm.default_metadata_cache', (string) $calls[2][1][0]);
+        $this->assertEquals('doctrine.orm.default_query_cache', (string) $calls[3][1][0]);
+        $this->assertEquals('doctrine.orm.default_result_cache', (string) $calls[4][1][0]);
 
-        $this->assertEquals('doctrine.orm.naming_strategy.default', (string) $calls[11][1][0]);
-        $this->assertEquals('doctrine.orm.quote_strategy.default', (string) $calls[12][1][0]);
-        $this->assertEquals('doctrine.orm.typed_field_mapper.default', (string) $calls[13][1][0]);
-        $this->assertEquals('doctrine.orm.default_entity_listener_resolver', (string) $calls[14][1][0]);
+        $this->assertEquals('doctrine.orm.naming_strategy.default', (string) $calls[9][1][0]);
+        $this->assertEquals('doctrine.orm.quote_strategy.default', (string) $calls[10][1][0]);
+        $this->assertEquals('doctrine.orm.typed_field_mapper.default', (string) $calls[11][1][0]);
+        $this->assertEquals('doctrine.orm.default_entity_listener_resolver', (string) $calls[12][1][0]);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache_warmer');
         $this->assertSame(DoctrineMetadataCacheWarmer::class, $definition->getClass());
@@ -511,34 +507,6 @@ class DoctrineExtensionTest extends TestCase
 
         $calls = $container->getDefinition('doctrine.dbal.default_connection')->getMethodCalls();
         $this->assertCount(0, $calls);
-    }
-
-    public function testAutoGenerateProxyClasses(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        $container = $this->getContainer();
-        $extension = new DoctrineExtension();
-
-        $config = BundleConfigurationBuilder::createBuilder()
-            ->addBaseConnection()
-            ->addEntityManager([
-                'proxy_namespace' => 'MyProxies',
-                'auto_generate_proxy_classes' => 'eval',
-                'default_entity_manager' => 'default',
-                'entity_managers' => [
-                    'default' => [
-                        'mappings' => ['XmlBundle' => []],
-                    ],
-                ],
-            ])
-            ->build();
-
-        $extension->load([$config], $container);
-
-        $this->assertEquals(3 /* \Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_EVAL */, $container->getParameter('doctrine.orm.auto_generate_proxy_classes'));
     }
 
     public function testSingleEntityManagerWithDefaultConfiguration(): void
@@ -793,7 +761,6 @@ class DoctrineExtensionTest extends TestCase
         $config1 = BundleConfigurationBuilder::createBuilder()
             ->addBaseConnection()
             ->addEntityManager([
-                'auto_generate_proxy_classes' => true,
                 'default_entity_manager' => 'default',
                 'entity_managers' => [
                     'default' => [
@@ -805,7 +772,6 @@ class DoctrineExtensionTest extends TestCase
         $config2 = BundleConfigurationBuilder::createBuilder()
             ->addBaseConnection()
             ->addEntityManager([
-                'auto_generate_proxy_classes' => false,
                 'default_entity_manager' => 'default',
                 'entity_managers' => [
                     'default' => [
@@ -827,18 +793,6 @@ class DoctrineExtensionTest extends TestCase
             new Reference('doctrine.orm.default_xml_metadata_driver'),
             'Fixtures\Bundles\XmlBundle\Entity',
         ]);
-
-        $configDef = $container->getDefinition('doctrine.orm.default_configuration');
-        $this->assertDICDefinitionMethodCallOnce($configDef, 'setAutoGenerateProxyClasses');
-
-        $calls = $configDef->getMethodCalls();
-        foreach ($calls as $call) {
-            if ($call[0] === 'setAutoGenerateProxyClasses') {
-                $this->assertFalse($container->getParameterBag()->resolveValue($call[1][0]));
-
-                break;
-            }
-        }
     }
 
     public function testMessengerIntegration(): void
