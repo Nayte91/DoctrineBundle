@@ -15,8 +15,7 @@ class BlacklistSchemaAssetFilter
     ) {
     }
 
-    /** @param string|AbstractAsset $assetName */
-    public function __invoke($assetName): bool
+    public function __invoke(string|AbstractAsset $assetName): bool
     {
         if ($assetName instanceof AbstractAsset) {
             $assetName = $assetName->getName();

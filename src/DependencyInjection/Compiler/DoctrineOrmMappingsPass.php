@@ -34,7 +34,7 @@ class DoctrineOrmMappingsPass extends RegisterMappingsPass
      *                                                container.
      * @param string[]             $aliasMap          Map of alias to namespace.
      */
-    public function __construct($driver, array $namespaces, array $managerParameters, $enabledParameter = false, array $aliasMap = [])
+    public function __construct(Definition|Reference $driver, array $namespaces, array $managerParameters, string|false $enabledParameter = false, array $aliasMap = [])
     {
         $managerParameters[] = 'doctrine.default_entity_manager';
 
@@ -60,10 +60,8 @@ class DoctrineOrmMappingsPass extends RegisterMappingsPass
      *                                        enable the mapping. Set to false to not do any check,
      *                                        optional.
      * @param string[]     $aliasMap          Map of alias to namespace.
-     *
-     * @return self
      */
-    public static function createXmlMappingDriver(array $namespaces, array $managerParameters = [], $enabledParameter = false, array $aliasMap = [], bool $enableXsdValidation = false)
+    public static function createXmlMappingDriver(array $namespaces, array $managerParameters = [], string|false $enabledParameter = false, array $aliasMap = [], bool $enableXsdValidation = false): self
     {
         $locator = new Definition(SymfonyFileLocator::class, [$namespaces, '.orm.xml']);
         $driver  = new Definition(XmlDriver::class, [$locator, XmlDriver::DEFAULT_FILE_EXTENSION, $enableXsdValidation]);
@@ -81,10 +79,8 @@ class DoctrineOrmMappingsPass extends RegisterMappingsPass
      *                                        enable the mapping. Set to false to not do any check,
      *                                        optional.
      * @param string[]     $aliasMap          Map of alias to namespace.
-     *
-     * @return self
      */
-    public static function createPhpMappingDriver(array $namespaces, array $managerParameters = [], $enabledParameter = false, array $aliasMap = [])
+    public static function createPhpMappingDriver(array $namespaces, array $managerParameters = [], string|false $enabledParameter = false, array $aliasMap = []): self
     {
         $locator = new Definition(SymfonyFileLocator::class, [$namespaces, '.php']);
         $driver  = new Definition(PHPDriver::class, [$locator]);
@@ -103,10 +99,8 @@ class DoctrineOrmMappingsPass extends RegisterMappingsPass
      *                                        enable the mapping. Set to false to not do any check,
      *                                        optional.
      * @param string[]     $aliasMap          Map of alias to namespace.
-     *
-     * @return self
      */
-    public static function createAttributeMappingDriver(array $namespaces, array $directories, array $managerParameters = [], $enabledParameter = false, array $aliasMap = [])
+    public static function createAttributeMappingDriver(array $namespaces, array $directories, array $managerParameters = [], string|false $enabledParameter = false, array $aliasMap = []): self
     {
         $driver = new Definition(AttributeDriver::class, [$directories]);
 
@@ -124,10 +118,8 @@ class DoctrineOrmMappingsPass extends RegisterMappingsPass
      *                                        enable the mapping. Set to false to not do any check,
      *                                        optional.
      * @param string[]     $aliasMap          Map of alias to namespace.
-     *
-     * @return self
      */
-    public static function createStaticPhpMappingDriver(array $namespaces, array $directories, array $managerParameters = [], $enabledParameter = false, array $aliasMap = [])
+    public static function createStaticPhpMappingDriver(array $namespaces, array $directories, array $managerParameters = [], string|false $enabledParameter = false, array $aliasMap = []): self
     {
         $driver = new Definition(StaticPHPDriver::class, [$directories]);
 

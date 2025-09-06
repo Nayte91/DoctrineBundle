@@ -16,8 +16,6 @@ use function array_keys;
 use function assert;
 use function method_exists;
 
-use const PHP_VERSION_ID;
-
 /**
  * References all Doctrine connections and entity managers in a given Container.
  */
@@ -45,7 +43,7 @@ class Registry extends ManagerRegistry implements ResetInterface
      *
      * @return string The full namespace
      */
-    public function getAliasNamespace($alias)
+    public function getAliasNamespace(string $alias): string
     {
         foreach (array_keys($this->getManagers()) as $name) {
             $objectManager = $this->getManager($name);
@@ -87,7 +85,7 @@ class Registry extends ManagerRegistry implements ResetInterface
         /** @phpstan-ignore function.alreadyNarrowedType */
         $sfNativeLazyObjects = method_exists('Symfony\Component\DependencyInjection\ContainerBuilder', 'findTaggedResourceIds');
 
-        if (PHP_VERSION_ID < 80400 || ! $sfNativeLazyObjects) {
+        if (! $sfNativeLazyObjects) {
             if ((! $manager instanceof LazyLoadingInterface && ! $manager instanceof LazyObjectInterface) || $manager->isOpen()) {
                 $manager->clear();
 

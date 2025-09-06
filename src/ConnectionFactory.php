@@ -28,7 +28,7 @@ use const PHP_EOL;
 class ConnectionFactory
 {
     /** @internal */
-    public const DEFAULT_SCHEME_MAP = [
+    public const array DEFAULT_SCHEME_MAP = [
         'db2'        => 'ibm_db2',
         'mssql'      => 'pdo_sqlsrv',
         'mysql'      => 'pdo_mysql',
@@ -59,14 +59,12 @@ class ConnectionFactory
      * @param mixed[]               $params
      * @param array<string, string> $mappingTypes
      * @phpstan-param Params $params
-     *
-     * @return Connection
      */
     public function createConnection(
         array $params,
         Configuration|null $config = null,
         array $mappingTypes = [],
-    ) {
+    ): Connection {
         if (! $this->initialized) {
             $this->initializeTypes();
         }

@@ -16,8 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CacheSchemaSubscriberPass implements CompilerPassInterface
 {
-    /** @return void */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (! $container->hasDefinition('doctrine.orm.listeners.doctrine_dbal_cache_adapter_schema_listener')) {
             return;

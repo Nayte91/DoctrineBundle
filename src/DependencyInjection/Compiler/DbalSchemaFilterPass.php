@@ -16,8 +16,7 @@ use function sprintf;
  */
 class DbalSchemaFilterPass implements CompilerPassInterface
 {
-    /** @return void */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $filters = $container->findTaggedServiceIds('doctrine.dbal.schema_filter');
 

@@ -84,7 +84,7 @@ class ConnectionFactoryTest extends TestCase
         $this->assertEquals($params, array_intersect_key($connection->getParams(), $params));
     }
 
-    public function testConnectionCharsetFromUrl()
+    public function testConnectionCharsetFromUrl(): void
     {
         /** @psalm-suppress InvalidArgument Need to be compatible with DBAL < 4, which still has `$params['url']` */
         $connection = (new ConnectionFactory([]))->createConnection(

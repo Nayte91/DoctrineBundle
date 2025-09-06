@@ -41,7 +41,7 @@ class DoctrineExtension extends AbstractExtension
      *
      * @return TwigFilter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         $out     = [
             new TwigFilter('doctrine_prettify_sql', [$this, 'prettifySql'], ['is_safe' => ['html']]),
@@ -64,10 +64,8 @@ class DoctrineExtension extends AbstractExtension
      * DON'T USE THIS FUNCTION OUTSIDE ITS INTENDED SCOPE
      *
      * @internal
-     *
-     * @return string
      */
-    public static function escapeFunction(mixed $parameter)
+    public static function escapeFunction(mixed $parameter): string|int
     {
         $result = $parameter;
 
@@ -108,12 +106,9 @@ class DoctrineExtension extends AbstractExtension
     /**
      * Return a query with the parameters replaced
      *
-     * @param string                       $query
      * @param array<array-key, mixed>|Data $parameters
-     *
-     * @return string
      */
-    public function replaceQueryParameters($query, $parameters)
+    public function replaceQueryParameters(string $query, array|Data $parameters): string
     {
         if ($parameters instanceof Data) {
             $parameters = $parameters->getValue(true);
@@ -147,12 +142,9 @@ class DoctrineExtension extends AbstractExtension
     /**
      * Formats and/or highlights the given SQL statement.
      *
-     * @param  string $sql
-     * @param  bool   $highlightOnly If true the query is not formatted, just highlighted
-     *
-     * @return string
+     * @param  bool $highlightOnly If true the query is not formatted, just highlighted
      */
-    public function formatQuery($sql, $highlightOnly = false)
+    public function formatQuery(string $sql, bool $highlightOnly = false): string
     {
         trigger_deprecation(
             'doctrine/doctrine-bundle',

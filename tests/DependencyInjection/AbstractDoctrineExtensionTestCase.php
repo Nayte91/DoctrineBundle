@@ -47,7 +47,6 @@ use function sys_get_temp_dir;
 use function uniqid;
 
 use const DIRECTORY_SEPARATOR;
-use const PHP_VERSION_ID;
 
 abstract class AbstractDoctrineExtensionTestCase extends TestCase
 {
@@ -1319,10 +1318,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM 3.4+');
         }
 
-        if (PHP_VERSION_ID < 80400) {
-            self::markTestSkipped('This test requires PHP 8.4+');
-        }
-
         $container     = $this->loadContainer('orm_filters');
         $entityManager = $container->get('doctrine.orm.entity_manager');
 
@@ -1337,10 +1332,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
         if (! class_exists(LegacyReflectionFields::class)) {
             self::markTestSkipped('This test requires ORM 3.4+');
-        }
-
-        if (PHP_VERSION_ID < 80400) {
-            self::markTestSkipped('This test requires PHP 8.4+');
         }
 
         $container     = $this->loadContainer('orm_native_lazy_objects_enable');
@@ -1359,33 +1350,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM 3.4+');
         }
 
-        if (PHP_VERSION_ID < 80400) {
-            self::markTestSkipped('This test requires PHP 8.4+');
-        }
-
         $container     = $this->loadContainer('orm_native_lazy_objects_disable');
         $entityManager = $container->get('doctrine.orm.entity_manager');
 
         $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
-    }
-
-    public function testNativeLazyObjectsWithBadPHP(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        if (! class_exists(LegacyReflectionFields::class)) {
-            self::markTestSkipped('This test requires ORM 3.4+');
-        }
-
-        if (PHP_VERSION_ID >= 80400) {
-            self::markTestSkipped('This test requires PHP 8.3 or less');
-        }
-
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Using native lazy objects requires PHP 8.4 or higher.');
-        $this->loadContainer('orm_native_lazy_objects_enable');
     }
 
     /** @param list<string> $bundles */

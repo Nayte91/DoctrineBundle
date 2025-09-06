@@ -21,8 +21,8 @@ use function interface_exists;
 
 class DoctrineDataCollectorTest extends TestCase
 {
-    public const FIRST_ENTITY  = 'TestBundle\Test\Entity\Test1';
-    public const SECOND_ENTITY = 'TestBundle\Test\Entity\Test2';
+    public const string FIRST_ENTITY  = 'TestBundle\Test\Entity\Test1';
+    public const string SECOND_ENTITY = 'TestBundle\Test\Entity\Test2';
 
     public function testCollectEntities(): void
     {

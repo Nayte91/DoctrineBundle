@@ -88,7 +88,7 @@ class DoctrineExtensionTest extends TestCase
         }
     }
 
-    public function testConnectionAutowiringAlias()
+    public function testConnectionAutowiringAlias(): void
     {
         $container = $this->getContainer();
         $extension = new DoctrineExtension();
@@ -118,7 +118,7 @@ class DoctrineExtensionTest extends TestCase
         }
     }
 
-    public function testEntityManagerAutowiringAlias()
+    public function testEntityManagerAutowiringAlias(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
             self::markTestSkipped('This test requires ORM');
@@ -1065,7 +1065,7 @@ class DoctrineExtensionTest extends TestCase
     }
 
     /** @dataProvider provideAttributeExcludedFromContainer */
-    public function testEntityAttributeExcludesFromContainer(string $class)
+    public function testEntityAttributeExcludesFromContainer(string $class): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
             self::markTestSkipped('This test requires ORM');
@@ -1094,7 +1094,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertTrue($definition->isAbstract());
     }
 
-    public function testAsEntityListenerAttribute()
+    public function testAsEntityListenerAttribute(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
             self::markTestSkipped('This test requires ORM');
@@ -1133,7 +1133,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertSame([$expected], $definition->getTag('doctrine.orm.entity_listener'));
     }
 
-    public function testAsDoctrineListenerAttribute()
+    public function testAsDoctrineListenerAttribute(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
             self::markTestSkipped('This test requires ORM');

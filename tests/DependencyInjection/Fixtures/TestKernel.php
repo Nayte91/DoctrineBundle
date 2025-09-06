@@ -16,8 +16,6 @@ use function method_exists;
 use function mt_rand;
 use function sys_get_temp_dir;
 
-use const PHP_VERSION_ID;
-
 class TestKernel extends Kernel
 {
     private string|null $projectDir = null;
@@ -54,7 +52,7 @@ class TestKernel extends Kernel
                     'auto_generate_proxy_classes' => true,
                     'enable_lazy_ghost_objects' => true,
                     /** @phpstan-ignore function.alreadyNarrowedType */
-                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
+                    'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
                     'mappings' => [
                         'RepositoryServiceBundle' => [
                             'type' => 'attribute',
