@@ -14,7 +14,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
-use Doctrine\ORM\Mapping\LegacyReflectionFields;
 use Generator;
 use InvalidArgumentException;
 use PDO;
@@ -37,7 +36,6 @@ use function array_intersect_key;
 use function array_keys;
 use function array_values;
 use function assert;
-use function class_exists;
 use function end;
 use function interface_exists;
 use function is_dir;
@@ -478,7 +476,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container = $this->loadContainer('orm_imports');
 
         $configDefinition = $container->getDefinition('doctrine.orm.default_configuration');
-        $this->assertDICDefinitionMethodCallOnce($configDefinition, 'setAutoGenerateProxyClasses', ['%doctrine.orm.auto_generate_proxy_classes%']);
 
         $cacheDefinition = $container->getDefinition((string) $container->getAlias('doctrine.orm.default_metadata_cache'));
         $this->assertEquals(PhpArrayAdapter::class, $cacheDefinition->getClass());
@@ -1302,24 +1299,16 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        if (! class_exists(LegacyReflectionFields::class)) {
-            self::markTestSkipped('This test requires ORM 3.4+');
-        }
-
         $container     = $this->loadContainer('orm_filters');
         $entityManager = $container->get('doctrine.orm.entity_manager');
 
-        $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
+        $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
     }
 
     public function testNativeLazyObjectsWithConfigTrue(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
             self::markTestSkipped('This test requires ORM');
-        }
-
-        if (! class_exists(LegacyReflectionFields::class)) {
-            self::markTestSkipped('This test requires ORM 3.4+');
         }
 
         $container     = $this->loadContainer('orm_native_lazy_objects_enable');
@@ -1334,14 +1323,13 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        if (! class_exists(LegacyReflectionFields::class)) {
-            self::markTestSkipped('This test requires ORM 3.4+');
-        }
-
         $container     = $this->loadContainer('orm_native_lazy_objects_disable');
         $entityManager = $container->get('doctrine.orm.entity_manager');
 
-        $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
+        $this->assertTrue(
+            $entityManager->getConfiguration()->isNativeLazyObjectsEnabled(),
+            'The configuration node should be silently ignored, and will be deprecated in the future.',
+        );
     }
 
     /** @param list<string> $bundles */

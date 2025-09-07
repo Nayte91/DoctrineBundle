@@ -10,10 +10,6 @@
         </testsuite>
     </testsuites>
 
-    <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="ignoreFile=./tests/baseline-ignore"/>
-    </php>
-
     <coverage>
         <include>
             <directory>src</directory>

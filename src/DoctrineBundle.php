@@ -2,7 +2,6 @@
 
 namespace Doctrine\Bundle\DoctrineBundle;
 
-use Closure;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheSchemaSubscriberPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DbalSchemaFilterPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
@@ -11,9 +10,6 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\MiddlewaresPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\RemoveLoggingMiddlewarePass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\RemoveProfilerControllerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Proxy\Autoloader;
-use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\DoctrineValidationPass;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterDatePointTypePass;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
@@ -26,17 +22,12 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use function assert;
 use function class_exists;
-use function clearstatcache;
 use function dirname;
-use function spl_autoload_unregister;
 
 /** @final since 2.9 */
 class DoctrineBundle extends Bundle
 {
-    private Closure|null $autoloader = null;
-
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
@@ -80,65 +71,8 @@ class DoctrineBundle extends Bundle
         $container->addCompilerPass(new RegisterDatePointTypePass());
     }
 
-    public function boot(): void
-    {
-        // Register an autoloader for proxies when native lazy objects are not in use
-        // to avoid issues when unserializing them when the ORM is used.
-        if ($this->container->hasParameter('doctrine.orm.enable_native_lazy_objects') && $this->container->getParameter('doctrine.orm.enable_native_lazy_objects')) {
-            return;
-        }
-
-        if (! $this->container->hasParameter('doctrine.orm.proxy_namespace')) {
-            return;
-        }
-
-        $namespace      = (string) $this->container->getParameter('doctrine.orm.proxy_namespace');
-        $dir            = (string) $this->container->getParameter('doctrine.orm.proxy_dir');
-        $proxyGenerator = null;
-
-        if ($this->container->getParameter('doctrine.orm.auto_generate_proxy_classes')) {
-            // See https://github.com/symfony/symfony/pull/3419 for usage of references
-            /** @psalm-suppress UnsupportedPropertyReferenceUsage */
-            $container = &$this->container;
-
-            $proxyGenerator = static function ($proxyDir, $proxyNamespace, $class) use (&$container): void {
-                $originalClassName = (new DefaultProxyClassNameResolver())->resolveClassName($class);
-                $registry          = $container->get('doctrine');
-                assert($registry instanceof Registry);
-
-                foreach ($registry->getManagers() as $em) {
-                    assert($em instanceof EntityManagerInterface);
-                    if (! $em->getConfiguration()->getAutoGenerateProxyClasses()) {
-                        continue;
-                    }
-
-                    $metadataFactory = $em->getMetadataFactory();
-
-                    if ($metadataFactory->isTransient($originalClassName)) {
-                        continue;
-                    }
-
-                    $classMetadata = $metadataFactory->getMetadataFor($originalClassName);
-
-                    $em->getProxyFactory()->generateProxyClasses([$classMetadata]);
-
-                    clearstatcache(true, Autoloader::resolveFile($proxyDir, $proxyNamespace, $class));
-
-                    break;
-                }
-            };
-        }
-
-        $this->autoloader = Autoloader::register($dir, $namespace, $proxyGenerator);
-    }
-
     public function shutdown(): void
     {
-        if ($this->autoloader !== null) {
-            spl_autoload_unregister($this->autoloader);
-            $this->autoloader = null;
-        }
-
         // Clear all entity managers to clear references to entities for GC
         if ($this->container->hasParameter('doctrine.entity_managers')) {
             foreach ($this->container->getParameter('doctrine.entity_managers') as $id) {

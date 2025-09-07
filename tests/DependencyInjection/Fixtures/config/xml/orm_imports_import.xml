@@ -11,10 +11,7 @@
             <connection name="default" dbname="db" />
         </dbal>
 
-        <orm
-            auto-generate-proxy-classes="false"
-            default-entity-manager="default"
-        >
+        <orm default-entity-manager="default">
             <entity-manager name="default">
                 <mapping name="XmlBundle" />
             </entity-manager>

@@ -213,12 +213,9 @@ Configuration Reference
             orm:
                 default_entity_manager: ~ # The first defined is used if not set
 
-                # Auto generate mode possible values are: "NEVER", "ALWAYS", "FILE_NOT_EXISTS", "EVAL", "FILE_NOT_EXISTS_OR_CHANGED"
-                auto_generate_proxy_classes:  false
-                proxy_dir:                    "%kernel.cache_dir%/doctrine/orm/Proxies"
-                proxy_namespace:              Proxies
-                # Enables the new native implementation of PHP lazy objects instead of generated proxies
-                enable_native_lazy_objects:   false
+                # No-op, will be deprecated and removed in the future
+                enable_native_lazy_objects:   true
+
                 identity_generation_preferences:
                     Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
 
@@ -494,13 +491,7 @@ Configuration Reference
 
                 </doctrine:dbal>
 
-                <!-- auto-generate-proxy-classes: Auto generate mode possible values are: "NEVER", "ALWAYS", "FILE_NOT_EXISTS", "EVAL, "FILE_NOT_EXISTS_OR_CHANGED" -->
-                <doctrine:orm
-                    default-entity-manager="default"
-                    auto-generate-proxy-classes="false"
-                    proxy-dir="%kernel.cache_dir%/doctrine/orm/Proxies"
-                    proxy-namespace="Proxies"
-                >
+                <doctrine:orm default-entity-manager="default">
 
                     <!-- example -->
                     <doctrine:entity-manager
@@ -659,9 +650,6 @@ the ORM resolves to:
         orm:
             auto_mapping: true
             # the standard distribution overrides this to be true in debug, false otherwise
-            auto_generate_proxy_classes: false
-            proxy_namespace: Proxies
-            proxy_dir: "%kernel.cache_dir%/doctrine/orm/Proxies"
             default_entity_manager: default
             metadata_cache_driver: ~
             query_cache_driver: ~

@@ -5,7 +5,6 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Compiler;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\IdGeneratorPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\CustomIdGenerator;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Fixtures\Bundles\AttributesBundle\AttributesBundle;
 use Fixtures\Bundles\AttributesBundle\Entity\TestCustomIdGeneratorEntity as AttributeCustomIdGeneratorEntity;
@@ -16,7 +15,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use function assert;
 use function interface_exists;
-use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
 
@@ -84,11 +82,7 @@ class IdGeneratorPassTest extends TestCase
                     'charset' => 'UTF8',
                     'schema_manager_factory' => 'doctrine.dbal.default_schema_manager_factory',
                 ],
-                'orm' => [
-                    'mappings' => $mappings,
-                    /** @phpstan-ignore function.alreadyNarrowedType */
-                    'enable_native_lazy_objects' => method_exists(Configuration::class, 'enableNativeLazyObjects'),
-                ],
+                'orm' => ['mappings' => $mappings],
             ],
         ], $container);
 

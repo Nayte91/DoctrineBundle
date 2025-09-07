@@ -42,7 +42,6 @@ use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
 use Doctrine\Persistence\Mapping\Driver\StaticPHPDriver;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
-use Symfony\Bridge\Doctrine\CacheWarmer\ProxyCacheWarmer;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bridge\Doctrine\SchemaListener\DoctrineDbalCacheAdapterSchemaListener;
@@ -69,9 +68,6 @@ return static function (ContainerConfigurator $container): void {
         ->set('doctrine.orm.metadata.php.class', PHPDriver::class)
         ->set('doctrine.orm.metadata.staticphp.class', StaticPHPDriver::class)
         ->set('doctrine.orm.metadata.attribute.class', AttributeDriver::class)
-
-        // cache warmer
-        ->set('doctrine.orm.proxy_cache_warmer.class', ProxyCacheWarmer::class)
 
         // form field factory guesser
         ->set('form.type_guesser.doctrine.class', DoctrineOrmTypeGuesser::class)
@@ -113,12 +109,6 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
 
         ->alias(EntityManagerInterface::class, 'doctrine.orm.entity_manager')
-
-        ->set('doctrine.orm.proxy_cache_warmer', param('doctrine.orm.proxy_cache_warmer.class'))
-            ->tag('kernel.cache_warmer')
-            ->args([
-                service('doctrine'),
-            ])
 
         ->set('form.type_guesser.doctrine', param('form.type_guesser.doctrine.class'))
             ->tag('form.type_guesser')

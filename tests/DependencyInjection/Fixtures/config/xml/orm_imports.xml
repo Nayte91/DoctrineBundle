@@ -11,6 +11,6 @@
     </srv:imports>
 
     <config>
-        <orm auto-generate-proxy-classes="true" />
+        <orm/>
     </config>
 </srv:container>
