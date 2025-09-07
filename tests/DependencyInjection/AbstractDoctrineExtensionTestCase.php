@@ -1425,6 +1425,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertFalse($collectorDefinition->getArguments()[1]);
     }
 
+    /** @group legacy */
     public function testNativeLazyObjectsWithoutConfig(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1465,6 +1466,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
     }
 
+    /** @group legacy */
     public function testNativeLazyObjectsWithConfigFalse(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
