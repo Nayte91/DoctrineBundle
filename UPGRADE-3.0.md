@@ -64,6 +64,11 @@ Use `doctrine.dbal.default_table_options.collation` instead.
 
 There is no replacement for this option.
 
+### The `doctrine.dbal.types.some_custom_type.commented` option is removed
+
+The `commented` option for custom types is no longer supported and has been
+removed.
+
 ### Controller resolver auto mapping can no longer be configured
 
 The `doctrine.orm.controller_resolver.auto_mapping` option now only accepts `false` as value, to disallow the usage of the controller resolver auto mapping feature by default. The configuration option will be fully removed in 4.0.
@@ -94,9 +99,3 @@ Type declarations
 
 Native type declarations have been added to all constants, properties, and
 methods.
-
-Types
------
-
- * The `commented` configuration option for types is no longer supported and
- deprecated.
