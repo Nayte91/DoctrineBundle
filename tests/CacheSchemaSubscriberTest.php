@@ -73,7 +73,7 @@ class CacheSchemaSubscriberTest extends TestCase
                     /* @phpstan-ignore function.alreadyNarrowedType */
                 ] + (method_exists(Configuration::class, 'enableNativeLazyObjects') ? [
                     'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400,
-                ] : []),
+                ] : ['enable_lazy_ghost_objects' => true]),
             ],
         ], $container);
 
