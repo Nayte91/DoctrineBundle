@@ -7,7 +7,7 @@ doctrine:
                 server_version: 9.4.0
 
     orm:
-        enable_native_lazy_objects: true
+        enable_lazy_ghost_objects: true
         filters:
             soft_delete:
                 class: Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestFilter

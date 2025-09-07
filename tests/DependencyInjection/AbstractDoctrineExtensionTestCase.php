@@ -934,7 +934,11 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->loadContainer('orm_filters');
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $container = $this->loadContainer(PHP_VERSION_ID >= 80400 && method_exists(
+            OrmConfiguration::class,
+            'enableNativeLazyObjects',
+        ) ? 'orm_filters' : 'orm_filters_legacy');
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $args       = [
@@ -1425,6 +1429,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertFalse($collectorDefinition->getArguments()[1]);
     }
 
+    /** @group legacy */
     public function testNativeLazyObjectsWithoutConfig(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1439,7 +1444,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires PHP 8.4+');
         }
 
-        $container     = $this->loadContainer('orm_filters');
+        $container     = $this->loadContainer('orm_native_lazy_objects_default');
         $entityManager = $container->get('doctrine.orm.entity_manager');
 
         $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
@@ -1465,6 +1470,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
     }
 
+    /** @group legacy */
     public function testNativeLazyObjectsWithConfigFalse(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
