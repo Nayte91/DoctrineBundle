@@ -8,10 +8,10 @@
 
     <config>
         <dbal default-connection="default">
-            <connection name="default" dbname="db" server-version="8.0.31" />
+            <connection name="default" dbname="db" server-version="9.4.0" />
         </dbal>
 
-        <orm enable-lazy-ghost-objects="true">
+        <orm enable-native-lazy-objects="true">
             <filter name="soft_delete" enabled="true" >Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestFilter</filter>
             <filter name="myFilter" enabled="true" class="Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestFilter">
                 <parameter name="myParameter">myValue</parameter>

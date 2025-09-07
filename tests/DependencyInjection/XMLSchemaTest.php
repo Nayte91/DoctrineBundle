@@ -6,11 +6,12 @@ use DirectoryIterator;
 use DOMDocument;
 use PHPUnit\Framework\TestCase;
 
+use function basename;
 use function substr;
 
 class XMLSchemaTest extends TestCase
 {
-    /** @return list<array{0: string}> */
+    /** @return array<string, array{0: string}> */
     public static function dataValidateSchemaFiles(): array
     {
         $schemaFiles = [];
@@ -20,7 +21,7 @@ class XMLSchemaTest extends TestCase
                 continue;
             }
 
-            $schemaFiles[] = [$element->getPathname()];
+            $schemaFiles[basename($element->getPathname())] = [$element->getPathname()];
         }
 
         return $schemaFiles;

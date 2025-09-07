@@ -57,7 +57,7 @@ class EntityListenerPassTest extends TestCase
     }
 
     /** @return iterable<array{0: ?string, 1: ?string, 2: ?string}> */
-    public function provideEvents(): iterable
+    public static function provideEvents(): iterable
     {
         yield 'With event and matching method' => [Events::prePersist, null, null];
         yield 'Without event' => [null, null, null];

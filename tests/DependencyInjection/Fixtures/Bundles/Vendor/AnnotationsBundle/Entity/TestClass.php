@@ -2,6 +2,6 @@
 
 namespace Fixtures\Bundles\Vendor\AnnotationsBundle\Entity;
 
-class Test
+class TestClass
 {
 }

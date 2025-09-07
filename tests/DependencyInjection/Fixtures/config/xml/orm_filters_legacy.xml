@@ -11,7 +11,12 @@
             <connection name="default" dbname="db" server-version="9.4.0" />
         </dbal>
 
-        <orm enable-native-lazy-objects="false">
+        <orm enable-lazy-ghost-objects="true">
+            <filter name="soft_delete" enabled="true" >Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestFilter</filter>
+            <filter name="myFilter" enabled="true" class="Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestFilter">
+                <parameter name="myParameter">myValue</parameter>
+                <parameter name="mySecondParameter">mySecondValue</parameter>
+            </filter>
         </orm>
     </config>
 </srv:container>

@@ -15,7 +15,7 @@ class UrlOverrideTest extends TestCase
      *
      * @dataProvider connectionDataProvider
      */
-    public static function testConnectionConfiguration(array $config, array $expectedParams): void
+    public function testConnectionConfiguration(array $config, array $expectedParams): void
     {
         $kernel = new DbalTestKernel($config);
         $kernel->boot();
@@ -30,7 +30,7 @@ class UrlOverrideTest extends TestCase
     }
 
     /** @return array<string, array{0: array<string, (bool|string|null)>, 1:  array<string, (bool|string|null)>}> */
-    public function connectionDataProvider(): array
+    public static function connectionDataProvider(): array
     {
         return [
             'override some' => [

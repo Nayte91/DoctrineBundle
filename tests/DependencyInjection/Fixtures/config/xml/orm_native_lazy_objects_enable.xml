@@ -8,7 +8,7 @@
 
     <config>
         <dbal default-connection="default">
-            <connection name="default" dbname="db" server-version="8.0.31" />
+            <connection name="default" dbname="db" server-version="9.4.0" />
         </dbal>
 
         <orm enable-native-lazy-objects="true">

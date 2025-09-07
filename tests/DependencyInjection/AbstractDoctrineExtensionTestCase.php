@@ -143,7 +143,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertEquals('mysql_user', $config['user']);
         $this->assertEquals('mysql_db', $config['dbname']);
         $this->assertEquals('/path/to/mysqld.sock', $config['unix_socket']);
-        $this->assertEquals('5.6.20', $config['serverVersion']);
+        $this->assertEquals('9.4.0', $config['serverVersion']);
     }
 
     /** @group legacy */
@@ -152,7 +152,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container = $this->loadContainer('dbal_allow_url_override');
         $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
-        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8', $config['url']);
+        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
 
         $expectedOverrides = [
             'dbname' => 'main_test',
@@ -181,7 +181,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         ];
 
         $this->assertEquals($expectedDefaults, array_intersect_key($config, $expectedDefaults));
-        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8', $config['url']);
+        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
         $this->assertCount(1, $config['connection_override_options']);
         $this->assertSame('main_test', $config['connection_override_options']['dbname']);
         $this->assertFalse(isset($config['override_url']));
@@ -192,7 +192,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container = $this->loadContainer('dbal_dbname_suffix');
         $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
-        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8', $config['url']);
+        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
         $this->assertSame('_test', $config['dbname_suffix']);
     }
 
@@ -919,7 +919,11 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->loadContainer('orm_filters');
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $container = $this->loadContainer(PHP_VERSION_ID >= 80400 && method_exists(
+            OrmConfiguration::class,
+            'enableNativeLazyObjects',
+        ) ? 'orm_filters' : 'orm_filters_legacy');
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $args       = [
@@ -1440,6 +1444,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertFalse($collectorDefinition->getArguments()[1]);
     }
 
+    /** @group legacy */
     public function testNativeLazyObjectsWithoutConfig(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1454,7 +1459,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires PHP 8.4+');
         }
 
-        $container     = $this->loadContainer('orm_filters');
+        $container     = $this->loadContainer('orm_native_lazy_objects_default');
         $entityManager = $container->get('doctrine.orm.entity_manager');
 
         $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
@@ -1480,6 +1485,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
     }
 
+    /** @group legacy */
     public function testNativeLazyObjectsWithConfigFalse(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
