@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -30,7 +31,6 @@ use function key;
 use function reset;
 use function sprintf;
 use function strtoupper;
-use function trigger_deprecation;
 
 /**
  * This class contains the configuration information for the bundle
@@ -284,13 +284,12 @@ class Configuration implements ConfigurationInterface
 
                 if ($urlConflictingValues) {
                     $tail = count($urlConflictingValues) > 1 ? sprintf('or "%s" options', array_pop($urlConflictingValues)) : 'option';
-                    trigger_deprecation(
-                        'doctrine/doctrine-bundle',
-                        '2.4',
-                        'Setting the "doctrine.dbal.%s" %s while the "url" one is defined is deprecated',
+
+                    throw new RuntimeException(sprintf(
+                        'Setting the "doctrine.dbal.%s" %s while the "url" one is defined is not allowed.',
                         implode('", "', $urlConflictingValues),
                         $tail,
-                    );
+                    ));
                 }
 
                 return $values;

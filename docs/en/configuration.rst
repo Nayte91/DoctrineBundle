@@ -823,7 +823,7 @@ can configure. The following block shows all possible configuration keys:
 
         doctrine:
             dbal:
-                url:                      mysql://user:secret@localhost:1234/otherdatabase # this would override the values below
+                url:                      mysql://user:secret@localhost:1234/otherdatabase
                 dbname:                   database
                 host:                     localhost
                 port:                     1234
