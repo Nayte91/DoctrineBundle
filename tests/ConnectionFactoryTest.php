@@ -43,7 +43,7 @@ class ConnectionFactoryTest extends TestCase
     public function testDefaultCharsetMySql(): void
     {
         $factory = new ConnectionFactory([]);
-        $params  = ['driver' => 'pdo_mysql', 'serverVersion' => '8.0.31'];
+        $params  = ['driver' => 'pdo_mysql', 'serverVersion' => '9.4.0'];
 
         $connection = $factory->createConnection($params, $this->configuration);
 
@@ -53,7 +53,7 @@ class ConnectionFactoryTest extends TestCase
     public function testDefaultCollationMySql(): void
     {
         $factory    = new ConnectionFactory([]);
-        $connection = $factory->createConnection(['driver' => 'pdo_mysql', 'serverVersion' => '8.0.31'], $this->configuration);
+        $connection = $factory->createConnection(['driver' => 'pdo_mysql', 'serverVersion' => '9.4.0'], $this->configuration);
 
         $this->assertSame(
             'utf8mb4_unicode_ci',
@@ -75,7 +75,7 @@ class ConnectionFactoryTest extends TestCase
         /** @psalm-suppress InvalidArgument We should adjust when https://github.com/vimeo/psalm/issues/8984 is fixed */
         $connection = (new ConnectionFactory([]))->createConnection(
             [
-                'url' => 'mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8',
+                'url' => 'mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1',
                 'connection_override_options' => $params,
             ],
             $this->configuration,
@@ -100,7 +100,7 @@ class ConnectionFactoryTest extends TestCase
         /** @psalm-suppress InvalidArgument We should adjust when https://github.com/vimeo/psalm/issues/8984 is fixed */
         $connection = (new ConnectionFactory([]))->createConnection(
             [
-                'url' => 'mysql://root:password@database:3306/main?serverVersion=mariadb-10.5.8',
+                'url' => 'mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1',
                 'dbname_suffix' => '_test',
             ],
             $this->configuration,
@@ -115,13 +115,14 @@ class ConnectionFactoryTest extends TestCase
         $connection = (new ConnectionFactory([]))->createConnection(
             [
                 'driver' => 'pdo_mysql',
+                'serverVersion' => '9.4.0',
                 'primary' => [
-                    'url' => 'mysql://root:password@database:3306/primary?serverVersion=mariadb-10.5.8',
+                    'url' => 'mysql://root:password@database:3306/primary?serverVersion=mariadb-12.1.1',
                     'dbname_suffix' => '_test',
                 ],
                 'replica' => [
                     'replica1' => [
-                        'url' => 'mysql://root:password@database:3306/replica?serverVersion=mariadb-10.5.8',
+                        'url' => 'mysql://root:password@database:3306/replica?serverVersion=mariadb-12.1.1',
                         'dbname_suffix' => '_test',
                     ],
                 ],

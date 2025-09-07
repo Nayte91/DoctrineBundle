@@ -4,8 +4,8 @@ doctrine:
         connections:
             connection1:
                 schema_filter: ~^(?!t_)~
-                server_version: 8.0.31
+                server_version: 9.4.0
             connection2:
-                server_version: 8.0.31
+                server_version: 9.4.0
             connection3:
-                server_version: 8.0.31
+                server_version: 9.4.0

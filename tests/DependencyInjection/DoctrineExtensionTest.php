@@ -251,7 +251,7 @@ class DoctrineExtensionTest extends TestCase
     }
 
     /** @return mixed[][][][] */
-    public function getAutomappingConfigurations(): array
+    public static function getAutomappingConfigurations(): array
     {
         return [
             [
