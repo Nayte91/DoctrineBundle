@@ -111,6 +111,8 @@ jobs:
   upload_coverage:
     name: "Upload coverage to Codecov"
     runs-on: "ubuntu-latest"
+    # Only run on PRs from forks or PRs from branches that do not match `*.x`
+    if: "github.event.pull_request.head.repo.full_name != github.repository || !contains(github.event.pull_request.head.ref, '.x')"
     needs:
       - "phpunit"
 
