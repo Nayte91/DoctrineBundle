@@ -8,6 +8,8 @@ use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\ORM\Cache\Region;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -100,7 +102,7 @@ class CacheCompatibilityPassTest extends TestCase
         })->boot();
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testMetadataCacheConfigUsingNonPsr6ServiceDefinedByApplication(): void
     {
         $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/1365');
