@@ -99,9 +99,6 @@ class ConnectionFactory
                     if (class_exists(InvalidWrapperClass::class)) {
                         throw InvalidWrapperClass::new($params['wrapperClass']);
                     }
-
-                    /* @phpstan-ignore staticMethod.notFound */
-                    throw DBALException::invalidWrapperClass($params['wrapperClass']);
                 }
 
                 $wrapperClass           = $params['wrapperClass'];
