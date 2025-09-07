@@ -72,6 +72,12 @@ Auto mapping used any route parameter that matches with a field name of the Enti
 
 If you were relying on this functionality, you will need to update your code to use explicit mapped route parameters instead.
 
+### URL overrides are no longer allowed
+
+When using the `doctrine.dbal.url` configuration option, you can no longer
+specify other configuration options that would conflict with it, such as
+`dbname`, `host`, etc.
+
 ConnectionFactory::createConnection() signature change
 ------------------------------------------------------
 
