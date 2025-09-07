@@ -417,7 +417,6 @@ Configuration Reference
                         MultipleActiveResultSets=""
                         use-savepoints="true"
                         driver="pdo_mysql"
-                        platform-service=""
                         auto-commit=""
                         schema-filter=""
                         logging="%kernel.debug%"
@@ -944,7 +943,6 @@ can configure. The following block shows all possible configuration keys:
                     wrapper-class="MyDoctrineDbalConnectionWrapper"
                     charset=""
                     logging="%kernel.debug%"
-                    platform-service="MyOwnDatabasePlatformService"
                     auto-commit="false"
                     schema-filter="^sf2_"
                 >

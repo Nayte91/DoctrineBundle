@@ -341,15 +341,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
 
         $options += $connectionDefaults;
 
-        foreach (['replicas', 'slaves'] as $connectionKey) {
-            foreach (array_keys($options[$connectionKey]) as $name) {
-                $options[$connectionKey][$name] += $connectionDefaults;
-            }
-        }
-
-        if (isset($options['platform_service'])) {
-            $options['platform'] = new Reference($options['platform_service']);
-            unset($options['platform_service']);
+        foreach (array_keys($options['replicas']) as $name) {
+            $options['replicas'][$name] += $connectionDefaults;
         }
 
         unset($options['mapping_types']);
@@ -359,7 +352,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 'options' => 'driverOptions',
                 'driver_class' => 'driverClass',
                 'wrapper_class' => 'wrapperClass',
-                'keep_slave' => 'keepReplica',
                 'keep_replica' => 'keepReplica',
                 'replicas' => 'replica',
                 'server_version' => 'serverVersion',
@@ -374,27 +366,23 @@ class DoctrineExtension extends AbstractDoctrineExtension
             unset($options[$old]);
         }
 
-        foreach (['replica', 'slaves'] as $connectionKey) {
-            foreach ($options[$connectionKey] as $name => $value) {
-                $driverOptions       = $value['driverOptions'] ?? [];
-                $parentDriverOptions = $options['driverOptions'] ?? [];
-                if ($driverOptions === [] && $parentDriverOptions === []) {
-                    continue;
-                }
-
-                $options[$connectionKey][$name]['driverOptions'] = $driverOptions + $parentDriverOptions;
+        foreach ($options['replica'] as $name => $value) {
+            $driverOptions       = $value['driverOptions'] ?? [];
+            $parentDriverOptions = $options['driverOptions'] ?? [];
+            if ($driverOptions === [] && $parentDriverOptions === []) {
+                continue;
             }
+
+            $options['replica'][$name]['driverOptions'] = $driverOptions + $parentDriverOptions;
         }
 
-        if (! empty($options['slaves']) || ! empty($options['replica'])) {
+        if (! empty($options['replica'])) {
             $nonRewrittenKeys = [
                 'driver' => true,
                 'driverClass' => true,
                 'wrapperClass' => true,
-                'keepSlave' => true,
                 'keepReplica' => true,
                 'platform' => true,
-                'slaves' => true,
                 'primary' => true,
                 'replica' => true,
                 'serverVersion' => true,
@@ -419,7 +407,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 $options['wrapperClass'] = PrimaryReadReplicaConnection::class;
             }
         } else {
-            unset($options['slaves'], $options['replica']);
+            unset($options['replica']);
         }
 
         return $options;
