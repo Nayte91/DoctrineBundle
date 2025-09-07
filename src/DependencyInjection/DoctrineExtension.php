@@ -57,7 +57,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
-use function array_intersect_key;
 use function array_keys;
 use function array_merge;
 use function class_exists;
@@ -338,11 +337,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             'password' => null,
         ];
 
-        if ($options['override_url'] ?? false) {
-            $options['connection_override_options'] = array_intersect_key($options, ['dbname' => null] + $connectionDefaults);
-        }
-
-        unset($options['override_url']);
         unset($options['schema_manager_factory']);
 
         $options += $connectionDefaults;
