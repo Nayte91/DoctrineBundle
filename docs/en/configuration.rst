@@ -814,15 +814,6 @@ Doctrine DBAL Configuration
     accept, converted to the XML or YAML naming standards that Symfony
     enforces. See the Doctrine `DBAL documentation`_ for more information.
 
-.. note::
-
-    When specifying a ``url`` parameter, any information extracted from that
-    URL will override explicitly set parameters unless ``override_url`` is set
-    to ``true``. An example database URL would be
-    ``mysql://snoopy:redbaron@localhost/baseball``, and any explicitly set driver,
-    user, password and dbname parameter would be overridden by this URL.
-    See the Doctrine `DBAL documentation`_ for more information.
-
 Besides default Doctrine options, there are some Symfony-related ones that you
 can configure. The following block shows all possible configuration keys:
 

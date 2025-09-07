@@ -60,6 +60,10 @@ have been removed:
 
 Use `doctrine.dbal.default_table_options.collation` instead.
 
+### The `doctrine.dbal.override_url` option is removed
+
+There is no replacement for this option.
+
 ### Controller resolver auto mapping can no longer be configured
 
 The `doctrine.orm.controller_resolver.auto_mapping` option now only accepts `false` as value, to disallow the usage of the controller resolver auto mapping feature by default. The configuration option will be fully removed in 4.0.

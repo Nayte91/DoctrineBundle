@@ -9,8 +9,6 @@ use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 
-use function array_intersect_key;
-
 class ConnectionFactoryTest extends TestCase
 {
     use VerifyDeprecations;
@@ -59,29 +57,6 @@ class ConnectionFactoryTest extends TestCase
             'utf8mb4_unicode_ci',
             $connection->getParams()['defaultTableOptions']['collation'],
         );
-    }
-
-    /** @group legacy */
-    public function testConnectionOverrideOptions(): void
-    {
-        $params = [
-            'dbname' => 'main_test',
-            'host' => 'db_test',
-            'port' => 5432,
-            'user' => 'tester',
-            'password' => 'wordpass',
-        ];
-
-        /** @psalm-suppress InvalidArgument We should adjust when https://github.com/vimeo/psalm/issues/8984 is fixed */
-        $connection = (new ConnectionFactory([]))->createConnection(
-            [
-                'url' => 'mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1',
-                'connection_override_options' => $params,
-            ],
-            $this->configuration,
-        );
-
-        $this->assertEquals($params, array_intersect_key($connection->getParams(), $params));
     }
 
     public function testConnectionCharsetFromUrl(): void

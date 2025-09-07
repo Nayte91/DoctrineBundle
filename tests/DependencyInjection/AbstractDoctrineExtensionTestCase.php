@@ -32,7 +32,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use function array_filter;
-use function array_intersect_key;
 use function array_keys;
 use function array_values;
 use function assert;
@@ -128,47 +127,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertEquals('mysql_db', $config['dbname']);
         $this->assertEquals('/path/to/mysqld.sock', $config['unix_socket']);
         $this->assertEquals('9.4.0', $config['serverVersion']);
-    }
-
-    /** @group legacy */
-    public function testDbalLoadUrlOverride(): void
-    {
-        $container = $this->loadContainer('dbal_allow_url_override');
-        $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
-
-        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
-
-        $expectedOverrides = [
-            'dbname' => 'main_test',
-            'user' => 'tester',
-            'password' => 'wordpass',
-            'host' => 'localhost',
-            'port' => 4321,
-        ];
-
-        $this->assertEquals($expectedOverrides, array_intersect_key($config, $expectedOverrides));
-        $this->assertSame($expectedOverrides, $config['connection_override_options']);
-        $this->assertFalse(isset($config['override_url']));
-    }
-
-    /** @group legacy */
-    public function testDbalLoadPartialUrlOverrideSetsDefaults(): void
-    {
-        $container = $this->loadContainer('dbal_allow_partial_url_override');
-        $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
-
-        $expectedDefaults = [
-            'host' => 'localhost',
-            'user' => 'root',
-            'password' => null,
-            'port' => null,
-        ];
-
-        $this->assertEquals($expectedDefaults, array_intersect_key($config, $expectedDefaults));
-        $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
-        $this->assertCount(1, $config['connection_override_options']);
-        $this->assertSame('main_test', $config['connection_override_options']['dbname']);
-        $this->assertFalse(isset($config['override_url']));
     }
 
     public function testDbalDbnameSuffix(): void

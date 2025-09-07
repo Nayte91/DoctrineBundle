@@ -20,7 +20,6 @@ use Doctrine\DBAL\Types\Type;
 use function array_merge;
 use function class_exists;
 use function is_subclass_of;
-use function trigger_deprecation;
 
 use const PHP_EOL;
 
@@ -69,14 +68,6 @@ class ConnectionFactory
             $this->initializeTypes();
         }
 
-        $overriddenOptions = [];
-        /** @phpstan-ignore isset.offset (We should adjust when https://github.com/phpstan/phpstan/issues/12414 is fixed) */
-        if (isset($params['connection_override_options'])) {
-            trigger_deprecation('doctrine/doctrine-bundle', '2.4', 'The "connection_override_options" connection parameter is deprecated');
-            $overriddenOptions = $params['connection_override_options'];
-            unset($params['connection_override_options']);
-        }
-
         $params = $this->parseDatabaseUrl($params);
 
         // URL support for PrimaryReplicaConnection
@@ -91,7 +82,7 @@ class ConnectionFactory
         }
 
         /** @phpstan-ignore-next-line We should adjust when https://github.com/phpstan/phpstan/issues/12414 is fixed */
-        if (! isset($params['pdo']) && (! isset($params['charset']) || $overriddenOptions || isset($params['dbname_suffix']))) {
+        if (! isset($params['pdo']) && (! isset($params['charset']) || isset($params['dbname_suffix']))) {
             $wrapperClass = null;
 
             if (isset($params['wrapperClass'])) {
@@ -106,7 +97,7 @@ class ConnectionFactory
             }
 
             $connection = DriverManager::getConnection($params, $config);
-            $params     = $this->addDatabaseSuffix(array_merge($connection->getParams(), $overriddenOptions));
+            $params     = $this->addDatabaseSuffix($connection->getParams());
             $driver     = $connection->getDriver();
             $platform   = $driver->getDatabasePlatform(new StaticServerVersionProvider(
                 $params['serverVersion'] ?? $params['primary']['serverVersion'] ?? '',
