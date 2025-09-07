@@ -69,6 +69,16 @@ There is no replacement for this option.
 The `commented` option for custom types is no longer supported and has been
 removed.
 
+### The `doctrine.dbal.connection.some_connection.platform_service` option is removed
+
+The `platform_service` option for connections is no longer supported and has
+been removed.
+
+### The `doctrine.dbal.connection.some_connection.keep_slave` and `doctrine.dbal.connection.some_connection.slaves` option is removed
+
+`doctrine.dbal.connection.some_connection.slaves` becomes
+`doctrine.dbal.connection.some_connection.replicas`.
+
 ### Controller resolver auto mapping can no longer be configured
 
 The `doctrine.orm.controller_resolver.auto_mapping` option now only accepts `false` as value, to disallow the usage of the controller resolver auto mapping feature by default. The configuration option will be fully removed in 4.0.

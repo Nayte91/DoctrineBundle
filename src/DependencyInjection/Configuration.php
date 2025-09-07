@@ -171,18 +171,10 @@ class Configuration implements ConfigurationInterface
         $connectionNode
             ->fixXmlConfig('option')
             ->fixXmlConfig('mapping_type')
-            ->fixXmlConfig('slave')
             ->fixXmlConfig('replica')
             ->fixXmlConfig('default_table_option')
             ->children()
                 ->scalarNode('driver')->defaultValue('pdo_mysql')->end()
-                ->scalarNode('platform_service')
-                    ->setDeprecated(
-                        'doctrine/doctrine-bundle',
-                        '2.9',
-                        'The "platform_service" configuration key is deprecated since doctrine-bundle 2.9. DBAL 4 will not support setting a custom platform via connection params anymore.',
-                    )
-                ->end()
                 ->booleanNode('auto_commit')->end()
                 ->scalarNode('schema_filter')->end()
                 ->booleanNode('logging')->defaultValue($this->debug)->end()
@@ -200,13 +192,6 @@ class Configuration implements ConfigurationInterface
                 ->integerNode('idle_connection_ttl')->defaultValue(600)->end()
                 ->scalarNode('driver_class')->end()
                 ->scalarNode('wrapper_class')->end()
-                ->booleanNode('keep_slave')
-                    ->setDeprecated(
-                        'doctrine/doctrine-bundle',
-                        '2.2',
-                        'The "keep_slave" configuration key is deprecated since doctrine-bundle 2.2. Use the "keep_replica" configuration key instead.',
-                    )
-                ->end()
                 ->booleanNode('keep_replica')->end()
                 ->arrayNode('options')
                     ->useAttributeAsKey('key')
@@ -230,27 +215,14 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('result_cache')->end()
             ->end();
 
-        // dbal < 2.11
-        $slaveNode = $connectionNode
-            ->children()
-                ->arrayNode('slaves')
-                    ->setDeprecated(
-                        'doctrine/doctrine-bundle',
-                        '2.2',
-                        'The "slaves" configuration key will be renamed to "replicas" in doctrine-bundle 3.0. "slaves" is deprecated since doctrine-bundle 2.2.',
-                    )
-                    ->useAttributeAsKey('name')
-                    ->prototype('array');
-        /* @phpstan-ignore argument.type (symfony plugin needed) */
-        $this->configureDbalDriverNode($slaveNode);
-
-        // dbal >= 2.11
         $replicaNode = $connectionNode
             ->children()
                 ->arrayNode('replicas')
                     ->useAttributeAsKey('name')
                     ->prototype('array');
-        /* @phpstan-ignore argument.type (symfony plugin needed) */
+
+        assert($replicaNode instanceof ArrayNodeDefinition);
+
         $this->configureDbalDriverNode($replicaNode);
 
         assert($node instanceof ArrayNodeDefinition);
