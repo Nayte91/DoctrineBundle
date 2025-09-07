@@ -934,7 +934,11 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->loadContainer('orm_filters');
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $container = $this->loadContainer(PHP_VERSION_ID >= 80400 && method_exists(
+            OrmConfiguration::class,
+            'enableNativeLazyObjects',
+        ) ? 'orm_filters' : 'orm_filters_legacy');
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $args       = [
