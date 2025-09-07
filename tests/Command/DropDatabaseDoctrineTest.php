@@ -3,6 +3,7 @@
 namespace Doctrine\Bundle\DoctrineBundle\Tests\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Command\DropDatabaseDoctrineCommand;
+use Doctrine\Bundle\DoctrineBundle\Tests\Polyfill\SymfonyApp;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -12,7 +13,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Generator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -41,8 +41,8 @@ class DropDatabaseDoctrineTest extends TestCase
         /** @psalm-suppress InvalidArgument Need to be compatible with DBAL < 4, which still has `$params['url']` */
         $container = $this->getMockContainer($connectionName, $params);
 
-        $application = new Application();
-        $application->add(new DropDatabaseDoctrineCommand($container->get('doctrine')));
+        $application = new SymfonyApp();
+        $application->addCommand(new DropDatabaseDoctrineCommand($container->get('doctrine')));
 
         $command = $application->find('doctrine:database:drop');
 
@@ -84,8 +84,8 @@ class DropDatabaseDoctrineTest extends TestCase
 
         $container = $this->getMockContainer($connectionName, $params);
 
-        $application = new Application();
-        $application->add(new DropDatabaseDoctrineCommand($container->get('doctrine')));
+        $application = new SymfonyApp();
+        $application->addCommand(new DropDatabaseDoctrineCommand($container->get('doctrine')));
 
         $command = $application->find('doctrine:database:drop');
 
@@ -108,7 +108,7 @@ class DropDatabaseDoctrineTest extends TestCase
         );
     }
 
-    public function provideForceOption(): Generator
+    public static function provideForceOption(): Generator
     {
         yield 'full name' => [
             ['--force' => true],
@@ -119,7 +119,7 @@ class DropDatabaseDoctrineTest extends TestCase
         ];
     }
 
-    public function provideIncompatibleDriverOptions(): Generator
+    public static function provideIncompatibleDriverOptions(): Generator
     {
         yield 'full name' => [
             [

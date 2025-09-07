@@ -2,6 +2,6 @@
 
 namespace Fixtures\Bundles\AttributesBundle\Entity;
 
-class Test
+class TestClass
 {
 }
