@@ -8,6 +8,8 @@ use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\ORM\Cache\Region;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -54,6 +56,7 @@ class CacheCompatibilityPassTest extends TestCase
                         'doctrine',
                         [
                             'orm' => [
+                                'controller_resolver' => ['auto_mapping' => false],
                                 'query_cache_driver' => ['type' => 'service', 'id' => 'custom_cache_service'],
                                 'result_cache_driver' => ['type' => 'pool', 'pool' => 'doctrine.system_cache_pool'],
                                 'second_level_cache' => [
@@ -89,7 +92,12 @@ class CacheCompatibilityPassTest extends TestCase
                 $loader->load(static function (ContainerBuilder $containerBuilder): void {
                     $containerBuilder->loadFromExtension(
                         'doctrine',
-                        ['orm' => ['metadata_cache_driver' => ['type' => 'service', 'id' => 'custom_cache_service']]],
+                        [
+                            'orm' => [
+                                'controller_resolver' => ['auto_mapping' => false],
+                                'metadata_cache_driver' => ['type' => 'service', 'id' => 'custom_cache_service'],
+                            ],
+                        ],
                     );
                     $containerBuilder->setDefinition(
                         'custom_cache_service',
@@ -100,7 +108,7 @@ class CacheCompatibilityPassTest extends TestCase
         })->boot();
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testMetadataCacheConfigUsingNonPsr6ServiceDefinedByApplication(): void
     {
         $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/1365');

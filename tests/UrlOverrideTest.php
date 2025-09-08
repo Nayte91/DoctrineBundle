@@ -3,18 +3,19 @@
 namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\DbalTestKernel;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 
 use function array_intersect_key;
 
-/** @group legacy */
 class UrlOverrideTest extends TestCase
 {
     /**
      * @param array<string, (bool|string|null)> $config
      * @param array<string, (bool|string|null)> $expectedParams
-     *
-     * @dataProvider connectionDataProvider
      */
+    #[WithoutErrorHandler]
+    #[DataProvider('connectionDataProvider')]
     public function testConnectionConfiguration(array $config, array $expectedParams): void
     {
         $kernel = new DbalTestKernel($config);
