@@ -5,9 +5,9 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Compiler;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\TestKernel;
 use Doctrine\Bundle\DoctrineBundle\Tests\TestCase;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
+use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\ORM\Cache\Region;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,7 +18,7 @@ use function interface_exists;
 
 class CacheCompatibilityPassTest extends TestCase
 {
-    use ExpectDeprecationTrait;
+    use VerifyDeprecations;
 
     public static function setUpBeforeClass(): void
     {
@@ -100,13 +100,10 @@ class CacheCompatibilityPassTest extends TestCase
         })->boot();
     }
 
-    /**
-     * @group legacy
-     * @doesNotPerformAssertions
-     */
+    /** @group legacy */
     public function testMetadataCacheConfigUsingNonPsr6ServiceDefinedByApplication(): void
     {
-        $this->expectDeprecation('Since doctrine/doctrine-bundle 2.4: Configuring doctrine/cache is deprecated. Please update the cache service "custom_cache_service" to use a PSR-6 cache.');
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/1365');
         (new class (false) extends TestKernel {
             public function registerContainerConfiguration(LoaderInterface $loader): void
             {
