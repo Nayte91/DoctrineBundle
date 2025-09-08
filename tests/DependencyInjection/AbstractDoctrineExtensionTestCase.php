@@ -17,6 +17,8 @@ use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Generator;
 use InvalidArgumentException;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator;
@@ -203,7 +205,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertCount(0, $calls);
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testDbalSchemaManagerFactory(): void
     {
         $container = $this->loadContainer('dbal_schema_manager_factory');
@@ -623,10 +625,8 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertDICDefinitionMethodCallOnce($definition, 'setTypedFieldMapper', [0 => new Reference('doctrine.orm.typed_field_mapper.default')]);
     }
 
-    /**
-     * @dataProvider cacheConfigProvider
-     * @group legacy
-     */
+    #[DataProvider('cacheConfigProvider')]
+    #[WithoutErrorHandler]
     public function testCacheConfig(string|null $expectedClass, string $entityManagerName, string|null $cacheGetter): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -990,7 +990,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         }
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testWellKnownSchemaFilterDefaultTables(): void
     {
         $container = $this->getContainer([]);
@@ -1013,7 +1013,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertTrue($filter->__invoke('anything_else'));
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testWellKnownSchemaFilterOverriddenTables(): void
     {
         $container = $this->getContainer([]);
@@ -1251,7 +1251,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertFalse($collectorDefinition->getArguments()[1]);
     }
 
-    /** @group legacy */
     public function testNativeLazyObjectsWithoutConfig(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1276,7 +1275,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
     }
 
-    /** @group legacy */
     public function testNativeLazyObjectsWithConfigFalse(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
