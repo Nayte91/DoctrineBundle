@@ -38,6 +38,8 @@ use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use InvalidArgumentException;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -66,10 +68,10 @@ use function sys_get_temp_dir;
 class DoctrineExtensionTest extends TestCase
 {
     /**
-     * https://github.com/doctrine/orm/pull/7953 needed, otherwise ORM classes we define services for trigger deprecations
-     *
-     * @group legacy
+     * https://github.com/doctrine/orm/pull/7953 needed, otherwise ORM classes
+     * we define services for trigger deprecations
      */
+    #[WithoutErrorHandler]
     public function testAutowiringAlias(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -656,7 +658,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.second_level_cache.default_cache_factory.class%', $slcDefinition->getClass());
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testSingleEntityManagerWithCustomSecondLevelCacheConfiguration(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1018,7 +1020,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertNotContains('messenger.transport_factory', $container->findTags());
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testInvalidCacheConfiguration(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1065,12 +1067,9 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals($expectedTarget, (string) $alias);
     }
 
-    /**
-     * @param array{type: ?string, pool?: string, id?: string} $cacheConfig
-     *
-     * @dataProvider legacyCacheConfigurationProvider
-     * @group legacy
-     */
+    /** @param array{type: ?string, pool?: string, id?: string} $cacheConfig */
+    #[DataProvider('legacyCacheConfigurationProvider')]
+    #[WithoutErrorHandler]
     public function testLegacyCacheConfiguration(string $expectedAliasName, string $expectedAliasTarget, string $cacheName, array $cacheConfig): void
     {
         $this->testCacheConfiguration($expectedAliasName, $expectedAliasTarget, $cacheName, $cacheConfig);
