@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use function class_exists;
 use function interface_exists;
 
 class EntityListenerPassTest extends TestCase
@@ -59,6 +60,13 @@ class EntityListenerPassTest extends TestCase
     /** @return iterable<array{0: ?string, 1: ?string, 2: ?string}> */
     public static function provideEvents(): iterable
     {
+        if (! class_exists(Events::class)) {
+            // If ORM is not available, return fake data to make the data provider valid
+            yield 'Without ORM' => [null, null, null];
+
+            return;
+        }
+
         yield 'With event and matching method' => [Events::prePersist, null, null];
         yield 'Without event' => [null, null, null];
         yield 'With event and custom method' => [Events::postLoad, 'postLoadHandler', 'postLoadHandler'];
