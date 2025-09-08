@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Middleware\ConnectionNameAwareInterface;
 use Doctrine\Bundle\DoctrineBundle\Middleware\IdleConnectionMiddleware;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Middleware;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Bridge\Doctrine\Middleware\IdleConnection\Listener;
@@ -33,7 +34,7 @@ class MiddlewarePassTest extends TestCase
         ];
     }
 
-    /** @dataProvider provideAddMiddleware */
+    #[DataProvider('provideAddMiddleware')]
     public function testAddMiddlewareWithExplicitTag(string $middlewareClass, bool $connectionNameAware): void
     {
         $container = $this->createContainer(static function (ContainerBuilder $container) use ($middlewareClass) {
@@ -105,11 +106,8 @@ class MiddlewarePassTest extends TestCase
         ];
     }
 
-    /**
-     * @param class-string $className
-     *
-     * @dataProvider provideAddMiddlewareWithAttributeForAutoconfiguration
-     */
+    /** @param class-string $className */
+    #[DataProvider('provideAddMiddlewareWithAttributeForAutoconfiguration')]
     public function testAddMiddlewareWithAttributeForAutoconfiguration(string $className, bool $registeredOnConn1): void
     {
         $container = $this->createContainer(static function (ContainerBuilder $container) use ($className) {
@@ -135,7 +133,7 @@ class MiddlewarePassTest extends TestCase
         $this->assertMiddlewareInjected($container, 'conn2', $className);
     }
 
-    /** @dataProvider provideAddMiddleware */
+    #[DataProvider('provideAddMiddleware')]
     public function testDontAddMiddlewareWhenDbalIsNotUsed(string $middlewareClass): void
     {
         $container = $this->createContainer(static function (ContainerBuilder $container) use ($middlewareClass) {
