@@ -3,6 +3,7 @@
 namespace Doctrine\Bundle\DoctrineBundle\Tests\Twig;
 
 use Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 
 use function pack;
@@ -103,7 +104,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals('1', DoctrineExtension::escapeFunction(true));
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testItHighlightsSqlQueriesUsingCssClasses(): void
     {
         $extension = new DoctrineExtension();
@@ -117,7 +118,7 @@ class DoctrineExtensionTest extends TestCase
         );
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testItDoesNotOutputDuplicatePreTags(): void
     {
         $extension = new DoctrineExtension();
@@ -131,7 +132,7 @@ class DoctrineExtensionTest extends TestCase
         );
     }
 
-    /** @group legacy */
+    #[WithoutErrorHandler]
     public function testItUsesCssOnTheDivTag(): void
     {
         $extension = new DoctrineExtension();
