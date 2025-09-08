@@ -5,6 +5,7 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests\Middleware;
 use ArrayObject;
 use Doctrine\Bundle\DoctrineBundle\Middleware\IdleConnectionMiddleware;
 use Doctrine\DBAL\Driver;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver as IdleConnectionDriver;
 
@@ -12,7 +13,7 @@ use function time;
 
 class IdleConnectionMiddlewareTest extends TestCase
 {
-    /** @requires function Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver::__construct */
+    #[RequiresMethod(\Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver::class, '__construct')]
     public function testWrap()
     {
         /** @var ArrayObject<string, int> $connectionExpiries */

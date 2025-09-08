@@ -82,7 +82,7 @@ class CacheCompatibilityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /** @doesNotPerformAssertions */
+    #[DoesNotPerformAssertions]
     public function testMetadataCacheConfigUsingPsr6ServiceDefinedByApplication(): void
     {
         (new class (false) extends TestKernel {
