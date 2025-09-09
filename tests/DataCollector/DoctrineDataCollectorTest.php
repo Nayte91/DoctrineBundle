@@ -38,19 +38,19 @@ class DoctrineDataCollectorTest extends TestCase
 
         $manager->expects($this->any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($factory));
+            ->willReturn($factory);
         $manager->expects($this->any())
             ->method('getConfiguration')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
         $manager->expects($this->any())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
+            ->willReturn($unitOfWork);
         $unitOfWork->expects($this->any())
             ->method('getIdentityMap')
-            ->will($this->returnValue([
+            ->willReturn([
                 self::FIRST_ENTITY => [new stdClass()],
                 self::SECOND_ENTITY => [new stdClass(), new stdClass()],
-            ]));
+            ]);
 
         $config->expects($this->once())
             ->method('isSecondLevelCacheEnabled')
@@ -63,7 +63,7 @@ class DoctrineDataCollectorTest extends TestCase
         ];
         $factory->expects($this->once())
             ->method('getLoadedMetadata')
-            ->will($this->returnValue($metadatas));
+            ->willReturn($metadatas);
 
         $collector->collect(new Request(), new Response());
 
@@ -87,13 +87,13 @@ class DoctrineDataCollectorTest extends TestCase
         $manager->expects($this->never())
             ->method('getMetadataFactory');
         $manager->method('getConfiguration')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
         $manager->expects($this->any())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
+            ->willReturn($unitOfWork);
         $unitOfWork->expects($this->any())
             ->method('getIdentityMap')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $collector->collect(new Request(), new Response());
 
@@ -167,15 +167,15 @@ class DoctrineDataCollectorTest extends TestCase
         $registry
             ->expects($this->any())
             ->method('getConnectionNames')
-            ->will($this->returnValue(['default' => 'doctrine.dbal.default_connection']));
+            ->willReturn(['default' => 'doctrine.dbal.default_connection']);
         $registry
             ->expects($this->any())
             ->method('getManagerNames')
-            ->will($this->returnValue(['default' => 'doctrine.orm.default_entity_manager']));
+            ->willReturn(['default' => 'doctrine.orm.default_entity_manager']);
         $registry
             ->expects($this->any())
             ->method('getManagers')
-            ->will($this->returnValue($managers));
+            ->willReturn($managers);
 
         return new DoctrineDataCollector($registry, $shouldValidateSchema, $debugDataHolder);
     }
