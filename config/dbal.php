@@ -9,7 +9,6 @@ use Doctrine\Bundle\DoctrineBundle\Command\DropDatabaseDoctrineCommand;
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\Controller\ProfilerController;
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
-use Doctrine\Bundle\DoctrineBundle\Dbal\BlacklistSchemaAssetFilter;
 use Doctrine\Bundle\DoctrineBundle\Dbal\ManagerRegistryAwareConnectionProvider;
 use Doctrine\Bundle\DoctrineBundle\Dbal\SchemaAssetsFilterManager;
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -86,11 +85,6 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('doctrine.dbal.schema_asset_filter_manager', SchemaAssetsFilterManager::class)
             ->abstract()
-
-        ->set('doctrine.dbal.well_known_schema_asset_filter', BlacklistSchemaAssetFilter::class)
-            ->args([
-                [],
-            ])
 
         ->set('doctrine.database_create_command', CreateDatabaseDoctrineCommand::class)
             ->args([

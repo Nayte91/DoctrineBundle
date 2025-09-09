@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
-use Doctrine\Bundle\DoctrineBundle\Dbal\BlacklistSchemaAssetFilter;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DbalSchemaFilterPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
@@ -990,48 +989,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             $connConfig = $getConfiguration($connectionName);
             $this->assertSame($expectedTables, array_values(array_filter($assetNames, $connConfig->getSchemaAssetsFilter())), sprintf('Filtering for connection "%s"', $connectionName));
         }
-    }
-
-    #[WithoutErrorHandler]
-    public function testWellKnownSchemaFilterDefaultTables(): void
-    {
-        $container = $this->getContainer([]);
-        $loader    = new DoctrineExtension();
-        $container->registerExtension($loader);
-        $container->addCompilerPass(new DbalSchemaFilterPass());
-
-        $this->loadFromFile($container, 'well_known_schema_filter_default_tables_session');
-
-        $this->compileContainer($container);
-
-        $definition = $container->getDefinition('doctrine.dbal.well_known_schema_asset_filter');
-
-        $filter = $container->get('well_known_filter');
-
-        $this->assertInstanceOf(BlacklistSchemaAssetFilter::class, $filter);
-
-        $this->assertNotSame([['sessions']], $definition->getArguments());
-        $this->assertTrue($filter->__invoke('sessions'));
-        $this->assertTrue($filter->__invoke('anything_else'));
-    }
-
-    #[WithoutErrorHandler]
-    public function testWellKnownSchemaFilterOverriddenTables(): void
-    {
-        $container = $this->getContainer([]);
-        $loader    = new DoctrineExtension();
-        $container->registerExtension($loader);
-        $container->addCompilerPass(new DbalSchemaFilterPass());
-
-        $this->loadFromFile($container, 'well_known_schema_filter_overridden_tables_session');
-
-        $this->compileContainer($container);
-
-        $filter = $container->get('well_known_filter');
-
-        $this->assertInstanceOf(BlacklistSchemaAssetFilter::class, $filter);
-
-        $this->assertTrue($filter->__invoke('app_session'));
     }
 
     public function testEntityListenerResolver(): void

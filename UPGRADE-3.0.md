@@ -104,6 +104,17 @@ You should use stop passing an event manager argument.
 + $connectionFactory->createConnection($params, $config, $mappingTypes)
 ```
 
+`Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventListenerInterface` has been removed
+----------------------------------------------------------------------------------------
+
+Use the `#[Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener]`
+attribute instead.
+
+`Doctrine\Bundle\DoctrineBundle\Dbal\BlacklistSchemaAssetsFilter` has been removed
+----------------------------------------------------------------------------------
+
+Implement your own include/exclude mechanism instead.
+
 Type declarations
 -----------------
 
