@@ -135,7 +135,16 @@ class MiddlewarePassTest extends TestCase
         $this->assertMiddlewareInjected($container, 'conn2', $className);
     }
 
-    #[DataProvider('provideAddMiddleware')]
+    /** @return array<string, array{0: class-string}> */
+    public static function provideDontAddMiddleware(): array
+    {
+        return [
+            'not connection name aware' => [PHP7Middleware::class],
+            'connection name aware' => [ConnectionAwarePHP7Middleware::class],
+        ];
+    }
+
+    #[DataProvider('provideDontAddMiddleware')]
     public function testDontAddMiddlewareWhenDbalIsNotUsed(string $middlewareClass): void
     {
         $container = $this->createContainer(static function (ContainerBuilder $container) use ($middlewareClass) {
