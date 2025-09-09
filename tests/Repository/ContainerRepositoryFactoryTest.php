@@ -169,13 +169,11 @@ EXCEPTION);
             $classMetadatas[$entityClass] = $metadata;
         }
 
-        $em = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
-        $em->expects($this->any())
-            ->method('getClassMetadata')
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getClassMetadata')
             ->willReturnCallback(static fn (string $class) => $classMetadatas[$class]);
 
-        $em->expects($this->any())
-            ->method('getConfiguration')
+        $em->method('getConfiguration')
             ->willReturn(new Configuration());
 
         return $em;
