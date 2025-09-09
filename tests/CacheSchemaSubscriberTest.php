@@ -4,7 +4,6 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheSchemaSubscriberPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\Alias;
@@ -14,10 +13,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 
 use function interface_exists;
-use function method_exists;
 use function sys_get_temp_dir;
-
-use const PHP_VERSION_ID;
 
 class CacheSchemaSubscriberTest extends TestCase
 {
@@ -66,15 +62,8 @@ class CacheSchemaSubscriberTest extends TestCase
         $extension = new DoctrineExtension();
         $container->registerExtension($extension);
         $extension->load([
-            [
-                'dbal' => [],
-                'orm' => [
-                    'controller_resolver' => ['auto_mapping' => false],
-                    /* @phpstan-ignore function.alreadyNarrowedType */
-                ] + (method_exists(Configuration::class, 'enableNativeLazyObjects') ? [
-                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400,
-                ] : ['enable_lazy_ghost_objects' => true]),
-            ],
+            DeprecationFreeConfig::get(),
+            ['dbal' => []],
         ], $container);
 
         $container->setAlias('test_subscriber_alias', new Alias('doctrine.orm.listeners.doctrine_dbal_cache_adapter_schema_listener', true));

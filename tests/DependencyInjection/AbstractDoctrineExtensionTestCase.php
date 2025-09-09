@@ -27,17 +27,19 @@ use InvalidArgumentException;
 use LogicException;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -62,11 +64,20 @@ use const PHP_VERSION_ID;
 
 abstract class AbstractDoctrineExtensionTestCase extends TestCase
 {
-    abstract protected function loadFromFile(ContainerBuilder $container, string $file): void;
+    abstract protected function loadFromFile(
+        ContainerBuilder $container,
+        string $file,
+    ): void;
+
+    final protected function loadMinimalOrmConfig(ContainerBuilder $container): void
+    {
+        $loadPhp = new PhpFileLoader($container, new FileLocator(__DIR__ . '/Fixtures/config/php'));
+        $loadPhp->import('minimal_orm.php');
+    }
 
     public function testDbalLoadFromXmlMultipleConnections(): void
     {
-        $container = $this->loadContainer('dbal_service_multiple_connections');
+        $container = $this->loadContainer(fixture: 'dbal_service_multiple_connections', withMinimalOrmConfig: false);
 
         // doctrine.dbal.mysql_connection
         $config = $container->getDefinition('doctrine.dbal.mysql_connection')->getArgument(0);
@@ -135,7 +146,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalLoadFromXmlSingleConnections(): void
     {
-        $container = $this->loadContainer('dbal_service_single_connection');
+        $container = $this->loadContainer(fixture: 'dbal_service_single_connection', withMinimalOrmConfig: false);
         $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
         $this->assertEquals('mysql_s3cr3t', $config['password']);
@@ -145,10 +156,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertEquals('9.4.0', $config['serverVersion']);
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testDbalLoadUrlOverride(): void
     {
-        $container = $this->loadContainer('dbal_allow_url_override');
+        $container = $this->loadContainer(fixture: 'dbal_allow_url_override', withMinimalOrmConfig: false);
         $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
         $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
@@ -166,10 +177,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertFalse(isset($config['override_url']));
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testDbalLoadPartialUrlOverrideSetsDefaults(): void
     {
-        $container = $this->loadContainer('dbal_allow_partial_url_override');
+        $container = $this->loadContainer(fixture: 'dbal_allow_partial_url_override', withMinimalOrmConfig: false);
         $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
         $expectedDefaults = [
@@ -188,7 +199,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalDbnameSuffix(): void
     {
-        $container = $this->loadContainer('dbal_dbname_suffix');
+        $container = $this->loadContainer(fixture: 'dbal_dbname_suffix', withMinimalOrmConfig: false);
         $config    = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
         $this->assertSame('mysql://root:password@database:3306/main?serverVersion=mariadb-12.1.1', $config['url']);
@@ -197,7 +208,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalDriverScheme(): void
     {
-        $container = $this->loadContainer('dbal_driver_schemes');
+        $container = $this->loadContainer(fixture: 'dbal_driver_schemes', withMinimalOrmConfig: false);
         $schemes   = $container->getDefinition('doctrine.dbal.connection_factory.dsn_parser')->getArgument(0);
 
         $this->assertSame('my_driver', $schemes['my-scheme']);
@@ -207,7 +218,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalLoadSinglePrimaryReplicaConnection(): void
     {
-        $container = $this->loadContainer('dbal_service_single_primary_replica_connection');
+        $container = $this->loadContainer(fixture: 'dbal_service_single_primary_replica_connection', withMinimalOrmConfig: false);
         $param     = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
 
         $this->assertEquals(PrimaryReadReplicaConnection::class, $param['wrapperClass']);
@@ -262,7 +273,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalLoadDisableTypeComments(): void
     {
-        $container = $this->loadContainer('dbal_disable_type_comments');
+        $container = $this->loadContainer(fixture: 'dbal_disable_type_comments', withMinimalOrmConfig: false);
 
         $calls = $container->getDefinition('doctrine.dbal.no_comments_connection.configuration')->getMethodCalls();
         $calls = array_values(array_filter($calls, static fn ($call) => $call[0] === 'setDisableTypeComments'));
@@ -280,10 +291,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertCount(0, $calls);
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testDbalSchemaManagerFactory(): void
     {
-        $container = $this->loadContainer('dbal_schema_manager_factory');
+        $container = $this->loadContainer(fixture: 'dbal_schema_manager_factory', withMinimalOrmConfig: false);
 
         $this->assertDICDefinitionMethodCallOnce(
             $container->getDefinition('doctrine.dbal.default_schema_manager_factory_connection.configuration'),
@@ -304,7 +315,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalResultCache(): void
     {
-        $container = $this->loadContainer('dbal_result_cache');
+        $container = $this->loadContainer(fixture: 'dbal_result_cache', withMinimalOrmConfig: false);
 
         $this->assertDICDefinitionMethodCallOnce(
             $container->getDefinition('doctrine.dbal.connection_with_cache_connection.configuration'),
@@ -560,13 +571,19 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         ]);
     }
 
+    /** Remove the attribute and keep the test in 3.0.x */
+    #[IgnoreDeprecations]
     public function testMultipleEntityManagersMappingBundleDefinitions(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container = $this->loadContainer('orm_multiple_em_bundle_mappings', ['YamlBundle', 'XmlBundle', 'AttributesBundle']);
+        $container = $this->loadContainer(
+            fixture: 'orm_multiple_em_bundle_mappings',
+            bundles: ['YamlBundle', 'XmlBundle', 'AttributesBundle'],
+            withMinimalOrmConfig: false, // using the minimal config creates a default entity manager
+        );
 
         $this->assertEquals(['em1' => 'doctrine.orm.em1_entity_manager', 'em2' => 'doctrine.orm.em2_entity_manager'], $container->getParameter('doctrine.entity_managers'), 'Set of the existing EntityManagers names is incorrect.');
         $this->assertEquals('%doctrine.entity_managers%', $container->getDefinition('doctrine')->getArgument(2), 'Set of the existing EntityManagers names is incorrect.');
@@ -622,7 +639,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testSetTypes(): void
     {
-        $container = $this->loadContainer('dbal_types');
+        $container = $this->loadContainer(fixture: 'dbal_types', withMinimalOrmConfig: false);
 
         $this->assertEquals(
             ['test' => ['class' => TestType::class]],
@@ -704,7 +721,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
     }
 
     #[DataProvider('cacheConfigProvider')]
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testCacheConfig(string|null $expectedClass, string $entityManagerName, string|null $cacheGetter): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -918,11 +935,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        /** @phpstan-ignore function.alreadyNarrowedType */
-        $container = $this->loadContainer(PHP_VERSION_ID >= 80400 && method_exists(
-            OrmConfiguration::class,
-            'enableNativeLazyObjects',
-        ) ? 'orm_filters' : 'orm_filters_legacy');
+        $container = $this->loadContainer('orm_filters');
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $args       = [
@@ -1090,7 +1103,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalAutoCommit(): void
     {
-        $container = $this->loadContainer('dbal_auto_commit');
+        $container = $this->loadContainer(fixture: 'dbal_auto_commit', withMinimalOrmConfig: false);
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection.configuration');
         $this->assertDICDefinitionMethodCallOnce($definition, 'setAutoCommit', [false]);
@@ -1098,7 +1111,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalOracleConnectstring(): void
     {
-        $container = $this->loadContainer('dbal_oracle_connectstring');
+        $container = $this->loadContainer(fixture: 'dbal_oracle_connectstring', withMinimalOrmConfig: false);
 
         $config = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
         $this->assertSame('scott@sales-server:1521/sales.us.example.com', $config['connectstring']);
@@ -1106,7 +1119,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDbalOracleInstancename(): void
     {
-        $container = $this->loadContainer('dbal_oracle_instancename');
+        $container = $this->loadContainer(fixture: 'dbal_oracle_instancename', withMinimalOrmConfig: false);
 
         $config = $container->getDefinition('doctrine.dbal.default_connection')->getArgument(0);
         $this->assertSame('mySuperInstance', $config['instancename']);
@@ -1152,7 +1165,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         }
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testWellKnownSchemaFilterDefaultTables(): void
     {
         $container = $this->getContainer([]);
@@ -1175,7 +1188,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertTrue($filter->__invoke('anything_else'));
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testWellKnownSchemaFilterOverriddenTables(): void
     {
         $container = $this->getContainer([]);
@@ -1226,6 +1239,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container->registerExtension($loader);
         $container->addCompilerPass(new EntityListenerPass());
 
+        $this->loadMinimalOrmConfig($container);
         $this->loadFromFile($container, 'orm_attach_entity_listener_tag');
 
         $this->compileContainer($container);
@@ -1262,6 +1276,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container->registerExtension($loader);
         $container->addCompilerPass(new RegisterEventListenersAndSubscribersPass('doctrine.connections', 'doctrine.dbal.%s_connection.event_manager', 'doctrine'));
 
+        $this->loadMinimalOrmConfig($container);
         $this->loadFromFile($container, 'orm_attach_entity_listeners_two_connections');
 
         $this->compileContainer($container);
@@ -1289,6 +1304,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container->registerExtension($loader);
         $container->addCompilerPass(new EntityListenerPass());
 
+        $this->loadMinimalOrmConfig($container);
         $this->loadFromFile($container, 'orm_attach_lazy_entity_listener');
 
         $this->compileContainer($container);
@@ -1320,6 +1336,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container->registerExtension($loader);
         $container->addCompilerPass(new EntityListenerPass());
 
+        $this->loadMinimalOrmConfig($container);
         $this->loadFromFile($container, 'orm_entity_listener_custom_resolver');
 
         $this->compileContainer($container);
@@ -1342,6 +1359,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container->registerExtension($loader);
         $container->addCompilerPass(new EntityListenerPass());
 
+        $this->loadMinimalOrmConfig($container);
         $this->loadFromFile($container, 'orm_entity_listener_lazy_resolver_without_interface');
 
         $this->expectException(InvalidArgumentException::class);
@@ -1360,6 +1378,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container->registerExtension($loader);
         $container->addCompilerPass(new EntityListenerPass());
 
+        $this->loadMinimalOrmConfig($container);
         $this->loadFromFile($container, 'orm_entity_listener_lazy_private');
 
         $this->compileContainer($container);
@@ -1378,6 +1397,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $container->registerExtension($loader);
         $container->addCompilerPass(new EntityListenerPass());
 
+        $this->loadMinimalOrmConfig($container);
         $this->loadFromFile($container, 'orm_entity_listener_abstract');
 
         $this->expectException(InvalidArgumentException::class);
@@ -1400,20 +1420,20 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
     public function testDisableSchemaValidation(): void
     {
-        $container           = $this->loadContainer('dbal_collect_schema_errors_enable');
+        $container           = $this->loadContainer(fixture: 'dbal_collect_schema_errors_enable', withMinimalOrmConfig: false);
         $collectorDefinition = $container->getDefinition('data_collector.doctrine');
         $this->assertTrue($collectorDefinition->getArguments()[1]);
 
-        $container           = $this->loadContainer('dbal_collect_schema_errors_disable');
+        $container           = $this->loadContainer(fixture: 'dbal_collect_schema_errors_disable', withMinimalOrmConfig: false);
         $collectorDefinition = $container->getDefinition('data_collector.doctrine');
         $this->assertFalse($collectorDefinition->getArguments()[1]);
 
-        $container           = $this->loadContainer('dbal_collect_schema_errors_disable_no_profiling');
+        $container           = $this->loadContainer(fixture: 'dbal_collect_schema_errors_disable_no_profiling', withMinimalOrmConfig: false);
         $collectorDefinition = $container->getDefinition('data_collector.doctrine');
         $this->assertFalse($collectorDefinition->getArguments()[1]);
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testNativeLazyObjectsWithoutConfig(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1428,7 +1448,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires PHP 8.4+');
         }
 
-        $container     = $this->loadContainer('orm_native_lazy_objects_default');
+        $container     = $this->loadContainer(
+            fixture: 'orm_native_lazy_objects_default',
+            withMinimalOrmConfig: false,
+        );
         $entityManager = $container->get('doctrine.orm.entity_manager');
 
         $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
@@ -1454,7 +1477,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testNativeLazyObjectsWithConfigFalse(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1469,7 +1492,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires PHP 8.4+');
         }
 
-        $container     = $this->loadContainer('orm_native_lazy_objects_disable');
+        $container     = $this->loadContainer(
+            fixture: 'orm_native_lazy_objects_disable',
+            withMinimalOrmConfig: false,
+        );
         $entityManager = $container->get('doctrine.orm.entity_manager');
 
         $this->assertFalse($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
@@ -1499,9 +1525,14 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         string $fixture,
         array $bundles = ['XmlBundle'],
         CompilerPassInterface|null $compilerPass = null,
+        bool $withMinimalOrmConfig = true,
     ): ContainerBuilder {
         $container = $this->getContainer($bundles);
         $container->registerExtension(new DoctrineExtension());
+
+        if ($withMinimalOrmConfig) {
+            $this->loadMinimalOrmConfig($container);
+        }
 
         $this->loadFromFile($container, $fixture);
 
