@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\Twig;
 
 use Doctrine\SqlFormatter\HtmlHighlighter;

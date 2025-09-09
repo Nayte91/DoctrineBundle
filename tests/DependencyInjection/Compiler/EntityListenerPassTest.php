@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Compiler;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
@@ -8,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Tools\AttachEntityListenersListener;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,7 +29,7 @@ class EntityListenerPassTest extends TestCase
         self::markTestSkipped('This test requires ORM');
     }
 
-    /** @dataProvider provideEvents */
+    #[DataProvider('provideEvents')]
     public function testEntityListenersAreRegistered(string|null $event, string|null $method, string|null $expectedMethod): void
     {
         $container = new ContainerBuilder();
