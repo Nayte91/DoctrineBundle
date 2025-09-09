@@ -4,6 +4,7 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -14,12 +15,9 @@ use function sys_get_temp_dir;
 
 class LockStoreSchemaListenerTest extends TestCase
 {
-    /**
-     * @param array<string, mixed> $config
-     *
-     * @testWith [{}, 0]
-     *           [{"lock": "flock"}, 1]
-     */
+    /** @param array<string, mixed> $config */
+    #[TestWith([[], 0])]
+    #[TestWith([['lock' => 'flock'], 1])]
     public function testLockStoreSchemaSubscriberWiring(array $config, int $expectedCount): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {

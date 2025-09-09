@@ -39,10 +39,14 @@ use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -603,10 +607,8 @@ class DoctrineExtensionTest extends TestCase
         ]);
     }
 
-    /**
-     * @testWith [[]]
-     *           [null]
-     */
+    #[TestWith([[]])]
+    #[TestWith([null])]
     public function testSingleEntityManagerWithEmptyConfiguration(array|null $ormConfiguration): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1410,7 +1412,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertArrayNotHasKey('doctrine.middleware', $abstractMiddlewareDefTags);
     }
 
-    /** @requires function Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver::__construct */
+    #[RequiresMethod(Driver::class, '__construct')]
     public function testDefinitionsIdleConnection(): void
     {
         $container = $this->getContainer();
@@ -1461,11 +1463,9 @@ class DoctrineExtensionTest extends TestCase
         $this->assertTrue(in_array(['connection' => 'conn2', 'priority' => 10], $idleConnectionMiddlewareTagAttributes, true), 'Tag with connection conn2 found for doctrine.dbal.idle_connection_middleware');
     }
 
-    /**
-     * @requires function \Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver::__construct
-     * @testWith [true]
-     *           [false]
-     */
+    #[RequiresMethod(EntityValueResolver::class, '__construct')]
+    #[TestWith([true])]
+    #[TestWith([false])]
     public function testControllerResolver(bool $simpleEntityManagerConfig): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
