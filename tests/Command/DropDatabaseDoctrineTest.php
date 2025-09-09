@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\Tests\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Command\DropDatabaseDoctrineCommand;
@@ -11,6 +13,7 @@ use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -23,11 +26,8 @@ use function sys_get_temp_dir;
 /** @psalm-import-type Params from DriverManager */
 class DropDatabaseDoctrineTest extends TestCase
 {
-    /**
-     * @param array<string, bool> $options
-     *
-     * @dataProvider provideForceOption
-     */
+    /** @param array<string, bool> $options */
+    #[DataProvider('provideForceOption')]
     public function testExecute(array $options): void
     {
         $connectionName = 'default';
@@ -61,11 +61,8 @@ class DropDatabaseDoctrineTest extends TestCase
         );
     }
 
-    /**
-     * @param array<string, bool> $options
-     *
-     * @dataProvider provideIncompatibleDriverOptions
-     */
+    /** @param array<string, bool> $options */
+    #[DataProvider('provideIncompatibleDriverOptions')]
     public function testItThrowsWhenUsingIfExistsWithAnIncompatibleDriver(array $options): void
     {
         $this->expectException(DBALException::class);

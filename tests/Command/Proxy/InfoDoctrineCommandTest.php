@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Command\Proxy;
 
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\TestKernel;
