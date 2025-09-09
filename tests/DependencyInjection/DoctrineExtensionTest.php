@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 use Closure;
@@ -288,11 +290,8 @@ class DoctrineExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @param mixed[][][][] $entityManagers
-     *
-     * @dataProvider getAutomappingConfigurations
-     */
+    /** @param mixed[][][][] $entityManagers */
+    #[DataProvider('getAutomappingConfigurations')]
     public static function testAutomapping(array $entityManagers): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -893,11 +892,8 @@ class DoctrineExtensionTest extends TestCase
         $extension->load([$config], $container);
     }
 
-    /**
-     * @param array{pool?: string, type: ?string, id?: string} $cacheConfig
-     *
-     * @dataProvider cacheConfigurationProvider
-     */
+    /** @param array{pool?: string, type: ?string, id?: string} $cacheConfig */
+    #[DataProvider('cacheConfigurationProvider')]
     public function testCacheConfiguration(string $expectedAliasName, string $expectedTarget, string $cacheName, array $cacheConfig): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1017,7 +1013,7 @@ class DoctrineExtensionTest extends TestCase
         ];
     }
 
-    /** @dataProvider provideAttributeExcludedFromContainer */
+    #[DataProvider('provideAttributeExcludedFromContainer')]
     public function testEntityAttributeExcludesFromContainer(string $class): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {

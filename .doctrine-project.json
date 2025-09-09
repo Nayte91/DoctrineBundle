@@ -6,17 +6,19 @@
   "versions": [
     {
       "name": "3.0",
+      "branchName": "3.0.x",
       "slug": "latest",
       "upcoming": true
     },
     {
       "name": "2.17",
+      "branchName": "2.17.x",
       "slug": "2.17",
       "upcoming": true
     },
     {
       "name": "2.16",
-      "slug": "latest",
+      "slug": "2.16",
       "current": true
     },
     {

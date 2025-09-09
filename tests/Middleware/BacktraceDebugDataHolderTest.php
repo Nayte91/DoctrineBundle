@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\Tests\Middleware;
 
 use Doctrine\Bundle\DoctrineBundle\Middleware\BacktraceDebugDataHolder;

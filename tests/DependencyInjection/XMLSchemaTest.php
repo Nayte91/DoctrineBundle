@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 use DirectoryIterator;
 use DOMDocument;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 use function basename;
@@ -27,7 +30,7 @@ class XMLSchemaTest extends TestCase
         return $schemaFiles;
     }
 
-    /** @dataProvider dataValidateSchemaFiles */
+    #[DataProvider('dataValidateSchemaFiles')]
     public function testValidateSchema(string $file): void
     {
         $found = false;

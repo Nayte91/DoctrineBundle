@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
