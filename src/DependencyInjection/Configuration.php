@@ -25,7 +25,6 @@ use function array_intersect_key;
 use function array_key_exists;
 use function array_keys;
 use function array_pop;
-use function assert;
 use function class_exists;
 use function constant;
 use function count;
@@ -66,9 +65,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('doctrine');
         $rootNode    = $treeBuilder->getRootNode();
 
-        /* @phpstan-ignore argument.type (symfony plugin needed) */
         $this->addDbalSection($rootNode);
-        /* @phpstan-ignore argument.type (symfony plugin needed) */
         $this->addOrmSection($rootNode);
 
         return $treeBuilder;
@@ -185,7 +182,6 @@ class Configuration implements ConfigurationInterface
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
             ->prototype('array');
-        assert($connectionNode instanceof ArrayNodeDefinition);
 
         $this->configureDbalDriverNode($connectionNode);
 
@@ -267,7 +263,6 @@ class Configuration implements ConfigurationInterface
                     )
                     ->useAttributeAsKey('name')
                     ->prototype('array');
-        /* @phpstan-ignore argument.type (symfony plugin needed) */
         $this->configureDbalDriverNode($slaveNode);
 
         // dbal >= 2.11
@@ -276,10 +271,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('replicas')
                     ->useAttributeAsKey('name')
                     ->prototype('array');
-        /* @phpstan-ignore argument.type (symfony plugin needed) */
         $this->configureDbalDriverNode($replicaNode);
-
-        assert($node instanceof ArrayNodeDefinition);
 
         return $node;
     }
@@ -834,8 +826,6 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
-        assert($node instanceof ArrayNodeDefinition);
-
         return $node;
     }
 
@@ -861,8 +851,6 @@ class Configuration implements ConfigurationInterface
         if ($name !== 'metadata_cache_driver') {
             $node->addDefaultsIfNotSet();
         }
-
-        assert($node instanceof ArrayNodeDefinition);
 
         return $node;
     }

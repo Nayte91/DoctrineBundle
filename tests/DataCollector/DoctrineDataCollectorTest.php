@@ -32,31 +32,23 @@ class DoctrineDataCollectorTest extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $manager    = $this->createMock(EntityManagerInterface::class);
+        $manager    = $this->createStub(EntityManagerInterface::class);
         $config     = $this->createMock(Configuration::class);
         $factory    = $this->createMock(ClassMetadataFactory::class);
         $collector  = $this->createCollector(['default' => $manager], true, $this->createMock(DebugDataHolder::class));
         $unitOfWork = $this->createMock(UnitOfWork::class);
 
-        $manager->expects($this->any())
-            ->method('getMetadataFactory')
-            ->will($this->returnValue($factory));
-        $manager->expects($this->any())
-            ->method('getConfiguration')
-            ->will($this->returnValue($config));
-        $manager->expects($this->any())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
-        $unitOfWork->expects($this->any())
-            ->method('getIdentityMap')
-            ->will($this->returnValue([
-                self::FIRST_ENTITY => [new stdClass()],
-                self::SECOND_ENTITY => [new stdClass(), new stdClass()],
-            ]));
+        $manager->method('getMetadataFactory')->willReturn($factory);
+        $manager->method('getConfiguration')->willReturn($config);
+        $manager->method('getUnitOfWork')->willReturn($unitOfWork);
+        $unitOfWork->method('getIdentityMap')->willReturn([
+            self::FIRST_ENTITY => [new stdClass()],
+            self::SECOND_ENTITY => [new stdClass(), new stdClass()],
+        ]);
 
         $config->expects($this->once())
             ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $metadatas = [
             $this->createEntityMetadata(self::FIRST_ENTITY),
@@ -65,7 +57,7 @@ class DoctrineDataCollectorTest extends TestCase
         ];
         $factory->expects($this->once())
             ->method('getLoadedMetadata')
-            ->will($this->returnValue($metadatas));
+            ->willReturn($metadatas);
 
         $collector->collect(new Request(), new Response());
 
@@ -84,18 +76,12 @@ class DoctrineDataCollectorTest extends TestCase
         $manager    = $this->createMock(EntityManager::class);
         $config     = $this->createMock(Configuration::class);
         $collector  = $this->createCollector(['default' => $manager], false, $this->createMock(DebugDataHolder::class));
-        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $unitOfWork = $this->createStub(UnitOfWork::class);
 
-        $manager->expects($this->never())
-            ->method('getMetadataFactory');
-        $manager->method('getConfiguration')
-            ->will($this->returnValue($config));
-        $manager->expects($this->any())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
-        $unitOfWork->expects($this->any())
-            ->method('getIdentityMap')
-            ->will($this->returnValue([]));
+        $manager->expects($this->never())->method('getMetadataFactory');
+        $manager->method('getConfiguration')->willReturn($config);
+        $manager->method('getUnitOfWork')->willReturn($unitOfWork);
+        $unitOfWork->method('getIdentityMap')->willReturn([]);
 
         $collector->collect(new Request(), new Response());
 
@@ -165,19 +151,12 @@ class DoctrineDataCollectorTest extends TestCase
         bool $shouldValidateSchema = true,
         DebugDataHolder|null $debugDataHolder = null,
     ): DoctrineDataCollector {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry
-            ->expects($this->any())
-            ->method('getConnectionNames')
-            ->will($this->returnValue(['default' => 'doctrine.dbal.default_connection']));
-        $registry
-            ->expects($this->any())
-            ->method('getManagerNames')
-            ->will($this->returnValue(['default' => 'doctrine.orm.default_entity_manager']));
-        $registry
-            ->expects($this->any())
-            ->method('getManagers')
-            ->will($this->returnValue($managers));
+        $registry = $this->createStub(ManagerRegistry::class);
+        $registry->method('getConnectionNames')
+            ->willReturn(['default' => 'doctrine.dbal.default_connection']);
+        $registry->method('getManagerNames')
+            ->willReturn(['default' => 'doctrine.orm.default_entity_manager']);
+        $registry->method('getManagers')->willReturn($managers);
 
         return new DoctrineDataCollector($registry, $shouldValidateSchema, $debugDataHolder);
     }

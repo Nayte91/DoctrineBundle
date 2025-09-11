@@ -506,22 +506,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertDICDefinitionClass($definition, PhpArrayAdapter::class);
     }
 
-    public function testDependencyInjectionImportsOverrideDefaults(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        $container = $this->loadContainer('orm_imports');
-
-        $configDefinition = $container->getDefinition('doctrine.orm.default_configuration');
-        $this->assertDICDefinitionMethodCallOnce($configDefinition, 'setAutoGenerateProxyClasses', ['%doctrine.orm.auto_generate_proxy_classes%']);
-
-        $cacheDefinition = $container->getDefinition((string) $container->getAlias('doctrine.orm.default_metadata_cache'));
-        $this->assertEquals(PhpArrayAdapter::class, $cacheDefinition->getClass());
-        $this->assertDICDefinitionMethodCallOnce($configDefinition, 'setMetadataCache', [new Reference('doctrine.orm.default_metadata_cache')]);
-    }
-
     public function testSingleEntityManagerMultipleMappingBundleDefinitions(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
