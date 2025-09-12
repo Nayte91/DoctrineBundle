@@ -9,12 +9,9 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
-use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 
 class ConnectionFactoryTest extends TestCase
 {
-    use VerifyDeprecations;
-
     private Configuration $configuration;
 
     protected function setUp(): void

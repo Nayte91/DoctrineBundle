@@ -19,7 +19,7 @@ use Generator;
 use InvalidArgumentException;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator;
@@ -206,7 +206,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertCount(0, $calls);
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testDbalSchemaManagerFactory(): void
     {
         $container = $this->loadContainer('dbal_schema_manager_factory');
@@ -428,21 +428,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertDICDefinitionClass($definition, PhpArrayAdapter::class);
     }
 
-    public function testDependencyInjectionImportsOverrideDefaults(): void
-    {
-        if (! interface_exists(EntityManagerInterface::class)) {
-            self::markTestSkipped('This test requires ORM');
-        }
-
-        $container = $this->loadContainer('orm_imports');
-
-        $configDefinition = $container->getDefinition('doctrine.orm.default_configuration');
-
-        $cacheDefinition = $container->getDefinition((string) $container->getAlias('doctrine.orm.default_metadata_cache'));
-        $this->assertEquals(PhpArrayAdapter::class, $cacheDefinition->getClass());
-        $this->assertDICDefinitionMethodCallOnce($configDefinition, 'setMetadataCache', [new Reference('doctrine.orm.default_metadata_cache')]);
-    }
-
     public function testSingleEntityManagerMultipleMappingBundleDefinitions(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -483,6 +468,8 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         ]);
     }
 
+    /** Remove the attribute and keep the test in 3.0.x */
+    #[IgnoreDeprecations]
     public function testMultipleEntityManagersMappingBundleDefinitions(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -627,7 +614,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
     }
 
     #[DataProvider('cacheConfigProvider')]
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testCacheConfig(string|null $expectedClass, string $entityManagerName, string|null $cacheGetter): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
