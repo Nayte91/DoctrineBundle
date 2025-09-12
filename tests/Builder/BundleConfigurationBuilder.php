@@ -2,6 +2,10 @@
 
 namespace Doctrine\Bundle\DoctrineBundle\Tests\Builder;
 
+use Doctrine\Bundle\DoctrineBundle\Tests\DeprecationFreeConfig;
+
+use function array_merge_recursive;
+
 class BundleConfigurationBuilder
 {
     /** @var array<string, mixed> */
@@ -69,9 +73,12 @@ class BundleConfigurationBuilder
     }
 
     /** @param array<string, mixed> $config */
-    public function addEntityManager(array $config): self
+    public function addEntityManager(array $config, bool $withMinimalOrmConfig = true): self
     {
         $this->configuration['orm'] = $config;
+        if ($withMinimalOrmConfig) {
+            $this->configuration = array_merge_recursive(DeprecationFreeConfig::get(), $this->configuration);
+        }
 
         return $this;
     }
