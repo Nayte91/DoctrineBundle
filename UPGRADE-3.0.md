@@ -120,3 +120,8 @@ Type declarations
 
 Native type declarations have been added to all constants, properties, and
 methods.
+
+Twig filters
+------------
+
+The Twig filter `doctrine_pretty_query` has been removed.
