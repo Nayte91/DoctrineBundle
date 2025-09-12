@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use function interface_exists;
+use function restore_exception_handler;
 
 class InfoDoctrineCommandTest extends TestCase
 {
@@ -36,5 +37,7 @@ class InfoDoctrineCommandTest extends TestCase
             'Found 3 mapped entities',
             $commandTester->getDisplay(),
         );
+
+        restore_exception_handler();
     }
 }
