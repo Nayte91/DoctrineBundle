@@ -49,7 +49,7 @@
         "phpstan/phpstan": "2.1.1",
         "phpstan/phpstan-phpunit": "2.0.3",
         "phpstan/phpstan-strict-rules": "^2",
-        "phpunit/phpunit": "^11.5.38",
+        "phpunit/phpunit": "^12.3.10",
         "psr/log": "^3.0",
         "symfony/doctrine-messenger": "^6.4 || ^7.0",
         "symfony/expression-language": "^6.4 || ^7.0",
