@@ -6,16 +6,20 @@ use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\TestKernel
 use Doctrine\Bundle\DoctrineBundle\Tests\TestCase;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
+use Doctrine\ORM\Cache\CacheEntry;
+use Doctrine\ORM\Cache\CacheKey;
+use Doctrine\ORM\Cache\CollectionCacheEntry;
+use Doctrine\ORM\Cache\Lock;
 use Doctrine\ORM\Cache\Region;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-use function get_class;
 use function interface_exists;
 
 class CacheCompatibilityPassTest extends TestCase
@@ -33,18 +37,11 @@ class CacheCompatibilityPassTest extends TestCase
 
     public function testCacheConfigUsingServiceDefinedByApplication(): void
     {
-        $customRegionClass = get_class($this->createMock(Region::class));
-
-        (new class ($customRegionClass) extends TestKernel {
-            public function __construct(private readonly string $regionClass)
-            {
-                parent::__construct(false);
-            }
-
+        (new class (false) extends TestKernel {
             public function registerContainerConfiguration(LoaderInterface $loader): void
             {
                 parent::registerContainerConfiguration($loader);
-                $loader->load(function (ContainerBuilder $containerBuilder): void {
+                $loader->load(static function (ContainerBuilder $containerBuilder): void {
                     $containerBuilder->loadFromExtension('framework', [
                         'cache' => [
                             'pools' => [
@@ -64,13 +61,16 @@ class CacheCompatibilityPassTest extends TestCase
                                     'regions' => [
                                         'filelock' => ['type' => 'filelock', 'lifetime' => 0, 'cache_driver' => ['type' => 'pool', 'pool' => 'doctrine.system_cache_pool']],
                                         'lifelong' => ['lifetime' => 0, 'cache_driver' => ['type' => 'pool', 'pool' => 'doctrine.system_cache_pool']],
-                                        'entity_cache_region' => ['type' => 'service', 'service' => $this->regionClass],
+                                        'entity_cache_region' => [
+                                            'type' => 'service',
+                                            'service' => TestRegion::class,
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     );
-                    $containerBuilder->register($this->regionClass, $this->regionClass);
+                    $containerBuilder->register(TestRegion::class, TestRegion::class);
                     $containerBuilder->setDefinition(
                         'custom_cache_service',
                         new Definition(ArrayAdapter::class),
@@ -130,5 +130,47 @@ class CacheCompatibilityPassTest extends TestCase
                 });
             }
         })->boot();
+    }
+}
+
+if (! interface_exists(Region::class)) {
+    return;
+}
+
+final class TestRegion implements Region
+{
+    public function getName(): string
+    {
+        return 'test_region';
+    }
+
+    public function contains(CacheKey $key): bool
+    {
+        throw new RuntimeException('Not implemented');
+    }
+
+    public function get(CacheKey $key): CacheEntry|null
+    {
+        throw new RuntimeException('Not implemented');
+    }
+
+    public function getMultiple(CollectionCacheEntry $collection): array|null
+    {
+        throw new RuntimeException('Not implemented');
+    }
+
+    public function put(CacheKey $key, CacheEntry $entry, Lock|null $lock = null): bool
+    {
+        throw new RuntimeException('Not implemented');
+    }
+
+    public function evict(CacheKey $key): bool
+    {
+        throw new RuntimeException('Not implemented');
+    }
+
+    public function evictAll(): bool
+    {
+        throw new RuntimeException('Not implemented');
     }
 }
