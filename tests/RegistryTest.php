@@ -21,6 +21,7 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 
 use function assert;
 use function interface_exists;
+use function restore_exception_handler;
 
 use const PHP_VERSION_ID;
 
@@ -153,7 +154,7 @@ class RegistryTest extends TestCase
         $registry->reset();
     }
 
-    /** @requires PHP < 8.4 */
+    #[RequiresPhp('8.4')]
     public function testResetLazyObject(): void
     {
         if (! interface_exists(EntityManagerInterface::class) || ! interface_exists(LazyObjectInterface::class)) {
@@ -209,5 +210,7 @@ class RegistryTest extends TestCase
         $this->assertFalse($repository->getEntityManager()->getUnitOfWork()->isEntityScheduled($entity));
 
         $entityManager->flush();
+
+        restore_exception_handler();
     }
 }

@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 use function interface_exists;
+use function restore_exception_handler;
 
 class CacheCompatibilityPassTest extends TestCase
 {
@@ -82,6 +83,8 @@ class CacheCompatibilityPassTest extends TestCase
         })->boot();
 
         $this->addToAssertionCount(1);
+
+        restore_exception_handler();
     }
 
     #[DoesNotPerformAssertions]
@@ -108,6 +111,8 @@ class CacheCompatibilityPassTest extends TestCase
                 });
             }
         })->boot();
+
+        restore_exception_handler();
     }
 
     #[IgnoreDeprecations]
@@ -132,6 +137,8 @@ class CacheCompatibilityPassTest extends TestCase
                 });
             }
         })->boot();
+
+        restore_exception_handler();
     }
 }
 

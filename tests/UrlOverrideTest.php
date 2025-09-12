@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 use function array_intersect_key;
+use function restore_exception_handler;
 
 class UrlOverrideTest extends TestCase
 {
@@ -30,6 +31,8 @@ class UrlOverrideTest extends TestCase
                 $expectedParams,
             ),
         );
+
+        restore_exception_handler();
     }
 
     /** @return array<string, array{0: array<string, (bool|string|null)>, 1:  array<string, (bool|string|null)>}> */
