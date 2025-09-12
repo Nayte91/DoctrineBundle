@@ -24,11 +24,6 @@ use Symfony\Bridge\Doctrine\Middleware\IdleConnection\Listener;
 
 return static function (ContainerConfigurator $container): void {
     $container->parameters()
-        ->set('doctrine.dbal.configuration.class', Configuration::class)
-        ->set('doctrine.data_collector.class', DoctrineDataCollector::class)
-        ->set('doctrine.dbal.connection.event_manager.class', ContainerAwareEventManager::class)
-        ->set('doctrine.dbal.connection_factory.class', ConnectionFactory::class)
-        ->set('doctrine.class', Registry::class)
         ->set('doctrine.entity_managers', [])
         ->set('doctrine.default_entity_manager', '');
 
@@ -37,7 +32,7 @@ return static function (ContainerConfigurator $container): void {
         ->alias(Connection::class, 'database_connection')
         ->alias(ManagerRegistry::class, 'doctrine')
 
-        ->set('data_collector.doctrine', (string) param('doctrine.data_collector.class'))
+        ->set('data_collector.doctrine', DoctrineDataCollector::class)
             ->args([
                 service('doctrine'),
                 true,
@@ -45,7 +40,7 @@ return static function (ContainerConfigurator $container): void {
             ])
             ->tag('data_collector', ['template' => '@Doctrine/Collector/db.html.twig', 'id' => 'db', 'priority' => 250])
 
-        ->set('doctrine.dbal.connection_factory', (string) param('doctrine.dbal.connection_factory.class'))
+        ->set('doctrine.dbal.connection_factory', ConnectionFactory::class)
             ->args([
                 (string) param('doctrine.dbal.connection_factory.types'),
                 service('doctrine.dbal.connection_factory.dsn_parser'),
@@ -60,16 +55,16 @@ return static function (ContainerConfigurator $container): void {
             ->abstract()
             ->factory([service('doctrine.dbal.connection_factory'), 'createConnection'])
 
-        ->set('doctrine.dbal.connection.event_manager', (string) param('doctrine.dbal.connection.event_manager.class'))
+        ->set('doctrine.dbal.connection.event_manager', ContainerAwareEventManager::class)
             ->abstract()
             ->args([
                 service('service_container'),
             ])
 
-        ->set('doctrine.dbal.connection.configuration', (string) param('doctrine.dbal.configuration.class'))
+        ->set('doctrine.dbal.connection.configuration', Configuration::class)
             ->abstract()
 
-        ->set('doctrine', (string) param('doctrine.class'))
+        ->set('doctrine', Registry::class)
             ->public()
             ->args([
                 service('service_container'),

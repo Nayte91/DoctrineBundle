@@ -13,10 +13,18 @@ use Doctrine\Bundle\DoctrineBundle\Dbal\ManagerRegistryAwareConnectionProvider;
 use Doctrine\Bundle\DoctrineBundle\Dbal\RegexSchemaAssetFilter;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\IdGeneratorPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
+use Doctrine\Bundle\DoctrineBundle\Mapping\ContainerEntityListenerResolver;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
+use Doctrine\ORM\Cache\CacheConfiguration;
+use Doctrine\ORM\Cache\DefaultCacheFactory;
+use Doctrine\ORM\Cache\Logging\CacheLoggerChain;
+use Doctrine\ORM\Cache\Logging\StatisticsCacheLogger;
+use Doctrine\ORM\Cache\Region\DefaultRegion;
+use Doctrine\ORM\Cache\Region\FileLockRegion;
+use Doctrine\ORM\Cache\RegionsConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Id\AbstractIdGenerator;
@@ -26,6 +34,7 @@ use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\ORM\Proxy\Autoloader;
+use Doctrine\ORM\Tools\AttachEntityListenersListener;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
@@ -568,7 +577,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         if (isset($entityManager['entity_listener_resolver']) && $entityManager['entity_listener_resolver']) {
             $container->setAlias(sprintf('doctrine.orm.%s_entity_listener_resolver', $entityManager['name']), $entityManager['entity_listener_resolver']);
         } else {
-            $definition = new Definition('%doctrine.orm.entity_listener_resolver.class%');
+            $definition = new Definition(ContainerEntityListenerResolver::class);
             $definition->addArgument(new Reference('service_container'));
             $container->setDefinition(sprintf('doctrine.orm.%s_entity_listener_resolver', $entityManager['name']), $definition);
         }
@@ -594,7 +603,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
         }
 
         $listenerId        = sprintf('doctrine.orm.%s_listeners.attach_entity_listeners', $entityManager['name']);
-        $listenerDef       = $container->setDefinition($listenerId, new Definition('%doctrine.orm.listeners.attach_entity_listeners.class%'));
+        $listenerDef       = $container->setDefinition($listenerId, new Definition(AttachEntityListenersListener::class));
         $listenerTagParams = ['event' => 'loadClassMetadata'];
         if (isset($entityManager['connection'])) {
             $listenerTagParams['connection'] = $entityManager['connection'];
@@ -806,13 +815,13 @@ class DoctrineExtension extends AbstractDoctrineExtension
         $configId   = sprintf('doctrine.orm.%s_second_level_cache.cache_configuration', $entityManager['name']);
         $regionsId  = sprintf('doctrine.orm.%s_second_level_cache.regions_configuration', $entityManager['name']);
         $driverId   = $driverId ?: sprintf('doctrine.orm.%s_second_level_cache.region_cache_driver', $entityManager['name']);
-        $configDef  = $container->setDefinition($configId, new Definition('%doctrine.orm.second_level_cache.cache_configuration.class%'));
+        $configDef  = $container->setDefinition($configId, new Definition(CacheConfiguration::class));
         $regionsDef = $container
-            ->setDefinition($regionsId, new Definition('%doctrine.orm.second_level_cache.regions_configuration.class%'))
+            ->setDefinition($regionsId, new Definition(RegionsConfiguration::class))
             ->setArguments([$entityManager['second_level_cache']['region_lifetime'], $entityManager['second_level_cache']['region_lock_lifetime']]);
 
         $slcFactoryId = sprintf('doctrine.orm.%s_second_level_cache.default_cache_factory', $entityManager['name']);
-        $factoryClass = $entityManager['second_level_cache']['factory'] ?? '%doctrine.orm.second_level_cache.default_cache_factory.class%';
+        $factoryClass = $entityManager['second_level_cache']['factory'] ?? DefaultCacheFactory::class;
 
         $definition = new Definition($factoryClass, [new Reference($regionsId), new Reference($driverId)]);
 
@@ -839,7 +848,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                     $regionRef  = new Reference($regionId);
 
                     $container
-                        ->setDefinition($regionId, new Definition('%doctrine.orm.second_level_cache.default_region.class%'))
+                        ->setDefinition($regionId, new Definition(DefaultRegion::class))
                         ->setArguments([$name, new Reference($driverId), $region['lifetime']]);
                 }
 
@@ -847,7 +856,7 @@ class DoctrineExtension extends AbstractDoctrineExtension
                     $regionId = sprintf('doctrine.orm.%s_second_level_cache.region.%s_filelock', $entityManager['name'], $name);
 
                     $container
-                        ->setDefinition($regionId, new Definition('%doctrine.orm.second_level_cache.filelock_region.class%'))
+                        ->setDefinition($regionId, new Definition(FileLockRegion::class))
                         ->setArguments([$regionRef, $region['lock_path'], $region['lock_lifetime']]);
 
                     $regionRef = new Reference($regionId);
@@ -862,8 +871,8 @@ class DoctrineExtension extends AbstractDoctrineExtension
         if ($entityManager['second_level_cache']['log_enabled']) {
             $loggerChainId   = sprintf('doctrine.orm.%s_second_level_cache.logger_chain', $entityManager['name']);
             $loggerStatsId   = sprintf('doctrine.orm.%s_second_level_cache.logger_statistics', $entityManager['name']);
-            $loggerChaingDef = $container->setDefinition($loggerChainId, new Definition('%doctrine.orm.second_level_cache.logger_chain.class%'));
-            $loggerStatsDef  = $container->setDefinition($loggerStatsId, new Definition('%doctrine.orm.second_level_cache.logger_statistics.class%'));
+            $loggerChaingDef = $container->setDefinition($loggerChainId, new Definition(CacheLoggerChain::class));
+            $loggerStatsDef  = $container->setDefinition($loggerStatsId, new Definition(StatisticsCacheLogger::class));
 
             $loggerChaingDef->addMethodCall('setLogger', ['statistics', $loggerStatsDef]);
             $configDef->addMethodCall('setCacheLogger', [$loggerChaingDef]);

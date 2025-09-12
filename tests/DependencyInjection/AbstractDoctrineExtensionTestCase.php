@@ -11,6 +11,12 @@ use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\InvokableE
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\ORM\Cache\DefaultCacheFactory;
+use Doctrine\ORM\Cache\Logging\CacheLoggerChain;
+use Doctrine\ORM\Cache\Logging\StatisticsCacheLogger;
+use Doctrine\ORM\Cache\Region\DefaultRegion;
+use Doctrine\ORM\Cache\Region\FileLockRegion;
+use Doctrine\ORM\Cache\RegionsConfiguration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -251,7 +257,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         ]);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
         $this->assertNull($definition->getFactory());
 
         $this->assertDICConstructorArguments($definition, [
@@ -291,7 +297,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         );
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, [
             new Reference('doctrine.dbal.default_connection'),
@@ -328,7 +334,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         ]);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, [
             new Reference('doctrine.dbal.default_connection'),
@@ -358,7 +364,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertEquals('doctrine.orm.em2_entity_manager', (string) $container->getAlias('doctrine.orm.entity_manager'));
 
         $definition = $container->getDefinition('doctrine.orm.em1_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
 
         $arguments = $definition->getArguments();
         $this->assertInstanceOf(Reference::class, $arguments[0]);
@@ -375,7 +381,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertEquals('doctrine.dbal.conn2_connection.configuration', (string) $args[1]);
 
         $definition = $container->getDefinition('doctrine.orm.em2_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
 
         $arguments = $definition->getArguments();
         $this->assertInstanceOf(Reference::class, $arguments[0]);
@@ -693,12 +699,12 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $myQueryRegionArgs   = $myQueryRegionDef->getArguments();
         $slcFactoryArgs      = $slcFactoryDef->getArguments();
 
-        $this->assertDICDefinitionClass($slcFactoryDef, '%doctrine.orm.second_level_cache.default_cache_factory.class%');
-        $this->assertDICDefinitionClass($slcRegionsConfDef, '%doctrine.orm.second_level_cache.regions_configuration.class%');
-        $this->assertDICDefinitionClass($myQueryRegionDef, '%doctrine.orm.second_level_cache.filelock_region.class%');
-        $this->assertDICDefinitionClass($myEntityRegionDef, '%doctrine.orm.second_level_cache.default_region.class%');
-        $this->assertDICDefinitionClass($loggerChainDef, '%doctrine.orm.second_level_cache.logger_chain.class%');
-        $this->assertDICDefinitionClass($loggerStatisticsDef, '%doctrine.orm.second_level_cache.logger_statistics.class%');
+        $this->assertDICDefinitionClass($slcFactoryDef, DefaultCacheFactory::class);
+        $this->assertDICDefinitionClass($slcRegionsConfDef, RegionsConfiguration::class);
+        $this->assertDICDefinitionClass($myQueryRegionDef, FileLockRegion::class);
+        $this->assertDICDefinitionClass($myEntityRegionDef, DefaultRegion::class);
+        $this->assertDICDefinitionClass($loggerChainDef, CacheLoggerChain::class);
+        $this->assertDICDefinitionClass($loggerStatisticsDef, StatisticsCacheLogger::class);
         $this->assertDICDefinitionClass($cacheDriverDef, ArrayAdapter::class);
         $this->assertDICDefinitionMethodCallOnce($configDef, 'setSecondLevelCacheConfiguration');
         $this->assertDICDefinitionMethodCallCount($slcFactoryDef, 'setRegion', [], 3);
