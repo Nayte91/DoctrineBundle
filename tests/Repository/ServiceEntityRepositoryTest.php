@@ -6,9 +6,13 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use LogicException;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarExporter\LazyGhostTrait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
+use Symfony\Component\VarExporter\ProxyHelper;
 
 use function interface_exists;
 
@@ -35,10 +39,9 @@ EXCEPTION);
         $repo->getClassName();
     }
 
-    /**
-     * @requires function \Symfony\Component\VarExporter\ProxyHelper::generateLazyGhost
-     * @requires PHP < 8.4
-     */
+    #[IgnoreDeprecations]
+    #[RequiresMethod(ProxyHelper::class, 'generateLazyGhost')]
+    #[RequiresPhp('8.4')]
     public function testConstructInitializesWhenImplementingLazyObjectInterface(): void
     {
         $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
