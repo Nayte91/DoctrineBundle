@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use LogicException;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
@@ -38,6 +39,7 @@ EXCEPTION);
         $repo->getClassName();
     }
 
+    #[IgnoreDeprecations]
     #[RequiresMethod(ProxyHelper::class, 'generateLazyGhost')]
     #[RequiresPhp('8.4')]
     public function testConstructInitializesWhenImplementingLazyObjectInterface(): void
