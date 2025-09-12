@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Container;
 
 use function assert;
 use function interface_exists;
+use function restore_exception_handler;
 
 class RegistryTest extends TestCase
 {
@@ -146,5 +147,7 @@ class RegistryTest extends TestCase
         $this->assertFalse($repository->getEntityManager()->getUnitOfWork()->isEntityScheduled($entity));
 
         $entityManager->flush();
+
+        restore_exception_handler();
     }
 }
