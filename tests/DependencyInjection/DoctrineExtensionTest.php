@@ -33,9 +33,9 @@ use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\TestWith;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
@@ -69,7 +69,7 @@ class DoctrineExtensionTest extends TestCase
      * https://github.com/doctrine/orm/pull/7953 needed, otherwise ORM classes
      * we define services for trigger deprecations
      */
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testAutowiringAlias(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -460,15 +460,25 @@ class DoctrineExtensionTest extends TestCase
 
         $definition = $container->getDefinition('doctrine.orm.default_configuration');
         $calls      = array_values($definition->getMethodCalls());
-        $this->assertEquals(['XmlBundle' => 'Fixtures\Bundles\XmlBundle\Entity'], $calls[0][1][0]);
-        $this->assertEquals('doctrine.orm.default_metadata_cache', (string) $calls[2][1][0]);
-        $this->assertEquals('doctrine.orm.default_query_cache', (string) $calls[3][1][0]);
-        $this->assertEquals('doctrine.orm.default_result_cache', (string) $calls[4][1][0]);
 
-        $this->assertEquals('doctrine.orm.naming_strategy.default', (string) $calls[9][1][0]);
-        $this->assertEquals('doctrine.orm.quote_strategy.default', (string) $calls[10][1][0]);
-        $this->assertEquals('doctrine.orm.typed_field_mapper.default', (string) $calls[11][1][0]);
-        $this->assertEquals('doctrine.orm.default_entity_listener_resolver', (string) $calls[12][1][0]);
+        $this->assertEquals(['XmlBundle' => 'Fixtures\Bundles\XmlBundle\Entity'], $calls[0][1][0]);
+        $references = [];
+        foreach ($calls as $call) {
+            if (! ($call[1][0] instanceof Reference)) {
+                continue;
+            }
+
+            $references[] = (string) $call[1][0];
+        }
+
+        self::assertContains('doctrine.orm.default_metadata_cache', $references);
+        self::assertContains('doctrine.orm.default_query_cache', $references);
+        self::assertContains('doctrine.orm.default_result_cache', $references);
+
+        self::assertContains('doctrine.orm.naming_strategy.default', $references);
+        self::assertContains('doctrine.orm.quote_strategy.default', $references);
+        self::assertContains('doctrine.orm.typed_field_mapper.default', $references);
+        self::assertContains('doctrine.orm.default_entity_listener_resolver', $references);
 
         $definition = $container->getDefinition('doctrine.orm.default_metadata_cache_warmer');
         $this->assertSame(DoctrineMetadataCacheWarmer::class, $definition->getClass());
@@ -588,7 +598,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals('%doctrine.orm.second_level_cache.default_cache_factory.class%', $slcDefinition->getClass());
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testSingleEntityManagerWithCustomSecondLevelCacheConfiguration(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -767,6 +777,7 @@ class DoctrineExtensionTest extends TestCase
                 'default_entity_manager' => 'default',
                 'entity_managers' => [
                     'default' => [
+                        'fetch_mode_subselect_batch_size' => 13,
                         'mappings' => ['AttributesBundle' => ['type' => 'attribute']],
                     ],
                 ],
@@ -778,6 +789,7 @@ class DoctrineExtensionTest extends TestCase
                 'default_entity_manager' => 'default',
                 'entity_managers' => [
                     'default' => [
+                        'fetch_mode_subselect_batch_size' => 42,
                         'mappings' => [
                             'XmlBundle' => [],
                         ],
@@ -873,7 +885,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertNotContains('messenger.transport_factory', $container->findTags());
     }
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testInvalidCacheConfiguration(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -919,7 +931,7 @@ class DoctrineExtensionTest extends TestCase
 
     /** @param array{type: ?string, pool?: string, id?: string} $cacheConfig */
     #[DataProvider('legacyCacheConfigurationProvider')]
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testLegacyCacheConfiguration(string $expectedAliasName, string $expectedAliasTarget, string $cacheName, array $cacheConfig): void
     {
         $this->testCacheConfiguration($expectedAliasName, $expectedAliasTarget, $cacheName, $cacheConfig);
@@ -1316,6 +1328,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertTrue(in_array(['connection' => 'conn2', 'priority' => 10], $idleConnectionMiddlewareTagAttributes, true), 'Tag with connection conn2 found for doctrine.dbal.idle_connection_middleware');
     }
 
+    #[IgnoreDeprecations]
     #[RequiresMethod(EntityValueResolver::class, '__construct')]
     #[TestWith([true])]
     #[TestWith([false])]

@@ -142,35 +142,22 @@ class DropDatabaseDoctrineTest extends TestCase
     private function getMockContainer(string $connectionName, array $params): MockObject
     {
         // Mock the container and everything you'll need here
-        $mockDoctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->getMock();
+        $mockDoctrine = $this->createStub(ManagerRegistry::class);
 
-        $mockDoctrine->expects($this->any())
-            ->method('getDefaultConnectionName')
-            ->withAnyParameters()
-            ->willReturn($connectionName);
+        $mockDoctrine->method('getDefaultConnectionName')->willReturn($connectionName);
 
         $config = (new Configuration())->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $mockConnection = $this->createMock(Connection::class);
         $mockConnection->method('getConfiguration')->willReturn($config);
-
-        $mockConnection->expects($this->any())
-            ->method('getParams')
-            ->withAnyParameters()
-            ->willReturn($params);
-
-        $mockDoctrine->expects($this->any())
-            ->method('getConnection')
-            ->withAnyParameters()
-            ->willReturn($mockConnection);
+        $mockConnection->method('getParams')->willReturn($params);
+        $mockDoctrine->method('getConnection')->willReturn($mockConnection);
 
         $mockContainer = $this->getMockBuilder(Container::class)
             ->onlyMethods(['get'])
             ->getMock();
 
-        $mockContainer->expects($this->any())
-            ->method('get')
+        $mockContainer->method('get')
             ->with('doctrine')
             ->willReturn($mockDoctrine);
 
