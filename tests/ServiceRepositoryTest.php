@@ -6,9 +6,8 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibilityPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
+use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\DeprecationFreeExtension;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -26,11 +25,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use function class_exists;
 use function interface_exists;
-use function method_exists;
 use function sys_get_temp_dir;
 use function uniqid;
-
-use const PHP_VERSION_ID;
 
 class ServiceRepositoryTest extends TestCase
 {
@@ -82,9 +78,10 @@ class ServiceRepositoryTest extends TestCase
             ],
         ], $container);
 
-        $extension = new DoctrineExtension();
+        $extension = new DeprecationFreeExtension();
         $container->registerExtension($extension);
         $extension->load([
+            DeprecationFreeConfig::get(),
             [
                 'dbal' => [
                     'driver' => 'pdo_sqlite',
@@ -92,9 +89,6 @@ class ServiceRepositoryTest extends TestCase
                     'schema_manager_factory' => 'doctrine.dbal.default_schema_manager_factory',
                 ],
                 'orm' => [
-                    'enable_lazy_ghost_objects' => true,
-                    /** @phpstan-ignore function.alreadyNarrowedType */
-                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
                     'mappings' => [
                         'RepositoryServiceBundle' => [
                             'type' => 'attribute',
