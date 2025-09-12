@@ -4,7 +4,7 @@ namespace Doctrine\Bundle\DoctrineBundle\Tests;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\CacheCompatibilityPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
-use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\DeprecationFreeExtension;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -75,7 +75,7 @@ class ServiceRepositoryTest extends TestCase
             ],
         ], $container);
 
-        $extension = new DeprecationFreeExtension();
+        $extension = new DoctrineExtension();
         $container->registerExtension($extension);
         $extension->load([
             DeprecationFreeConfig::get(),
