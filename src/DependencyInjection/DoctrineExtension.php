@@ -21,9 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Id\AbstractIdGenerator;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
-use Doctrine\ORM\Mapping\Driver\PHPDriver as LegacyPHPDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
-use Doctrine\ORM\Mapping\Driver\StaticPHPDriver as LegacyStaticPHPDriver;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
@@ -1041,12 +1039,10 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 return SimplifiedXmlDriver::class;
 
             case 'php':
-                /* @phpstan-ignore class.notFound */
-                return class_exists(PHPDriver::class) ? PHPDriver::class : LegacyPHPDriver::class;
+                return PHPDriver::class;
 
             case 'staticphp':
-                /* @phpstan-ignore class.notFound */
-                return class_exists(StaticPHPDriver::class) ? StaticPHPDriver::class : LegacyStaticPHPDriver::class;
+                return StaticPHPDriver::class;
 
             case 'attribute':
                 return AttributeDriver::class;
