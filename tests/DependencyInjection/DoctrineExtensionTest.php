@@ -542,6 +542,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertSame(ArrayAdapter::class, $definition->getClass());
     }
 
+    #[IgnoreDeprecations]
     public function testUseSavePointsAddMethodCallToAddSavepointsToTheConnection(): void
     {
         $container = $this->getContainer();
