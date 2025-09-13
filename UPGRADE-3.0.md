@@ -69,6 +69,11 @@ There is no replacement for this option.
 The `commented` option for custom types is no longer supported and has been
 removed.
 
+### The `doctrine.dbal.connection.some_connection.disable_type_comments` option is removed
+
+The `disable_type_comments` option for connections is no longer supported and has
+been removed.
+
 ### The `doctrine.dbal.connection.some_connection.platform_service` option is removed
 
 The `platform_service` option for connections is no longer supported and has
