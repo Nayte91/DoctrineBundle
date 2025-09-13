@@ -1510,8 +1510,6 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals(new MapEntity(null, null, null, [], null, null, null, true, true), $container->get('controller_resolver_defaults'));
     }
 
-    // phpcs:enable
-
     /** @param list<string> $bundles */
     private static function getContainer(array $bundles = ['XmlBundle'], string $vendor = ''): ContainerBuilder
     {
