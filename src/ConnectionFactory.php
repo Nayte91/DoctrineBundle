@@ -20,7 +20,6 @@ use Doctrine\DBAL\Tools\DsnParser;
 use Doctrine\DBAL\Types\Type;
 
 use function array_merge;
-use function class_exists;
 use function is_subclass_of;
 
 use const PHP_EOL;
@@ -89,9 +88,7 @@ class ConnectionFactory
 
             if (isset($params['wrapperClass'])) {
                 if (! is_subclass_of($params['wrapperClass'], Connection::class)) {
-                    if (class_exists(InvalidWrapperClass::class)) {
-                        throw InvalidWrapperClass::new($params['wrapperClass']);
-                    }
+                    throw InvalidWrapperClass::new($params['wrapperClass']);
                 }
 
                 $wrapperClass           = $params['wrapperClass'];
