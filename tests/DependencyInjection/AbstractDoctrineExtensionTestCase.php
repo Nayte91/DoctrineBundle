@@ -276,6 +276,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertCount(0, $calls);
     }
 
+    #[IgnoreDeprecations]
     public function testDbalLoadDisableTypeComments(): void
     {
         $container = $this->loadContainer(fixture: 'dbal_disable_type_comments', withMinimalOrmConfig: false);

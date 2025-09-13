@@ -4,5 +4,3 @@ doctrine:
         connections:
             savepoints:
                 use_savepoints: true
-            notset:
-                user: root
