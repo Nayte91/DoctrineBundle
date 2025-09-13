@@ -9,6 +9,11 @@ Configuration
 This option is a no-op when using `doctrine/orm` 3 and has been conditionally
 deprecated. You should stop using it as soon as you upgrade to Doctrine ORM 3.
 
+### The `doctrine.dbal.connections.some_connection.disable_type_comments` configuration option is deprecated
+
+This option is a no-op when using `doctrine/dbal` 4 and has been conditionally
+deprecated. You should stop using it as soon as you upgrade to Doctrine DBAL 4.
+
 ConnectionFactory::createConnection() signature change
 ------------------------------------------------------
 
