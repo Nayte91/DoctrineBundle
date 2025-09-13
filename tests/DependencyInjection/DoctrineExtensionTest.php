@@ -72,11 +72,6 @@ use function sys_get_temp_dir;
 
 class DoctrineExtensionTest extends TestCase
 {
-    /**
-     * https://github.com/doctrine/orm/pull/7953 needed, otherwise ORM classes
-     * we define services for trigger deprecations
-     */
-    #[IgnoreDeprecations]
     public function testAutowiringAlias(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
