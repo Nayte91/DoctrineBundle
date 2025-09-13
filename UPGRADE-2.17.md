@@ -14,6 +14,11 @@ deprecated. You should stop using it as soon as you upgrade to Doctrine ORM 3.
 This option is a no-op when using `doctrine/dbal` 4 and has been conditionally
 deprecated. You should stop using it as soon as you upgrade to Doctrine DBAL 4.
 
+### The `doctrine.dbal.connections.some_connection.use_savepoints` configuration option is deprecated
+
+This option is a no-op when using `doctrine/dbal` 4 and has been conditionally
+deprecated. You should stop using it as soon as you upgrade to Doctrine DBAL 4.
+
 ConnectionFactory::createConnection() signature change
 ------------------------------------------------------
 
