@@ -390,7 +390,21 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('pooled')->info('True to use a pooled server with the oci8/pdo_oracle driver')->end()
                 ->booleanNode('MultipleActiveResultSets')->info('Configuring MultipleActiveResultSets for the pdo_sqlsrv driver')->end()
-                ->booleanNode('use_savepoints')->info('Use savepoints for nested transactions')->end()
+                ->booleanNode('use_savepoints')
+                    ->info('Use savepoints for nested transactions')
+                    ->beforeNormalization()
+                        ->ifTrue(static fn ($v): bool => isset($v) && ! method_exists(Connection::class, 'getEventManager'))
+                        ->then(static function ($v) {
+                            Deprecation::trigger(
+                                'doctrine/doctrine-bundle',
+                                'https://github.com/doctrine/DoctrineBundle/pull/2055',
+                                'The "use_savepoints" configuration key is deprecated when using DBAL 4 and will be removed in DoctrineBundle 3.0.',
+                            );
+
+                            return $v;
+                        })
+                    ->end()
+                ->end()
                 ->scalarNode('instancename')
                 ->info(
                     'Optional parameter, complete whether to add the INSTANCE_NAME parameter in the connection.' .

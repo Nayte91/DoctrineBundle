@@ -1020,6 +1020,27 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->loadContainer(fixture: 'dbal_disable_type_comments', withMinimalOrmConfig: false);
     }
 
+    #[IgnoreDeprecations]
+    public function testSettingUseSavepointsWithDbal4IsDeprecated(): void
+    {
+        if (method_exists(Connection::class, 'getEventManager')) {
+            self::markTestSkipped('This test requires DBAL 4.');
+        }
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/2055');
+        $this->loadContainer(fixture: 'dbal_use_savepoints', withMinimalOrmConfig: false);
+    }
+
+    public function testSettingUseSavepointsWithDbal3IsFine(): void
+    {
+        if (! method_exists(Connection::class, 'getEventManager')) {
+            self::markTestSkipped('This test requires DBAL 3.');
+        }
+
+        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/2055');
+        $this->loadContainer(fixture: 'dbal_use_savepoints', withMinimalOrmConfig: false);
+    }
+
     public function testResolveTargetEntity(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
