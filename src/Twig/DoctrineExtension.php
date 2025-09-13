@@ -2,6 +2,7 @@
 
 namespace Doctrine\Bundle\DoctrineBundle\Twig;
 
+use Doctrine\Deprecations\Deprecation;
 use Doctrine\SqlFormatter\HtmlHighlighter;
 use Doctrine\SqlFormatter\NullHighlighter;
 use Doctrine\SqlFormatter\SqlFormatter;
@@ -25,7 +26,6 @@ use function preg_replace_callback;
 use function sprintf;
 use function strtoupper;
 use function substr;
-use function trigger_deprecation;
 
 /**
  * This class contains the needed functions in order to do the query highlighting
@@ -154,9 +154,9 @@ class DoctrineExtension extends AbstractExtension
      */
     public function formatQuery($sql, $highlightOnly = false)
     {
-        trigger_deprecation(
+        Deprecation::trigger(
             'doctrine/doctrine-bundle',
-            '2.1',
+            'https://github.com/doctrine/DoctrineBundle/pull/1056',
             'The "%s()" method is deprecated and will be removed in doctrine-bundle 3.0.',
             __METHOD__,
         );
