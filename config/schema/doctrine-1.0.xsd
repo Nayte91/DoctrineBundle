@@ -264,7 +264,7 @@
         <xsd:attribute name="enabled" type="xsd:boolean" default="true"/>
         <xsd:attribute name="log-enabled" type="xsd:boolean" default="true"/>
         <xsd:attribute name="factory" type="xsd:string" />
-        <xsd:attribute name="query-validator" type="xsd:string" />
+
         <xsd:attribute name="region-lifetime" type="xsd:integer" />
         <xsd:attribute name="region-lock-lifetime" type="xsd:integer" />
     </xsd:complexType>
