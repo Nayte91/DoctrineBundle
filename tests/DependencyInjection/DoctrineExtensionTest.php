@@ -72,11 +72,6 @@ use function sys_get_temp_dir;
 
 class DoctrineExtensionTest extends TestCase
 {
-    /**
-     * https://github.com/doctrine/orm/pull/7953 needed, otherwise ORM classes
-     * we define services for trigger deprecations
-     */
-    #[IgnoreDeprecations]
     public function testAutowiringAlias(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -1509,8 +1504,6 @@ class DoctrineExtensionTest extends TestCase
         $container->compile();
         $this->assertEquals(new MapEntity(null, null, null, [], null, null, null, true, true), $container->get('controller_resolver_defaults'));
     }
-
-    // phpcs:enable
 
     /** @param list<string> $bundles */
     private static function getContainer(array $bundles = ['XmlBundle'], string $vendor = ''): ContainerBuilder
