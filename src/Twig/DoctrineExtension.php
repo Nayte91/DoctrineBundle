@@ -141,7 +141,7 @@ class DoctrineExtension extends AbstractExtension
         return $this->sqlFormatter->format($sql);
     }
 
-    private function setUpSqlFormatter(bool $highlight = true, bool $legacy = false): void
+    private function setUpSqlFormatter(bool $highlight = true): void
     {
         $this->sqlFormatter = new SqlFormatter($highlight ? new HtmlHighlighter([
             HtmlHighlighter::HIGHLIGHT_PRE            => 'class="highlight highlight-sql"',
@@ -154,6 +154,6 @@ class DoctrineExtension extends AbstractExtension
             HtmlHighlighter::HIGHLIGHT_ERROR          => 'class="error"',
             HtmlHighlighter::HIGHLIGHT_COMMENT        => 'class="comment"',
             HtmlHighlighter::HIGHLIGHT_VARIABLE       => 'class="variable"',
-        ], ! $legacy) : new NullHighlighter());
+        ]) : new NullHighlighter());
     }
 }
