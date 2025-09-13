@@ -9,10 +9,8 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPa
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\InvokableEntityListener;
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -43,7 +41,6 @@ use function assert;
 use function end;
 use function interface_exists;
 use function is_dir;
-use function method_exists;
 use function sprintf;
 use function sys_get_temp_dir;
 use function uniqid;
@@ -52,8 +49,6 @@ use const DIRECTORY_SEPARATOR;
 
 abstract class AbstractDoctrineExtensionTestCase extends TestCase
 {
-    use VerifyDeprecations;
-
     abstract protected function loadFromFile(ContainerBuilder $container, string $file): void;
 
     public function testDbalLoadFromXmlMultipleConnections(): void
@@ -189,26 +184,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             $param['replica']['replica1'],
         );
         $this->assertEquals(['engine' => 'InnoDB'], $param['defaultTableOptions']);
-    }
-
-    public function testDbalLoadDisableTypeComments(): void
-    {
-        $container = $this->loadContainer('dbal_disable_type_comments');
-
-        $calls = $container->getDefinition('doctrine.dbal.no_comments_connection.configuration')->getMethodCalls();
-        $calls = array_values(array_filter($calls, static fn ($call) => $call[0] === 'setDisableTypeComments'));
-        $this->assertCount(1, $calls);
-        $this->assertEquals('setDisableTypeComments', $calls[0][0]);
-        $this->assertTrue($calls[0][1][0]);
-
-        $calls = $container->getDefinition('doctrine.dbal.comments_connection.configuration')->getMethodCalls();
-        $calls = array_values(array_filter($calls, static fn ($call) => $call[0] === 'setDisableTypeComments'));
-        $this->assertCount(1, $calls);
-        $this->assertFalse($calls[0][1][0]);
-
-        $calls = $container->getDefinition('doctrine.dbal.notset_connection.configuration')->getMethodCalls();
-        $calls = array_values(array_filter($calls, static fn ($call) => $call[0] === 'setDisableTypeComments'));
-        $this->assertCount(0, $calls);
     }
 
     #[IgnoreDeprecations]
@@ -798,27 +773,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $entityManager = $container->get('doctrine.orm.entity_manager');
         assert($entityManager instanceof EntityManagerInterface);
         $this->assertCount(2, $entityManager->getFilters()->getEnabledFilters());
-    }
-
-    #[IgnoreDeprecations]
-    public function testSettingDisableTypeCommentsWithDbal4IsDeprecated(): void
-    {
-        if (method_exists(Connection::class, 'getEventManager')) {
-            self::markTestSkipped('This test requires DBAL 4.');
-        }
-
-        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/2048');
-        $this->loadContainer('dbal_disable_type_comments');
-    }
-
-    public function testSettingDisableTypeCommentsWithDbal3IsFine(): void
-    {
-        if (! method_exists(Connection::class, 'getEventManager')) {
-            self::markTestSkipped('This test requires DBAL 3.');
-        }
-
-        $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/pull/2048');
-        $this->loadContainer('dbal_disable_type_comments');
     }
 
     public function testResolveTargetEntity(): void

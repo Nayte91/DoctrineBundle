@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Bundle\DoctrineBundle\DependencyInjection;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\Deprecations\Deprecation;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -31,7 +29,6 @@ use function in_array;
 use function is_array;
 use function is_string;
 use function key;
-use function method_exists;
 use function reset;
 use function sprintf;
 use function strtoupper;
@@ -187,20 +184,6 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('profiling_collect_schema_errors')
                     ->defaultValue(true)
                     ->info('Enables collecting schema errors when profiling is enabled')
-                ->end()
-                ->booleanNode('disable_type_comments')
-                    ->beforeNormalization()
-                        ->ifTrue(static fn ($v): bool => isset($v) && ! method_exists(Connection::class, 'getEventManager'))
-                        ->then(static function ($v) {
-                            Deprecation::trigger(
-                                'doctrine/doctrine-bundle',
-                                'https://github.com/doctrine/DoctrineBundle/pull/2048',
-                                'The "disable_type_comments" configuration key is deprecated when using DBAL 4 and will be removed in DoctrineBundle 3.0.',
-                            );
-
-                            return $v;
-                        })
-                    ->end()
                 ->end()
                 ->scalarNode('server_version')->end()
                 ->integerNode('idle_connection_ttl')->defaultValue(600)->end()
