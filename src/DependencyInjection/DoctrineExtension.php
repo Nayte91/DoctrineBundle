@@ -20,6 +20,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 use Doctrine\DBAL\Schema\LegacySchemaManagerFactory;
+use Doctrine\Deprecations\Deprecation;
 use Doctrine\ORM\Configuration as ORMConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
@@ -83,7 +84,6 @@ use function method_exists;
 use function reset;
 use function sprintf;
 use function str_replace;
-use function trigger_deprecation;
 
 use const PHP_VERSION_ID;
 
@@ -507,12 +507,20 @@ class DoctrineExtension extends AbstractDoctrineExtension
         }
 
         if ($config['controller_resolver']['auto_mapping'] === null) {
-            trigger_deprecation('doctrine/doctrine-bundle', '2.12', 'The default value of "doctrine.orm.controller_resolver.auto_mapping" will be changed from `true` to `false`. Explicitly configure `true` to keep existing behaviour.');
+            Deprecation::trigger(
+                'doctrine/doctrine-bundle',
+                'https://github.com/doctrine/DoctrineBundle/pull/1762',
+                'The default value of "doctrine.orm.controller_resolver.auto_mapping" will be changed from `true` to `false`. Explicitly configure `true` to keep existing behaviour.',
+            );
             $config['controller_resolver']['auto_mapping'] = true;
         }
 
         if ($config['controller_resolver']['auto_mapping'] === true) {
-            trigger_deprecation('doctrine/doctrine-bundle', '2.13', 'Enabling the controller resolver automapping feature has been deprecated. Symfony Mapped Route Parameters should be used as replacement.');
+            Deprecation::trigger(
+                'doctrine/doctrine-bundle',
+                'https://github.com/doctrine/DoctrineBundle/pull/1804',
+                'Enabling the controller resolver automapping feature has been deprecated. Symfony Mapped Route Parameters should be used as replacement.',
+            );
         }
 
         if (! $config['controller_resolver']['auto_mapping']) {
@@ -578,7 +586,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
                 'Lazy ghost objects cannot be disabled for ORM 3.',
             );
         } else {
-            trigger_deprecation('doctrine/doctrine-bundle', '2.11', 'Not setting "doctrine.orm.enable_lazy_ghost_objects" to true is deprecated.');
+            Deprecation::trigger(
+                'doctrine/doctrine-bundle',
+                'https://github.com/doctrine/DoctrineBundle/pull/1568',
+                'Not setting "doctrine.orm.enable_lazy_ghost_objects" to true is deprecated.',
+            );
         }
 
         if ($config['enable_native_lazy_objects'] ?? false) {
@@ -596,7 +608,11 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $container->removeDefinition('doctrine.orm.proxy_cache_warmer');
         } elseif (! class_exists(AnnotationDriver::class) && PHP_VERSION_ID >= 80400) {
             // Only emit the deprecation notice for ORM 3 and PHP 8.4+ users
-            trigger_deprecation('doctrine/doctrine-bundle', '2.16', 'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.');
+            Deprecation::trigger(
+                'doctrine/doctrine-bundle',
+                'https://github.com/doctrine/DoctrineBundle/pull/1905',
+                'Not setting "doctrine.orm.enable_native_lazy_objects" to true is deprecated.',
+            );
         }
 
         $options = ['auto_generate_proxy_classes', 'enable_lazy_ghost_objects', 'enable_native_lazy_objects', 'proxy_dir', 'proxy_namespace'];

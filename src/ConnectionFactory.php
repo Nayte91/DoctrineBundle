@@ -28,7 +28,6 @@ use function func_num_args;
 use function is_array;
 use function is_subclass_of;
 use function method_exists;
-use function trigger_deprecation;
 
 use const PHP_EOL;
 
@@ -117,7 +116,11 @@ class ConnectionFactory
         $overriddenOptions = [];
         /** @phpstan-ignore isset.offset (We should adjust when https://github.com/phpstan/phpstan/issues/12414 is fixed) */
         if (isset($params['connection_override_options'])) {
-            trigger_deprecation('doctrine/doctrine-bundle', '2.4', 'The "connection_override_options" connection parameter is deprecated');
+            Deprecation::trigger(
+                'doctrine/doctrine-bundle',
+                'https://github.com/doctrine/DoctrineBundle/pull/1342',
+                'The "connection_override_options" connection parameter is deprecated',
+            );
             $overriddenOptions = $params['connection_override_options'];
             unset($params['connection_override_options']);
         }

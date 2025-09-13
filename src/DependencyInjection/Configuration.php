@@ -44,7 +44,6 @@ use function strlen;
 use function strpos;
 use function strtoupper;
 use function substr;
-use function trigger_deprecation;
 
 /**
  * This class contains the configuration information for the bundle
@@ -309,9 +308,9 @@ class Configuration implements ConfigurationInterface
 
                 if ($urlConflictingValues) {
                     $tail = count($urlConflictingValues) > 1 ? sprintf('or "%s" options', array_pop($urlConflictingValues)) : 'option';
-                    trigger_deprecation(
+                    Deprecation::trigger(
                         'doctrine/doctrine-bundle',
-                        '2.4',
+                        'https://github.com/doctrine/DoctrineBundle/pull/1342',
                         'Setting the "doctrine.dbal.%s" %s while the "url" one is defined is deprecated',
                         implode('", "', $urlConflictingValues),
                         $tail,

@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Injects Doctrine DBAL and legacy PDO adapters into their schema subscribers.
+ * Injects Doctrine DBAL adapters into their schema subscriber.
  *
  * Must be run later after ResolveChildDefinitionsPass.
  *
