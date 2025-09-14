@@ -294,12 +294,6 @@ class DoctrineExtension extends AbstractDoctrineExtension
             $def->setClass($options['wrapperClass']);
         }
 
-        if (isset($connection['use_savepoints'])) {
-            if (! $connection['use_savepoints']) {
-                throw new LogicException('The "use_savepoints" option can only be set to "true" and should ideally not be set');
-            }
-        }
-
         $container->setDefinition(
             ManagerRegistryAwareConnectionProvider::class,
             new Definition(ManagerRegistryAwareConnectionProvider::class, [$container->getDefinition('doctrine')]),

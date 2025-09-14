@@ -89,9 +89,6 @@ Configuration Reference
                         # pdo_sqlsrv driver specific. Configuring MultipleActiveResultSets for the pdo_sqlsrv driver
                         MultipleActiveResultSets:  ~
 
-                        # Enable savepoints for nested transactions
-                        use_savepoints: true
-
                         driver:               pdo_mysql
                         platform_service:     ~
                         auto_commit:          ~
@@ -385,7 +382,6 @@ Configuration Reference
                     <!-- sslcrl: The name of a file containing the SSL certificate revocation list (CRL) -->
                     <!-- pooled: True to use a pooled server with the oci8/pdo_oracle driver -->
                     <!-- MultipleActiveResultSets: Configuring MultipleActiveResultSets for the pdo_sqlsrv driver -->
-                    <!-- use-savepoints: Enable savepoints for nested transactions -->
                     <doctrine:connection
                         name="default"
                         dbname=""
@@ -411,7 +407,6 @@ Configuration Reference
                         sslcrl=""
                         pooled=""
                         MultipleActiveResultSets=""
-                        use-savepoints="true"
                         driver="pdo_mysql"
                         auto-commit=""
                         schema-filter=""

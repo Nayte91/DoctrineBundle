@@ -500,26 +500,6 @@ class DoctrineExtensionTest extends TestCase
         $this->assertSame(ArrayAdapter::class, $definition->getClass());
     }
 
-    #[IgnoreDeprecations]
-    public function testUseSavePointsAddMethodCallToAddSavepointsToTheConnection(): void
-    {
-        $container = $this->getContainer();
-        $extension = new DoctrineExtension();
-
-        $extension->load([
-            [
-                'dbal' => [
-                    'connections' => [
-                        'default' => ['password' => 'foo', 'use_savepoints' => true],
-                    ],
-                ],
-            ],
-        ], $container);
-
-        $calls = $container->getDefinition('doctrine.dbal.default_connection')->getMethodCalls();
-        $this->assertCount(0, $calls);
-    }
-
     public function testSingleEntityManagerWithDefaultConfiguration(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {

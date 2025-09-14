@@ -84,6 +84,11 @@ been removed.
 `doctrine.dbal.connection.some_connection.slaves` becomes
 `doctrine.dbal.connection.some_connection.replicas`.
 
+### The `doctrine.dbal.connection.some_connection.use_savepoints` option is removed
+
+The `use_savepoints` option for connections is no longer supported and
+has been removed.
+
 ### Controller resolver auto mapping can no longer be configured
 
 The `doctrine.orm.controller_resolver.auto_mapping` option now only accepts `false` as value, to disallow the usage of the controller resolver auto mapping feature by default. The configuration option will be fully removed in 4.0.
