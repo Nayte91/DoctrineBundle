@@ -13,23 +13,14 @@ use Doctrine\Bundle\DoctrineBundle\Tests\Builder\BundleConfigurationBuilder;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EntityListener;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EventListener;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\Cache\CacheConfiguration;
 use Doctrine\ORM\Cache\DefaultCacheFactory;
-use Doctrine\ORM\Cache\Logging\CacheLoggerChain;
-use Doctrine\ORM\Cache\Logging\StatisticsCacheLogger;
-use Doctrine\ORM\Cache\Region\DefaultRegion;
-use Doctrine\ORM\Cache\Region\FileLockRegion;
-use Doctrine\ORM\Cache\RegionsConfiguration;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
-use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
-use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -400,20 +391,6 @@ class DoctrineExtensionTest extends TestCase
 
         $extension->load([$config], $container);
 
-        $this->assertEquals(Configuration::class, $container->getParameter('doctrine.orm.configuration.class'));
-        $this->assertEquals(EntityManager::class, $container->getParameter('doctrine.orm.entity_manager.class'));
-        $this->assertEquals(MappingDriverChain::class, $container->getParameter('doctrine.orm.metadata.driver_chain.class'));
-        $this->assertEquals(SimplifiedXmlDriver::class, $container->getParameter('doctrine.orm.metadata.xml.class'));
-
-        // second-level cache
-        $this->assertEquals(DefaultCacheFactory::class, $container->getParameter('doctrine.orm.second_level_cache.default_cache_factory.class'));
-        $this->assertEquals(DefaultRegion::class, $container->getParameter('doctrine.orm.second_level_cache.default_region.class'));
-        $this->assertEquals(FileLockRegion::class, $container->getParameter('doctrine.orm.second_level_cache.filelock_region.class'));
-        $this->assertEquals(CacheLoggerChain::class, $container->getParameter('doctrine.orm.second_level_cache.logger_chain.class'));
-        $this->assertEquals(StatisticsCacheLogger::class, $container->getParameter('doctrine.orm.second_level_cache.logger_statistics.class'));
-        $this->assertEquals(CacheConfiguration::class, $container->getParameter('doctrine.orm.second_level_cache.cache_configuration.class'));
-        $this->assertEquals(RegionsConfiguration::class, $container->getParameter('doctrine.orm.second_level_cache.regions_configuration.class'));
-
         $config = BundleConfigurationBuilder::createBuilder()
             ->addBaseConnection()
             ->addEntityManager([
@@ -440,7 +417,7 @@ class DoctrineExtensionTest extends TestCase
         $this->assertCount(0, $definition->getMethodCalls());
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
 
         $this->assertNull($definition->getFactory());
 
@@ -515,7 +492,7 @@ class DoctrineExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, [
             new Reference('doctrine.dbal.default_connection'),
@@ -562,7 +539,7 @@ class DoctrineExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, [
             new Reference('doctrine.dbal.default_connection'),
@@ -571,7 +548,7 @@ class DoctrineExtensionTest extends TestCase
         ]);
 
         $slcDefinition = $container->getDefinition('doctrine.orm.default_second_level_cache.default_cache_factory');
-        $this->assertEquals('%doctrine.orm.second_level_cache.default_cache_factory.class%', $slcDefinition->getClass());
+        $this->assertEquals(DefaultCacheFactory::class, $slcDefinition->getClass());
     }
 
     #[IgnoreDeprecations]
@@ -598,7 +575,7 @@ class DoctrineExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
-        $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
+        $this->assertEquals(EntityManager::class, $definition->getClass());
 
         $this->assertDICConstructorArguments($definition, [
             new Reference('doctrine.dbal.default_connection'),

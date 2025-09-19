@@ -103,6 +103,47 @@ When using the `doctrine.dbal.url` configuration option, you can no longer
 specify other configuration options that would conflict with it, such as
 `dbname`, `host`, etc.
 
+### Service class parameters removed
+
+The following service class parameters have been removed:
+
+- `doctrine.class`
+- `doctrine.data_collector.class`
+- `doctrine.dbal.configuration.class`
+- `doctrine.dbal.connection.event_manager.class`
+- `doctrine.dbal.connection_factory.class`
+- `doctrine.orm.configuration.class`
+- `doctrine.orm.entity_listener_resolver.class`
+- `doctrine.orm.entity_manager.class`
+- `doctrine.orm.listeners.attach_entity_listeners.class`
+- `doctrine.orm.listeners.resolve_target_entity.class`
+- `doctrine.orm.manager_configurator.class`
+- `doctrine.orm.metadata.attribute.class`
+- `doctrine.orm.metadata.driver_chain.class`
+- `doctrine.orm.metadata.php.class`
+- `doctrine.orm.metadata.staticphp.class`
+- `doctrine.orm.metadata.xml.class`
+- `doctrine.orm.naming_strategy.default.class`
+- `doctrine.orm.naming_strategy.underscore.class`
+- `doctrine.orm.quote_strategy.ansi.class`
+- `doctrine.orm.quote_strategy.default.class`
+- `doctrine.orm.second_level_cache.cache_configuration.class`
+- `doctrine.orm.second_level_cache.default_cache_factory.class`
+- `doctrine.orm.second_level_cache.default_region.class`
+- `doctrine.orm.second_level_cache.filelock_region.class`
+- `doctrine.orm.second_level_cache.logger_chain.class`
+- `doctrine.orm.second_level_cache.logger_statistics.class`
+- `doctrine.orm.second_level_cache.regions_configuration.class`
+- `doctrine.orm.security.user.provider.class`
+- `doctrine.orm.typed_field_mapper.default.class`
+- `doctrine.orm.validator.unique.class`
+- `doctrine.orm.validator_initializer.class`
+- `form.type_guesser.doctrine.class`
+
+If your application was relying on these parameters, you should update your
+service definitions to use the class names directly instead of parameter
+references.
+
 ConnectionFactory::createConnection() signature change
 ------------------------------------------------------
 

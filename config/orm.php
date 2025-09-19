@@ -5,16 +5,8 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Doctrine\Bundle\DoctrineBundle\ManagerConfigurator;
-use Doctrine\Bundle\DoctrineBundle\Mapping\ContainerEntityListenerResolver;
 use Doctrine\Bundle\DoctrineBundle\Orm\ManagerRegistryAwareEntityManagerProvider;
 use Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory;
-use Doctrine\ORM\Cache\CacheConfiguration;
-use Doctrine\ORM\Cache\DefaultCacheFactory;
-use Doctrine\ORM\Cache\Logging\CacheLoggerChain;
-use Doctrine\ORM\Cache\Logging\StatisticsCacheLogger;
-use Doctrine\ORM\Cache\Region\DefaultRegion;
-use Doctrine\ORM\Cache\Region\FileLockRegion;
-use Doctrine\ORM\Cache\RegionsConfiguration;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,10 +14,7 @@ use Doctrine\ORM\Mapping\AnsiQuoteStrategy;
 use Doctrine\ORM\Mapping\DefaultNamingStrategy;
 use Doctrine\ORM\Mapping\DefaultQuoteStrategy;
 use Doctrine\ORM\Mapping\DefaultTypedFieldMapper;
-use Doctrine\ORM\Mapping\Driver\AttributeDriver;
-use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
-use Doctrine\ORM\Tools\AttachEntityListenersListener;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\CollectionRegionCommand;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\EntityRegionCommand;
 use Doctrine\ORM\Tools\Console\Command\ClearCache\MetadataCommand;
@@ -40,12 +29,11 @@ use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
 use Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand;
 use Doctrine\ORM\Tools\Console\Command\ValidateSchemaCommand;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
-use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
-use Doctrine\Persistence\Mapping\Driver\PHPDriver;
-use Doctrine\Persistence\Mapping\Driver\StaticPHPDriver;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\SchemaListener\DoctrineDbalCacheAdapterSchemaListener;
 use Symfony\Bridge\Doctrine\SchemaListener\LockStoreSchemaListener;
 use Symfony\Bridge\Doctrine\SchemaListener\PdoSessionHandlerSchemaListener;
@@ -59,60 +47,11 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use const CASE_LOWER;
 
 return static function (ContainerConfigurator $container): void {
-    $container->parameters()
-        ->set('doctrine.orm.configuration.class', Configuration::class)
-        ->set('doctrine.orm.entity_manager.class', EntityManager::class)
-        ->set('doctrine.orm.manager_configurator.class', ManagerConfigurator::class)
-
-        // metadata drivers
-        ->set('doctrine.orm.metadata.driver_chain.class', MappingDriverChain::class)
-        ->set('doctrine.orm.metadata.xml.class', SimplifiedXmlDriver::class)
-        ->set('doctrine.orm.metadata.php.class', PHPDriver::class)
-        ->set('doctrine.orm.metadata.staticphp.class', StaticPHPDriver::class)
-        ->set('doctrine.orm.metadata.attribute.class', AttributeDriver::class)
-
-        // form field factory guesser
-        ->set('form.type_guesser.doctrine.class', DoctrineOrmTypeGuesser::class)
-
-        // validator
-        ->set('doctrine.orm.validator.unique.class', UniqueEntityValidator::class)
-        ->set('doctrine.orm.validator_initializer.class', DoctrineInitializer::class)
-
-        // security
-        ->set('doctrine.orm.security.user.provider.class', EntityUserProvider::class)
-
-        // listeners
-        ->set('doctrine.orm.listeners.resolve_target_entity.class', ResolveTargetEntityListener::class)
-        ->set('doctrine.orm.listeners.attach_entity_listeners.class', AttachEntityListenersListener::class)
-
-        // naming strategy
-        ->set('doctrine.orm.naming_strategy.default.class', DefaultNamingStrategy::class)
-        ->set('doctrine.orm.naming_strategy.underscore.class', UnderscoreNamingStrategy::class)
-
-        // quote strategy
-        ->set('doctrine.orm.quote_strategy.default.class', DefaultQuoteStrategy::class)
-        ->set('doctrine.orm.quote_strategy.ansi.class', AnsiQuoteStrategy::class)
-
-        // typed field mapper
-        ->set('doctrine.orm.typed_field_mapper.default.class', DefaultTypedFieldMapper::class)
-
-        // entity listener resolver
-        ->set('doctrine.orm.entity_listener_resolver.class', ContainerEntityListenerResolver::class)
-
-        // second level cache
-        ->set('doctrine.orm.second_level_cache.default_cache_factory.class', DefaultCacheFactory::class)
-        ->set('doctrine.orm.second_level_cache.default_region.class', DefaultRegion::class)
-        ->set('doctrine.orm.second_level_cache.filelock_region.class', FileLockRegion::class)
-        ->set('doctrine.orm.second_level_cache.logger_chain.class', CacheLoggerChain::class)
-        ->set('doctrine.orm.second_level_cache.logger_statistics.class', StatisticsCacheLogger::class)
-        ->set('doctrine.orm.second_level_cache.cache_configuration.class', CacheConfiguration::class)
-        ->set('doctrine.orm.second_level_cache.regions_configuration.class', RegionsConfiguration::class);
-
     $container->services()
 
         ->alias(EntityManagerInterface::class, 'doctrine.orm.entity_manager')
 
-        ->set('form.type_guesser.doctrine', (string) param('form.type_guesser.doctrine.class'))
+        ->set('form.type_guesser.doctrine', DoctrineOrmTypeGuesser::class)
             ->tag('form.type_guesser')
             ->args([
                 service('doctrine'),
@@ -124,10 +63,9 @@ return static function (ContainerConfigurator $container): void {
                 service('doctrine'),
             ])
 
-        ->set('doctrine.orm.configuration', (string) param('doctrine.orm.configuration.class'))
-            ->abstract()
+        ->set('doctrine.orm.configuration', Configuration::class)->abstract()
 
-        ->set('doctrine.orm.entity_manager.abstract', (string) param('doctrine.orm.entity_manager.class'))
+        ->set('doctrine.orm.entity_manager.abstract', EntityManager::class)
             ->abstract()
             ->lazy()
 
@@ -138,32 +76,32 @@ return static function (ContainerConfigurator $container): void {
                 ]),
             ])
 
-        ->set('doctrine.orm.manager_configurator.abstract', (string) param('doctrine.orm.manager_configurator.class'))
+        ->set('doctrine.orm.manager_configurator.abstract', ManagerConfigurator::class)
             ->abstract()
             ->args([
                 [],
                 [],
             ])
 
-        ->set('doctrine.orm.validator.unique', (string) param('doctrine.orm.validator.unique.class'))
+        ->set('doctrine.orm.validator.unique', UniqueEntityValidator::class)
             ->tag('validator.constraint_validator', ['alias' => 'doctrine.orm.validator.unique'])
             ->args([
                 service('doctrine'),
             ])
 
-        ->set('doctrine.orm.validator_initializer', (string) param('doctrine.orm.validator_initializer.class'))
+        ->set('doctrine.orm.validator_initializer', DoctrineInitializer::class)
             ->tag('validator.initializer')
             ->args([
                 service('doctrine'),
             ])
 
-        ->set('doctrine.orm.security.user.provider', (string) param('doctrine.orm.security.user.provider.class'))
+        ->set('doctrine.orm.security.user.provider', EntityUserProvider::class)
             ->abstract()
             ->args([
                 service('doctrine'),
             ])
 
-        ->set('doctrine.orm.listeners.resolve_target_entity', (string) param('doctrine.orm.listeners.resolve_target_entity.class'))
+        ->set('doctrine.orm.listeners.resolve_target_entity', ResolveTargetEntityListener::class)
 
         ->set('doctrine.orm.listeners.doctrine_dbal_cache_adapter_schema_listener', DoctrineDbalCacheAdapterSchemaListener::class)
             ->args([
@@ -189,29 +127,29 @@ return static function (ContainerConfigurator $container): void {
             ])
             ->tag('doctrine.event_listener', ['event' => 'postGenerateSchema'])
 
-        ->set('doctrine.orm.naming_strategy.default', (string) param('doctrine.orm.naming_strategy.default.class'))
+        ->set('doctrine.orm.naming_strategy.default', DefaultNamingStrategy::class)
 
-        ->set('doctrine.orm.naming_strategy.underscore', (string) param('doctrine.orm.naming_strategy.underscore.class'))
+        ->set('doctrine.orm.naming_strategy.underscore', UnderscoreNamingStrategy::class)
 
-        ->set('doctrine.orm.naming_strategy.underscore_number_aware', (string) param('doctrine.orm.naming_strategy.underscore.class'))
+        ->set('doctrine.orm.naming_strategy.underscore_number_aware', UnderscoreNamingStrategy::class)
             ->args([
                 CASE_LOWER,
                 true,
             ])
 
-        ->set('doctrine.orm.quote_strategy.default', (string) param('doctrine.orm.quote_strategy.default.class'))
+        ->set('doctrine.orm.quote_strategy.default', DefaultQuoteStrategy::class)
 
-        ->set('doctrine.orm.quote_strategy.ansi', (string) param('doctrine.orm.quote_strategy.ansi.class'))
+        ->set('doctrine.orm.quote_strategy.ansi', AnsiQuoteStrategy::class)
 
-        ->set('doctrine.orm.typed_field_mapper.default', (string) param('doctrine.orm.typed_field_mapper.default.class'))
+        ->set('doctrine.orm.typed_field_mapper.default', DefaultTypedFieldMapper::class)
 
-        ->set('doctrine.ulid_generator', 'Symfony\\Bridge\\Doctrine\\IdGenerator\\UlidGenerator')
+        ->set('doctrine.ulid_generator', UlidGenerator::class)
             ->args([
                 service('ulid.factory')->ignoreOnInvalid(),
             ])
             ->tag('doctrine.id_generator')
 
-        ->set('doctrine.uuid_generator', 'Symfony\\Bridge\\Doctrine\\IdGenerator\\UuidGenerator')
+        ->set('doctrine.uuid_generator', UuidGenerator::class)
             ->args([
                 service('uuid.factory')->ignoreOnInvalid(),
             ])
