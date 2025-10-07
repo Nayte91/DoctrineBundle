@@ -155,6 +155,13 @@ You should use stop passing an event manager argument.
 + $connectionFactory->createConnection($params, $config, $mappingTypes)
 ```
 
+DependencyInjection namespace becomes internal
+----------------------------------------------
+
+The `Doctrine\Bundle\DoctrineBundle\DependencyInjection` namespace is now
+considered internal, and all classes inside it are marked as final.
+Don't reference any classes from this namespace directly.
+
 `Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventListenerInterface` has been removed
 ----------------------------------------------------------------------------------------
 

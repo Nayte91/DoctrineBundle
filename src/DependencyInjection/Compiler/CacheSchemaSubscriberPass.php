@@ -14,9 +14,9 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * Must be run later after ResolveChildDefinitionsPass.
  *
- * @final since 2.9
+ * @internal
  */
-class CacheSchemaSubscriberPass implements CompilerPassInterface
+final class CacheSchemaSubscriberPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
