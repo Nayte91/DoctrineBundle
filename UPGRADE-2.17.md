@@ -1,6 +1,14 @@
 UPGRADE FROM 2.16 to 2.17
 =========================
 
+DoctrineExtension
+=================
+
+Minor breaking change:
+`Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension` no
+longer extends
+`Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension`.
+
 Configuration
 -------------
 
