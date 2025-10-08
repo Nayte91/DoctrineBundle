@@ -14,9 +14,9 @@ use function sprintf;
 /**
  * Processes the doctrine.dbal.schema_filter
  *
- * @final since 2.9
+ * @internal
  */
-class DbalSchemaFilterPass implements CompilerPassInterface
+final class DbalSchemaFilterPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

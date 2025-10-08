@@ -88,7 +88,8 @@ use const GLOB_NOSORT;
 /**
  * DoctrineExtension is an extension for the Doctrine DBAL and ORM library.
  *
- * @final since 2.9
+ * @internal
+ *
  * @phpstan-type DBALConfig = array{
  *      connections: array<string, array{logging: bool, profiling: bool, profiling_collect_backtrace: bool, idle_connection_ttl: int}>,
  *      driver_schemes: array<string, string>,
@@ -96,7 +97,7 @@ use const GLOB_NOSORT;
  *      types: array<string, string>,
  *  }
  */
-class DoctrineExtension extends Extension
+final class DoctrineExtension extends Extension
 {
     /**
      * Used inside metadata driver method to simplify aggregation of data.
