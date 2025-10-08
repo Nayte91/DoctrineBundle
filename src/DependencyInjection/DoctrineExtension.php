@@ -286,9 +286,7 @@ class DoctrineExtension extends Extension
                 ]);
             }
 
-            if (
-                str_contains($mappingDriverDef->getClass(), 'xml') || str_contains($mappingDriverDef->getClass(), 'Xml')
-            ) {
+            if (str_contains($mappingDriverDef->getClass(), 'Xml')) {
                 $mappingDriverDef->setArguments([array_flip($driverPaths)]);
                 $mappingDriverDef->addMethodCall('setGlobalBasename', ['mapping']);
             }
