@@ -80,7 +80,6 @@ use function is_dir;
 use function realpath;
 use function reset;
 use function sprintf;
-use function str_contains;
 use function str_replace;
 
 use const GLOB_NOSORT;
@@ -275,22 +274,12 @@ final class DoctrineExtension extends Extension
         }
 
         foreach ($this->drivers as $driverType => $driverPaths) {
-            $mappingService = $this->getObjectManagerElementName($objectManager['name'] . '_' . $driverType . '_metadata_driver');
-            if ($container->hasDefinition($mappingService)) {
-                $mappingDriverDef = $container->getDefinition($mappingService);
-                $args             = $mappingDriverDef->getArguments();
-                $args[0]          = array_merge(array_values($driverPaths), $args[0]);
-                $mappingDriverDef->setArguments($args);
-            } else {
-                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
-                    array_values($driverPaths),
-                ]);
-            }
+            $mappingService   = $this->getObjectManagerElementName($objectManager['name'] . '_' . $driverType . '_metadata_driver');
+            $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                array_values($driverPaths),
+            ]);
 
-            if (
-                str_contains($mappingDriverDef->getClass(), 'yml') || str_contains($mappingDriverDef->getClass(), 'xml')
-                || str_contains($mappingDriverDef->getClass(), 'Yaml') || str_contains($mappingDriverDef->getClass(), 'Xml')
-            ) {
+            if ($mappingDriverDef->getClass() === SimplifiedXmlDriver::class) {
                 $mappingDriverDef->setArguments([array_flip($driverPaths)]);
                 $mappingDriverDef->addMethodCall('setGlobalBasename', ['mapping']);
             }
@@ -322,8 +311,8 @@ final class DoctrineExtension extends Extension
             throw new InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
-        if (! in_array($mappingConfig['type'], ['xml', 'yml', 'php', 'staticphp', 'attribute'])) {
-            throw new InvalidArgumentException(sprintf('Can only configure "xml", "yml", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName . '_metadata_driver')));
+        if (! in_array($mappingConfig['type'], ['xml', 'php', 'staticphp', 'attribute'])) {
+            throw new InvalidArgumentException(sprintf('Can only configure "xml", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName . '_metadata_driver')));
         }
     }
 
