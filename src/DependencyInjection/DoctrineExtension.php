@@ -80,7 +80,6 @@ use function is_dir;
 use function realpath;
 use function reset;
 use function sprintf;
-use function str_contains;
 use function str_replace;
 
 use const GLOB_NOSORT;
@@ -286,7 +285,7 @@ class DoctrineExtension extends Extension
                 ]);
             }
 
-            if (str_contains($mappingDriverDef->getClass(), 'Xml')) {
+            if ($mappingDriverDef->getClass() === SimplifiedXmlDriver::class) {
                 $mappingDriverDef->setArguments([array_flip($driverPaths)]);
                 $mappingDriverDef->addMethodCall('setGlobalBasename', ['mapping']);
             }
