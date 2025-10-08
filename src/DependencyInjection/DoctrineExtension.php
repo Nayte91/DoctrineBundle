@@ -104,21 +104,21 @@ final class DoctrineExtension extends Extension
      *
      * @var array<string, string> List of alias => namespace
      */
-    protected array $aliasMap = [];
+    private array $aliasMap = [];
 
     /**
      * Used inside metadata driver method to simplify aggregation of data.
      *
      * @var array<string, array<string, string>> List of driver type => prefix => path
      */
-    protected array $drivers = [];
+    private array $drivers = [];
 
     /**
      * @param array<string, mixed> $objectManager A configured object manager
      *
      * @throws InvalidArgumentException
      */
-    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container): void
+    private function loadMappingInformation(array $objectManager, ContainerBuilder $container): void
     {
         if ($objectManager['auto_mapping']) {
             // automatically register bundle mappings
@@ -188,7 +188,7 @@ final class DoctrineExtension extends Extension
      *
      * @param array<string, mixed> $mappingConfig
      */
-    protected function setMappingDriverAlias(array $mappingConfig, string $mappingName): void
+    private function setMappingDriverAlias(array $mappingConfig, string $mappingName): void
     {
         if (isset($mappingConfig['alias'])) {
             $this->aliasMap[$mappingConfig['alias']] = $mappingConfig['prefix'];
@@ -204,7 +204,7 @@ final class DoctrineExtension extends Extension
      *
      * @throws InvalidArgumentException
      */
-    protected function setMappingDriverConfig(array $mappingConfig, string $mappingName): void
+    private function setMappingDriverConfig(array $mappingConfig, string $mappingName): void
     {
         $mappingDirectory = $mappingConfig['dir'];
         if (! is_dir($mappingDirectory)) {
@@ -221,7 +221,7 @@ final class DoctrineExtension extends Extension
      *
      * @param array<string, mixed> $bundleConfig
      */
-    protected function getMappingDriverBundleConfigDefaults(
+    private function getMappingDriverBundleConfigDefaults(
         array $bundleConfig,
         ReflectionClass $bundle,
         ContainerBuilder $container,
@@ -265,7 +265,7 @@ final class DoctrineExtension extends Extension
      *
      * @param array<string, mixed> $objectManager
      */
-    protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container): void
+    private function registerMappingDrivers(array $objectManager, ContainerBuilder $container): void
     {
         // configure metadata driver for each bundle based on the type of mapping files found
         if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'] . '_metadata_driver'))) {
@@ -312,7 +312,7 @@ final class DoctrineExtension extends Extension
      *
      * @throws InvalidArgumentException
      */
-    protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName): void
+    private function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName): void
     {
         if (! $mappingConfig['type'] || ! $mappingConfig['dir'] || ! $mappingConfig['prefix']) {
             throw new InvalidArgumentException(sprintf('Mapping definitions for Doctrine manager "%s" require at least the "type", "dir" and "prefix" options.', $objectManagerName));
@@ -330,7 +330,7 @@ final class DoctrineExtension extends Extension
     /**
      * Detects what metadata driver to use for the supplied directory.
      */
-    protected function detectMetadataDriver(string $dir, ContainerBuilder $container): string|null
+    private function detectMetadataDriver(string $dir, ContainerBuilder $container): string|null
     {
         $configPath = $this->getMappingResourceConfigDirectory($dir);
         $extension  = $this->getMappingResourceExtension();
@@ -372,7 +372,7 @@ final class DoctrineExtension extends Extension
      *
      * @return array<string, array<string, mixed>>
      */
-    protected function fixManagersAutoMappings(array $managerConfigs, array $bundles): array
+    private function fixManagersAutoMappings(array $managerConfigs, array $bundles): array
     {
         $autoMappedManager = $this->validateAutoMapping($managerConfigs);
 
@@ -494,7 +494,7 @@ final class DoctrineExtension extends Extension
      * @param DBALConfig       $config    An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function dbalLoad(array $config, ContainerBuilder $container): void
+    private function dbalLoad(array $config, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('dbal.php');
@@ -583,7 +583,7 @@ final class DoctrineExtension extends Extension
      * @param array<string, mixed> $connection A dbal connection configuration.
      * @param ContainerBuilder     $container  A ContainerBuilder instance
      */
-    protected function loadDbalConnection(string $name, array $connection, ContainerBuilder $container): void
+    private function loadDbalConnection(string $name, array $connection, ContainerBuilder $container): void
     {
         $configuration = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), new ChildDefinition('doctrine.dbal.connection.configuration'));
         unset($connection['logging']);
@@ -656,7 +656,7 @@ final class DoctrineExtension extends Extension
      *
      * @return mixed[]
      */
-    protected function getConnectionOptions(array $connection): array
+    private function getConnectionOptions(array $connection): array
     {
         $options = $connection;
 
@@ -753,7 +753,7 @@ final class DoctrineExtension extends Extension
      * @param array<string, mixed> $config    An array of configuration settings
      * @param ContainerBuilder     $container A ContainerBuilder instance
      */
-    protected function ormLoad(array $config, ContainerBuilder $container): void
+    private function ormLoad(array $config, ContainerBuilder $container): void
     {
         if (! class_exists(UnitOfWork::class)) {
             throw new LogicException('To configure the ORM layer, you must first install the doctrine/orm package.');
@@ -900,7 +900,7 @@ final class DoctrineExtension extends Extension
      * @param array<string, mixed> $entityManager A configured ORM entity manager.
      * @param ContainerBuilder     $container     A ContainerBuilder instance
      */
-    protected function loadOrmEntityManager(array $entityManager, ContainerBuilder $container): void
+    private function loadOrmEntityManager(array $entityManager, ContainerBuilder $container): void
     {
         $ormConfigDef = $container->setDefinition(sprintf('doctrine.orm.%s_configuration', $entityManager['name']), new ChildDefinition('doctrine.orm.configuration'));
         $ormConfigDef->addTag(IdGeneratorPass::CONFIGURATION_TAG);
@@ -1077,7 +1077,7 @@ final class DoctrineExtension extends Extension
      * In the case of bundles everything is really optional (which leads to autodetection for this bundle) but
      * in the mappings key everything except alias is a required argument.
      */
-    protected function loadOrmEntityManagerMappingInformation(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container): void
+    private function loadOrmEntityManagerMappingInformation(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container): void
     {
         // reset state of drivers and alias map. They are only used by this methods and children.
         $this->drivers  = [];
@@ -1135,7 +1135,7 @@ final class DoctrineExtension extends Extension
      *                      cache_driver:
      *                          type: apc
      */
-    protected function loadOrmSecondLevelCache(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container): void
+    private function loadOrmSecondLevelCache(array $entityManager, Definition $ormConfigDef, ContainerBuilder $container): void
     {
         $driverId = null;
         $enabled  = $entityManager['second_level_cache']['enabled'];
@@ -1231,7 +1231,7 @@ final class DoctrineExtension extends Extension
      *
      * @example $name is 'entity_manager' then the result would be 'doctrine.orm.entity_manager'
      */
-    protected function getObjectManagerElementName(string $name): string
+    private function getObjectManagerElementName(string $name): string
     {
         return 'doctrine.orm.' . $name;
     }
@@ -1241,7 +1241,7 @@ final class DoctrineExtension extends Extension
      *
      * Will be used for autodetection of persistent objects directory.
      */
-    protected function getMappingObjectDefaultName(): string
+    private function getMappingObjectDefaultName(): string
     {
         return 'Entity';
     }
@@ -1249,7 +1249,7 @@ final class DoctrineExtension extends Extension
     /**
      * Relative path from the bundle root to the directory where mapping files reside.
      */
-    protected function getMappingResourceConfigDirectory(string|null $bundleDir = null): string
+    private function getMappingResourceConfigDirectory(string|null $bundleDir = null): string
     {
         if ($bundleDir !== null && is_dir($bundleDir . '/config/doctrine')) {
             return 'config/doctrine';
@@ -1261,7 +1261,7 @@ final class DoctrineExtension extends Extension
     /**
      * Extension used by the mapping files.
      */
-    protected function getMappingResourceExtension(): string
+    private function getMappingResourceExtension(): string
     {
         return 'orm';
     }
@@ -1273,7 +1273,7 @@ final class DoctrineExtension extends Extension
      *
      * @throws InvalidArgumentException
      */
-    protected function loadCacheDriver(
+    private function loadCacheDriver(
         string $cacheName,
         string $objectManagerName,
         array $cacheDriver,
@@ -1309,7 +1309,7 @@ final class DoctrineExtension extends Extension
      *
      * @param array<string, mixed> $entityManager A configured ORM entity manager.
      */
-    protected function loadOrmCacheDrivers(array $entityManager, ContainerBuilder $container): void
+    private function loadOrmCacheDrivers(array $entityManager, ContainerBuilder $container): void
     {
         if (isset($entityManager['metadata_cache_driver'])) {
             $this->loadCacheDriver('metadata_cache', $entityManager['name'], $entityManager['metadata_cache_driver'], $container);
@@ -1390,7 +1390,7 @@ final class DoctrineExtension extends Extension
     /**
      * The class name used by the various mapping drivers.
      */
-    protected function getMetadataDriverClass(string $driverType): string
+    private function getMetadataDriverClass(string $driverType): string
     {
         switch ($driverType) {
             case 'driver_chain':
