@@ -273,17 +273,10 @@ class DoctrineExtension extends Extension
         }
 
         foreach ($this->drivers as $driverType => $driverPaths) {
-            $mappingService = $this->getObjectManagerElementName($objectManager['name'] . '_' . $driverType . '_metadata_driver');
-            if ($container->hasDefinition($mappingService)) {
-                $mappingDriverDef = $container->getDefinition($mappingService);
-                $args             = $mappingDriverDef->getArguments();
-                $args[0]          = array_merge(array_values($driverPaths), $args[0]);
-                $mappingDriverDef->setArguments($args);
-            } else {
-                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
-                    array_values($driverPaths),
-                ]);
-            }
+            $mappingService   = $this->getObjectManagerElementName($objectManager['name'] . '_' . $driverType . '_metadata_driver');
+            $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                array_values($driverPaths),
+            ]);
 
             if ($mappingDriverDef->getClass() === SimplifiedXmlDriver::class) {
                 $mappingDriverDef->setArguments([array_flip($driverPaths)]);
