@@ -287,8 +287,7 @@ class DoctrineExtension extends Extension
             }
 
             if (
-                str_contains($mappingDriverDef->getClass(), 'yml') || str_contains($mappingDriverDef->getClass(), 'xml')
-                || str_contains($mappingDriverDef->getClass(), 'Yaml') || str_contains($mappingDriverDef->getClass(), 'Xml')
+                str_contains($mappingDriverDef->getClass(), 'xml') || str_contains($mappingDriverDef->getClass(), 'Xml')
             ) {
                 $mappingDriverDef->setArguments([array_flip($driverPaths)]);
                 $mappingDriverDef->addMethodCall('setGlobalBasename', ['mapping']);
@@ -321,8 +320,8 @@ class DoctrineExtension extends Extension
             throw new InvalidArgumentException(sprintf('Specified non-existing directory "%s" as Doctrine mapping source.', $mappingConfig['dir']));
         }
 
-        if (! in_array($mappingConfig['type'], ['xml', 'yml', 'php', 'staticphp', 'attribute'])) {
-            throw new InvalidArgumentException(sprintf('Can only configure "xml", "yml", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName . '_metadata_driver')));
+        if (! in_array($mappingConfig['type'], ['xml', 'php', 'staticphp', 'attribute'])) {
+            throw new InvalidArgumentException(sprintf('Can only configure "xml", "php", "staticphp" or "attribute" through the DoctrineBundle. Use your own bundle to configure other metadata drivers. You can register them by adding a new driver to the "%s" service definition.', $this->getObjectManagerElementName($objectManagerName . '_metadata_driver')));
         }
     }
 
