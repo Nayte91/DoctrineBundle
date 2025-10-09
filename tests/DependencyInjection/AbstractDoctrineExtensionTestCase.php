@@ -31,6 +31,7 @@ use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListen
 use Symfony\Bundle\DoctrineBundle\Tests\DependencyInjection\TestHydrator;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -1213,13 +1214,8 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container     = $this->loadContainer('orm_native_lazy_objects_disable');
-        $entityManager = $container->get('doctrine.orm.entity_manager');
-
-        $this->assertTrue(
-            $entityManager->getConfiguration()->isNativeLazyObjectsEnabled(),
-            'The configuration node should be silently ignored, and will be deprecated in the future.',
-        );
+        $this->expectException(InvalidConfigurationException::class);
+        $container = $this->loadContainer('orm_native_lazy_objects_disable');
     }
 
     /** @param list<string> $bundles */
