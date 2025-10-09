@@ -4,7 +4,8 @@ parameters:
       - config
       - src
       - tests
-
+   scanFiles:
+      - vendor/symfony/dependency-injection/Loader/Configurator/functions.php
    ignoreErrors:
     # phpstan has no array shape intersection support https://github.com/phpstan/phpstan/issues/12414
     - message: '#unresolvable type.#'
