@@ -9,9 +9,11 @@ use Doctrine\Persistence\Proxy;
 use ReflectionClass;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 use function assert;
+use function method_exists;
 
 /**
  * References all Doctrine connections and entity managers in a given Container.
@@ -46,15 +48,27 @@ class Registry extends ManagerRegistry implements ResetInterface
 
         assert($manager instanceof EntityManagerInterface);
 
-        $r = new ReflectionClass($manager);
-        if ($r->isUninitializedLazyObject($manager)) {
-            return;
-        }
+        // Determine if the version of symfony/dependency-injection is >= 7.3
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $sfNativeLazyObjects = method_exists('Symfony\Component\DependencyInjection\ContainerBuilder', 'findTaggedResourceIds');
 
-        if ($manager->isOpen()) {
-            $manager->clear();
+        if (! $sfNativeLazyObjects) {
+            if (! $manager instanceof LazyObjectInterface || $manager->isOpen()) {
+                $manager->clear();
 
-            return;
+                return;
+            }
+        } else {
+            $r = new ReflectionClass($manager);
+            if ($r->isUninitializedLazyObject($manager)) {
+                return;
+            }
+
+            if ($manager->isOpen()) {
+                $manager->clear();
+
+                return;
+            }
         }
 
         $this->resetManager($managerName);
