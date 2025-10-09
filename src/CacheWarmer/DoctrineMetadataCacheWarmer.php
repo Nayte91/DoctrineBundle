@@ -11,8 +11,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 use function is_file;
 
-/** @final */
-class DoctrineMetadataCacheWarmer extends AbstractPhpFileCacheWarmer
+/** @internal */
+final class DoctrineMetadataCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
