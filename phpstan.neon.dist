@@ -4,7 +4,8 @@ parameters:
       - config
       - src
       - tests
-
+   scanFiles:
+      - vendor/symfony/dependency-injection/Loader/Configurator/functions.php
    excludePaths:
       - src/Command/Proxy/ConvertMappingDoctrineCommand.php
       - src/Command/Proxy/EnsureProductionSettingsDoctrineCommand.php
