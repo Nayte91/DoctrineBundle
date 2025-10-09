@@ -31,7 +31,7 @@ use function substr;
 /**
  * This class contains the needed functions in order to do the query highlighting
  *
- * @internal since 2.11
+ * @internal
  */
 class DoctrineExtension extends AbstractExtension
 {
