@@ -89,7 +89,7 @@ jobs:
         with:
           php-version: "${{ matrix.php-version }}"
           coverage: "pcov"
-          ini-values: "zend.assertions=1"
+          ini-file: "development"
           extensions: "pdo_sqlite"
           tools: "flex"
 
