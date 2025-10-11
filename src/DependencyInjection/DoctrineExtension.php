@@ -302,13 +302,22 @@ class DoctrineExtension extends Extension
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args             = $mappingDriverDef->getArguments();
-                if ($driverType === 'attribute') {
+                if ($driverType === 'annotation') {
                     $args[1] = array_merge(array_values($driverPaths), $args[1]);
                 } else {
                     $args[0] = array_merge(array_values($driverPaths), $args[0]);
                 }
 
                 $mappingDriverDef->setArguments($args);
+            } elseif ($driverType === 'attribute') {
+                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                    array_values($driverPaths),
+                ]);
+            } elseif ($driverType === 'annotation') {
+                $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
+                    new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
+                    array_values($driverPaths),
+                ]);
             } else {
                 $mappingDriverDef = new Definition($this->getMetadataDriverClass($driverType), [
                     array_values($driverPaths),
@@ -695,12 +704,13 @@ class DoctrineExtension extends Extension
         $def = $container
             ->setDefinition($connectionId, new ChildDefinition('doctrine.dbal.connection'))
             ->setPublic(true)
-            ->setArguments(array_merge(
-                [$options, new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name))],
-                // event manager must only be passed for DBAL < 4
-                method_exists(Connection::class, 'getEventManager') ? [new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name))] : [],
-                [$connection['mapping_types']],
-            ));
+            ->setArguments([
+                $options,
+                new Reference(sprintf('doctrine.dbal.%s_connection.configuration', $name)),
+                // event manager is only supported on DBAL < 4
+                method_exists(Connection::class, 'getEventManager') ? new Reference(sprintf('doctrine.dbal.%s_connection.event_manager', $name)) : null,
+                $connection['mapping_types'],
+            ]);
 
         $container
             ->registerAliasForArgument($connectionId, Connection::class, sprintf('%s.connection', $name))
