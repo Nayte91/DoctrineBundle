@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use function class_exists;
 use function dirname;
 
-/** @final since 2.9 */
+/** @final */
 class DoctrineBundle extends Bundle
 {
     public function build(ContainerBuilder $container): void

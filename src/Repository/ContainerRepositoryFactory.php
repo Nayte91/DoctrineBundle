@@ -21,6 +21,8 @@ use function sprintf;
 
 /**
  * Fetches repositories from the container or falls back to normal creation.
+ *
+ * @internal
  */
 final class ContainerRepositoryFactory implements RepositoryFactory
 {

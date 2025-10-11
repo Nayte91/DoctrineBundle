@@ -24,8 +24,12 @@ use function is_subclass_of;
 
 use const PHP_EOL;
 
-/** @phpstan-import-type Params from DriverManager */
-class ConnectionFactory
+/**
+ * @internal This class is not meant to be used outside this bundle
+ *
+ * @phpstan-import-type Params from DriverManager
+ */
+final class ConnectionFactory
 {
     /** @internal */
     public const array DEFAULT_SCHEME_MAP = [

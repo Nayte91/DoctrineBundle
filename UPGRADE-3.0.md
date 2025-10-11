@@ -22,7 +22,8 @@ More details below
 ### Support for `doctrine/orm` 2 is dropped
 
 This makes `DisconnectedMetadataFactory` redundant, as it relies on code
-available only in `doctrine/orm` 2. It has been removed.
+available only in `doctrine/orm` 2. It has been removed, as well as
+`ClassMetadataConnection`.
 
 Support for the YML and annotation metadata drivers has been dropped.
 
@@ -159,8 +160,10 @@ DependencyInjection namespace becomes internal
 ----------------------------------------------
 
 The `Doctrine\Bundle\DoctrineBundle\DependencyInjection` namespace is now
-considered internal, and all classes inside it are marked as final.
-Don't reference any classes from this namespace directly.
+considered internal, and all classes inside it are marked as final, except for
+`Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineORMMappingsPass`.
+Don't reference any classes from this namespace directly, except the one
+mentioned earlier.
 
 `Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventListenerInterface` has been removed
 ----------------------------------------------------------------------------------------
