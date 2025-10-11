@@ -349,17 +349,24 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
 
-        $this->assertDICConstructorArguments($definition, $this->getFactoryArguments([
-            'dbname' => 'db',
-            'host' => 'localhost',
-            'port' => null,
-            'user' => 'root',
-            'password' => null,
-            'driver' => 'pdo_mysql',
-            'driverOptions' => [],
-            'defaultTableOptions' => [],
-            'idle_connection_ttl' => 600,
-        ]));
+        $this->assertDICConstructorArguments($definition, [
+            [
+                'dbname' => 'db',
+                'host' => 'localhost',
+                'port' => null,
+                'user' => 'root',
+                'password' => null,
+                'driver' => 'pdo_mysql',
+                'driverOptions' => [],
+                'defaultTableOptions' => [],
+                'idle_connection_ttl' => 600,
+            ],
+            new Reference('doctrine.dbal.default_connection.configuration'),
+            method_exists(Connection::class, 'getEventManager')
+                ? new Reference('doctrine.dbal.default_connection.event_manager')
+                : null,
+            [],
+        ]);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
@@ -383,9 +390,8 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
         $container = $this->loadContainer('orm_service_simple_single_entity_manager_without_dbname');
 
-        $this->assertDICConstructorArguments(
-            $container->getDefinition('doctrine.dbal.default_connection'),
-            $this->getFactoryArguments([
+        $this->assertDICConstructorArguments($container->getDefinition('doctrine.dbal.default_connection'), [
+            [
                 'host' => 'localhost',
                 'port' => null,
                 'user' => 'root',
@@ -394,8 +400,13 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
                 'driverOptions' => [],
                 'defaultTableOptions' => [],
                 'idle_connection_ttl' => 600,
-            ]),
-        );
+            ],
+            new Reference('doctrine.dbal.default_connection.configuration'),
+            method_exists(Connection::class, 'getEventManager')
+                ? new Reference('doctrine.dbal.default_connection.event_manager')
+                : null,
+            [],
+        ]);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
@@ -417,18 +428,25 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
 
         $definition = $container->getDefinition('doctrine.dbal.default_connection');
 
-        $this->assertDICConstructorArguments($definition, $this->getFactoryArguments([
-            'host' => 'localhost',
-            'driver' => 'pdo_sqlite',
-            'driverOptions' => [],
-            'user' => 'sqlite_user',
-            'port' => null,
-            'password' => 'sqlite_s3cr3t',
-            'dbname' => 'sqlite_db',
-            'memory' => true,
-            'defaultTableOptions' => [],
-            'idle_connection_ttl' => 600,
-        ]));
+        $this->assertDICConstructorArguments($definition, [
+            [
+                'host' => 'localhost',
+                'driver' => 'pdo_sqlite',
+                'driverOptions' => [],
+                'user' => 'sqlite_user',
+                'port' => null,
+                'password' => 'sqlite_s3cr3t',
+                'dbname' => 'sqlite_db',
+                'memory' => true,
+                'defaultTableOptions' => [],
+                'idle_connection_ttl' => 600,
+            ],
+            new Reference('doctrine.dbal.default_connection.configuration'),
+            method_exists(Connection::class, 'getEventManager')
+                ? new Reference('doctrine.dbal.default_connection.event_manager')
+                : null,
+            [],
+        ]);
 
         $definition = $container->getDefinition('doctrine.orm.default_entity_manager');
         $this->assertEquals('%doctrine.orm.entity_manager.class%', $definition->getClass());
@@ -1751,26 +1769,6 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $passConfig->setRemovingPasses([]);
         $passConfig->addPass(new CacheCompatibilityPass());
         $container->compile();
-    }
-
-    /**
-     * @param array<string, mixed> $params
-     *
-     * @return list<mixed> The expected arguments to the connection factory
-     */
-    private function getFactoryArguments(array $params): array
-    {
-        $args = [
-            $params,
-            new Reference('doctrine.dbal.default_connection.configuration'),
-        ];
-        if (method_exists(Connection::class, 'getEventManager')) {
-            $args[] = new Reference('doctrine.dbal.default_connection.event_manager');
-        }
-
-        $args[] = [];
-
-        return $args;
     }
 }
 
