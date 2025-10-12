@@ -973,6 +973,7 @@ class DoctrineExtensionTest extends TestCase
         /** @phpstan-ignore function.alreadyNarrowedType */
         $attributes = method_exists($container, 'getAttributeAutoconfigurators')
             ? array_map(static fn (array $arr) => $arr[0], $container->getAttributeAutoconfigurators())
+            /** @phpstan-ignore method.notFound */
             : $container->getAutoconfiguredAttributes();
         $this->assertInstanceOf(Closure::class, $attributes[$class]);
 
@@ -1002,6 +1003,7 @@ class DoctrineExtensionTest extends TestCase
         /** @phpstan-ignore function.alreadyNarrowedType */
         $attributes = method_exists($container, 'getAttributeAutoconfigurators')
             ? array_map(static fn (array $arr) => $arr[0], $container->getAttributeAutoconfigurators())
+            /** @phpstan-ignore method.notFound */
             : $container->getAutoconfiguredAttributes();
         $this->assertInstanceOf(Closure::class, $attributes[AsEntityListener::class]);
 
@@ -1041,6 +1043,7 @@ class DoctrineExtensionTest extends TestCase
         /** @phpstan-ignore function.alreadyNarrowedType */
         $attributes = method_exists($container, 'getAttributeAutoconfigurators')
             ? array_map(static fn (array $arr) => $arr[0], $container->getAttributeAutoconfigurators())
+            /** @phpstan-ignore method.notFound */
             : $container->getAutoconfiguredAttributes();
         $this->assertInstanceOf(Closure::class, $attributes[AsDoctrineListener::class]);
 

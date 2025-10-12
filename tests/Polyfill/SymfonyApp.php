@@ -29,6 +29,7 @@ final class SymfonyApp extends Application
      */
     public function add(Command $command): Command
     {
+        /** @phpstan-ignore staticMethod.notFound */
         return parent::add($command);
     }
 }
