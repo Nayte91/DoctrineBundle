@@ -360,7 +360,6 @@ final class Configuration implements ConfigurationInterface
         // Key that should not be rewritten to the entity-manager config
         $excludedKeys = [
             'default_entity_manager' => true,
-            'enable_native_lazy_objects' => true,
             'resolve_target_entities' => true,
             'resolve_target_entity' => true,
             'controller_resolver' => true,
@@ -404,18 +403,6 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                     ->children()
                         ->scalarNode('default_entity_manager')->end()
-                        ->booleanNode('enable_native_lazy_objects')
-                            ->defaultTrue()
-                            ->validate()
-                                ->ifTrue(static fn ($v) => $v === false)
-                                ->thenInvalid('The setting "enable_native_lazy_objects" can no longer be disabled and should not be set')
-                            ->end()
-                            ->setDeprecated(
-                                'doctrine/doctrine-bundle',
-                                '3.1',
-                                'The "%node%" option is deprecated and will be removed in DoctrineBundle 4.0, as native lazy objects are now always enabled.',
-                            )
-                        ->end()
                         ->arrayNode('controller_resolver')
                             ->canBeDisabled()
                             ->children()
