@@ -410,7 +410,11 @@ final class Configuration implements ConfigurationInterface
                                 ->ifTrue(static fn ($v) => $v === false)
                                 ->thenInvalid('The setting "enable_native_lazy_objects" can no longer be disabled and should not be set')
                             ->end()
-                            ->info('no-op, will be deprecated and removed in the future')
+                            ->setDeprecated(
+                                'doctrine/doctrine-bundle',
+                                '3.1',
+                                'The "%node%" option is deprecated and will be removed in DoctrineBundle 4.0, as native lazy objects are now always enabled.',
+                            )
                         ->end()
                         ->arrayNode('controller_resolver')
                             ->canBeDisabled()
