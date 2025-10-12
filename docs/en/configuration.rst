@@ -206,7 +206,7 @@ Configuration Reference
             orm:
                 default_entity_manager: ~ # The first defined is used if not set
 
-                # No-op, will be deprecated and removed in the future
+                # No-op, deprecated, will be removed in the future
                 enable_native_lazy_objects:   true
 
                 identity_generation_preferences:
