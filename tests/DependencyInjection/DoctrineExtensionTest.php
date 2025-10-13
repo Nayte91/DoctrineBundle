@@ -20,6 +20,7 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\MemcacheCache;
 use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\DBAL\Connection;
+use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\ORM\Cache\CacheConfiguration;
 use Doctrine\ORM\Cache\DefaultCacheFactory;
 use Doctrine\ORM\Cache\Logging\CacheLoggerChain;
@@ -39,11 +40,13 @@ use Doctrine\ORM\Mapping\Embeddable;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
+use Generator;
 use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -72,8 +75,12 @@ use function method_exists;
 use function sprintf;
 use function sys_get_temp_dir;
 
+use const PHP_VERSION_ID;
+
 class DoctrineExtensionTest extends TestCase
 {
+    use VerifyDeprecations;
+
     public function testAutowiringAlias(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -445,18 +452,21 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals(CacheConfiguration::class, $container->getParameter('doctrine.orm.second_level_cache.cache_configuration.class'));
         $this->assertEquals(RegionsConfiguration::class, $container->getParameter('doctrine.orm.second_level_cache.regions_configuration.class'));
 
-        $config = BundleConfigurationBuilder::createBuilder()
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $enableNativeLazyObjects = PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects');
+        $config                  = BundleConfigurationBuilder::createBuilder()
             ->addBaseConnection()
             ->addEntityManager([
-                'proxy_namespace' => 'MyProxies',
-                'auto_generate_proxy_classes' => true,
                 'default_entity_manager' => 'default',
                 'entity_managers' => [
                     'default' => [
                         'mappings' => ['XmlBundle' => []],
                     ],
                 ],
-            ])
+            ] + ($enableNativeLazyObjects ? [] : [
+                'auto_generate_proxy_classes' => true,
+                'proxy_namespace' => 'MyProxies',
+            ]))
             ->build();
 
         $container = $this->getContainer();
@@ -565,6 +575,44 @@ class DoctrineExtensionTest extends TestCase
         $this->assertTrue($calls[0][1][0]);
     }
 
+    /** @param array<string, mixed> $settings */
+    #[IgnoreDeprecations]
+    #[RequiresPhp('>=8.4')]
+    #[RequiresMethod(Configuration::class, 'enableNativeLazyObjects')]
+    #[DataProvider('proxySettingsProvider')]
+    public function testProxySettingsAreConditionallyDeprecated(array $settings): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        $container = $this->getContainer();
+        $extension = new DoctrineExtension();
+
+        $this->expectDeprecationWithIdentifier('https://github.com/doctrine/DoctrineBundle/issues/2107');
+
+        $config = BundleConfigurationBuilder::createBuilder()
+            ->addBaseConnection()
+            ->addEntityManager([
+                'default_entity_manager' => 'default',
+                'entity_managers' => [
+                    'default' => [],
+                ],
+            ] + $settings)
+            ->build();
+
+        $extension->load([$config], $container);
+    }
+
+    /** @return Generator<string, array{array<string, mixed>}> */
+    public static function proxySettingsProvider(): Generator
+    {
+        yield 'auto_generate_proxy_classes' => [['auto_generate_proxy_classes' => true]];
+        yield 'proxy_namespace' => [['proxy_namespace' => 'MyProxies']];
+        yield 'proxy_dir' => [['proxy_dir' => sys_get_temp_dir()]];
+    }
+
+    #[IgnoreDeprecations]
     public function testAutoGenerateProxyClasses(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {

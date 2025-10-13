@@ -50,6 +50,8 @@ class TestKernel extends Kernel
                 'php_errors' => ['log' => true],
                 'handle_all_throwables' => true,
             ]);
+            /** @phpstan-ignore function.alreadyNarrowedType */
+            $enableNativeLazyObjects = PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects');
             $container->loadFromExtension('doctrine', [
                 'dbal' => [
                     'driver' => 'pdo_sqlite',
@@ -57,10 +59,8 @@ class TestKernel extends Kernel
                 ],
                 'orm' => [
                     'controller_resolver' => ['auto_mapping' => false],
-                    'auto_generate_proxy_classes' => true,
                     'enable_lazy_ghost_objects' => true,
-                    /** @phpstan-ignore function.alreadyNarrowedType */
-                    'enable_native_lazy_objects' => PHP_VERSION_ID >= 80400 && method_exists(Configuration::class, 'enableNativeLazyObjects'),
+                    'enable_native_lazy_objects' => $enableNativeLazyObjects,
                     'mappings' => [
                         'RepositoryServiceBundle' => [
                             'type' => 'attribute',
@@ -68,7 +68,8 @@ class TestKernel extends Kernel
                             'prefix' => 'Fixtures\Bundles\RepositoryServiceBundle\Entity',
                         ],
                     ],
-                ] + (class_exists(AnnotationDriver::class) ? ['report_fields_where_declared' => true] : []),
+                ] + (class_exists(AnnotationDriver::class) ? ['report_fields_where_declared' => true] : [])
+                + ($enableNativeLazyObjects ? [] : ['auto_generate_proxy_classes' => true]),
             ]);
 
             // Register a NullLogger to avoid getting the stderr default logger of FrameworkBundle
