@@ -57,6 +57,13 @@ have been removed:
 - `doctrine.orm.entity_managers.some_em.report_fields_where_declared`
 - `doctrine.orm.enable_lazy_ghost_objects`
 
+Also, the 3 following options where no-ops when enabling native lazy objects
+and have been removed as well:
+
+- `doctrine.orm.auto_generate_proxy_classes`
+- `doctrine.orm.proxy_dir`
+- `doctrine.orm.proxy_namespace`
+
 ### The `doctrine.dbal.default_table_options.collate` default table option is removed
 
 Use `doctrine.dbal.default_table_options.collation` instead.
