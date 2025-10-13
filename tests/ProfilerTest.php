@@ -43,7 +43,7 @@ class ProfilerTest extends BaseTestCase
     public function setUp(): void
     {
         $this->debugDataHolder = new DebugDataHolder();
-        $registry              = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry              = $this->createStub(ManagerRegistry::class);
         $registry->method('getConnectionNames')->willReturn([]);
         $registry->method('getManagerNames')->willReturn([]);
         $registry->method('getManagers')->willReturn([]);
@@ -53,14 +53,12 @@ class ProfilerTest extends BaseTestCase
         $twigLoaderFilesystem->addPath(__DIR__ . '/../vendor/symfony/web-profiler-bundle/Resources/views', 'WebProfiler');
         $this->twig = new Environment($twigLoaderFilesystem, ['debug' => true, 'strict_variables' => true]);
 
-        $fragmentHandler = $this->getMockBuilder(FragmentHandler::class);
-        $fragmentHandler->disableOriginalConstructor();
-        $fragmentHandler = $fragmentHandler->getMock();
+        $fragmentHandler = $this->createStub(FragmentHandler::class);
         $fragmentHandler->method('render')->willReturn('');
 
         $kernelRuntime = new HttpKernelRuntime($fragmentHandler);
 
-        $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $urlGenerator->method('generate')->willReturn('');
 
         if (class_exists(CodeExtension::class)) {

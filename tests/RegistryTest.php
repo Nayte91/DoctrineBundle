@@ -43,7 +43,7 @@ class RegistryTest extends TestCase
 
     public function testGetDefaultConnection(): void
     {
-        $conn      = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $conn      = $this->createStub(Connection::class);
         $container = new Container();
         $container->set('doctrine.dbal.default_connection', $conn);
 
@@ -54,7 +54,7 @@ class RegistryTest extends TestCase
 
     public function testGetConnection(): void
     {
-        $conn      = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $conn      = $this->createStub(Connection::class);
         $container = new Container();
         $container->set('doctrine.dbal.default_connection', $conn);
 
@@ -81,7 +81,7 @@ class RegistryTest extends TestCase
 
     public function testGetDefaultEntityManager(): void
     {
-        $em        = $this->createMock(ObjectManager::class);
+        $em        = $this->createStub(ObjectManager::class);
         $container = new Container();
         $container->set('doctrine.orm.default_entity_manager', $em);
 
@@ -92,7 +92,7 @@ class RegistryTest extends TestCase
 
     public function testGetEntityManager(): void
     {
-        $em        = $this->createMock(ObjectManager::class);
+        $em        = $this->createStub(ObjectManager::class);
         $container = new Container();
         $container->set('doctrine.orm.default_entity_manager', $em);
 
