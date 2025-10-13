@@ -57,7 +57,7 @@ have been removed:
 - `doctrine.orm.entity_managers.some_em.report_fields_where_declared`
 - `doctrine.orm.enable_lazy_ghost_objects`
 
-Also, the 3 following options where no-ops when enabling native lazy objects
+Also, the 3 following options were no-ops when enabling native lazy objects
 and have been removed as well:
 
 - `doctrine.orm.auto_generate_proxy_classes`
