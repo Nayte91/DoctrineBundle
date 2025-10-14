@@ -30,7 +30,7 @@ class DisconnectedMetadataFactoryTest extends TestCase
         $class      = new ClassMetadata(self::class);
         $collection = new ClassMetadataCollection([$class]);
 
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry = $this->createStub(ManagerRegistry::class);
         $factory  = new DisconnectedMetadataFactory($registry);
 
         $this->expectException(RuntimeException::class);
