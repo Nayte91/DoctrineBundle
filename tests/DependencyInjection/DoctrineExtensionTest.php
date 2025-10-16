@@ -1507,6 +1507,48 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals(new MapEntity(null, null, null, [], null, null, null, true, true), $container->get('controller_resolver_defaults'));
     }
 
+    #[TestWith(['AnnotationsBundle', 'attribute', 'Vendor'], 'Bundle without anything')]
+    #[TestWith(['AttributesBundle', 'attribute'], 'Bundle with attributes')]
+    #[TestWith(['RepositoryServiceBundle', 'attribute'], 'Bundle with both')]
+    #[TestWith(['AnnotationsBundle', 'annotation'], 'Bundle with annotations')]
+    #[TestWith(['AttributesWithPackageBundle', 'attribute'], 'Bundle with attributes and @package')]
+    public function testDetectMappingType(string $bundle, string $expectedType, string $vendor = '')
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        $container = $this->getContainer([$bundle], $vendor);
+        $extension = new DoctrineExtension();
+
+        $config = BundleConfigurationBuilder::createBuilder()
+            ->addBaseConnection()
+            ->addEntityManager([
+                'default_entity_manager' => 'default',
+                'entity_managers' => [
+                    'default' => [
+                        'mappings' => [
+                            $bundle => [],
+                        ],
+                    ],
+                ],
+            ])
+            ->build();
+
+        if (! class_exists(AnnotationDriver::class) && $expectedType === 'annotation') {
+            $this->expectException(LogicException::class);
+            $this->expectExceptionMessage('The annotation driver is only available in doctrine/orm v2.');
+        }
+
+        $extension->load([$config], $container);
+
+        $calls = $container->getDefinition('doctrine.orm.default_metadata_driver')->getMethodCalls();
+        $this->assertEquals(
+            sprintf('doctrine.orm.default_%s_metadata_driver', $expectedType),
+            (string) $calls[0][1][0],
+        );
+    }
+
     /** @param list<string> $bundles */
     private static function getContainer(array $bundles = ['XmlBundle'], string $vendor = ''): ContainerBuilder
     {
