@@ -427,8 +427,8 @@ class DoctrineExtension extends Extension
             }
 
             if (
-                preg_match('/^(?: \*|\/\*\*) @[a-zA-Z\\\\]*' . $quotedMappingObjectName . '\b/m', $content)
-                || preg_match('/^(?: \*|\/\*\*) @[a-zA-Z\\\\]*Embeddable\b/m', $content)
+                preg_match('/^(?: \*|\/\*\*) @\\\\?([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\\\\?)*' . $quotedMappingObjectName . '\b/m', $content)
+                || preg_match('/^(?: \*|\/\*\*) @\\\\?([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\\\\?)*Embeddable\b/m', $content)
             ) {
                 $type = 'annotation';
                 break;
