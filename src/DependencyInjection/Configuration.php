@@ -412,6 +412,11 @@ final class Configuration implements ConfigurationInterface
                                         ->ifTrue(static fn ($v) => $v !== false)
                                         ->thenInvalid('The setting "controller_resolver.auto_mapping" can no longer be enabled and must be set to false')
                                     ->end()
+                                    ->setDeprecated(
+                                        'doctrine/doctrine-bundle',
+                                        '3.1',
+                                        'The "%node%" option is deprecated and will be removed in DoctrineBundle 4.0, as it only accepts `false` since 3.0.',
+                                    )
                                     ->info('Set to true to enable using route placeholders as lookup criteria when the primary key doesn\'t match the argument name')
                                 ->end()
                                 ->booleanNode('evict_cache')
