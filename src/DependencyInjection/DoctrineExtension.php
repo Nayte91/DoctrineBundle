@@ -445,12 +445,12 @@ class DoctrineExtension extends Extension
      */
     public static function textContainsAnnotation(string $quotedMappingObjectName, string $content): bool
     {
-        return preg_match('/^(?:[ ]\*|\/\*\*)[ ]@                # Match phpdoc start or line with an at
+        return preg_match('/^(?:[ ]\*|\/\*\*)[ ]@               # Match phpdoc start or line with an at
             \\\\?                                               # Can start with antislash
-            ([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\\\\?)*    # Match 0-n namespace, the antislash is optionnal as it may be a prefix if an alias is used
+            ([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\\\\)*     # Match namespace components ending with antislash
             ' . $quotedMappingObjectName . '                    # The target class
-            [a-zA-Z0-9_\x80-\xff]*                              # Match a suffix if the class is aliased
-            \b/mx', $content) === 1;
+            \b                                                  # Match word boundary
+            /mx', $content) === 1;
     }
 
     /**
