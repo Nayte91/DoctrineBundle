@@ -1549,6 +1549,27 @@ class DoctrineExtensionTest extends TestCase
         );
     }
 
+    #[TestWith([' * @Mapping\\Entity', true], 'Using the namespace without alias')]
+    #[TestWith([' * @ORM\\Entity', true], 'Using the namespace with alias')]
+    #[TestWith([' * @\\Doctrine\\ORM\\Mapping\\Entity', true], 'Complete namespace with starting slash')]
+    #[TestWith([' * @Doctrine\\ORM\\Mapping\\Entity', true], 'Complete namespace without starting slash')]
+    #[TestWith([' * @Entity', true], 'Use of the class')]
+    #[TestWith(['/** @Entity */', true], 'Comment start')]
+    #[TestWith([' * @ORMEntity', true], 'Use of the class with alias prefixing')]
+    #[TestWith([' * @EntityORM', true], 'Use of the class with alias suffixing')]
+    #[TestWith([' * @ormEntity', true], 'namespace can start with lowercase')]
+    #[TestWith([' * @_ORMEntity', true], 'namespace can start with underscore')]
+    #[TestWith([" * @\x80ORMEntity", true], 'namespace can start with char from x80-Xff')]
+    #[TestWith([" * @orm0_\x80Entity", true], 'namespace can contain number, underscore and char from x80-Xff')]
+    #[TestWith([' * @package testEntity', false], 'Annotation with Entity as value')]
+    #[TestWith([' * @entity', false], 'Lowercase use of the class')]
+    #[TestWith([' * @1ORMEntity', false], 'namespace can\'t start with number')]
+    #[TestWith([' * @extend<Entity>', false], 'The Entity is used inside < and >')]
+    public function testTextContainsAnnotation(string $input, bool $expected): void
+    {
+        self::assertEquals($expected, DoctrineExtension::textContainsAnnotation('Entity', $input));
+    }
+
     /** @param list<string> $bundles */
     private static function getContainer(array $bundles = ['XmlBundle'], string $vendor = ''): ContainerBuilder
     {

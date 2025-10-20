@@ -427,8 +427,8 @@ class DoctrineExtension extends Extension
             }
 
             if (
-                preg_match('/^(?: \*|\/\*\*) @\\\\?([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\\\\?)*' . $quotedMappingObjectName . '\b/m', $content)
-                || preg_match('/^(?: \*|\/\*\*) @\\\\?([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\\\\?)*Embeddable\b/m', $content)
+                self::textContainsAnnotation($quotedMappingObjectName, $content)
+                || self::textContainsAnnotation('Embeddable', $content)
             ) {
                 $type = 'annotation';
                 break;
@@ -436,6 +436,21 @@ class DoctrineExtension extends Extension
         }
 
         return $type;
+    }
+
+    /**
+     * Check if the file content contains a class-like annotation
+     *
+     * @internal
+     */
+    public static function textContainsAnnotation(string $quotedMappingObjectName, string $content): bool
+    {
+        return preg_match('/^(?:[ ]\*|\/\*\*)[ ]@                # Match phpdoc start or line with an at
+            \\\\?                                               # Can start with antislash
+            ([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\\\\?)*    # Match 0-n namespace, the antislash is optionnal as it may be a prefix if an alias is used
+            ' . $quotedMappingObjectName . '                    # The target class
+            [a-zA-Z0-9_\x80-\xff]*                              # Match a suffix if the class is aliased
+            \b/mx', $content) === 1;
     }
 
     /**
