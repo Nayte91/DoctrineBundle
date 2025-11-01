@@ -50,8 +50,10 @@ class IdGeneratorPassTest extends TestCase
             'kernel.bundles' => $bundles,
             'kernel.cache_dir' => sys_get_temp_dir(),
             'kernel.build_dir' => sys_get_temp_dir(),
+            'kernel.share_dir' => sys_get_temp_dir(),
             'kernel.environment' => 'test',
             'kernel.runtime_environment' => '%%env(default:kernel.environment:APP_RUNTIME_ENV)%%',
+            'kernel.runtime_mode.web' => false,
             'kernel.root_dir' => __DIR__ . '/../../../../', // src dir
             'kernel.project_dir' => __DIR__ . '/../../../../', // src dir
             'kernel.bundles_metadata' => [],
