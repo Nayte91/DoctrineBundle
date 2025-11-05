@@ -14,7 +14,7 @@ use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
@@ -137,9 +137,9 @@ class DropDatabaseDoctrineTest extends TestCase
      * @param list<mixed> $params Connection parameters
      * @psalm-param Params $params
      *
-     * @return MockObject&Container
+     * @return Stub&Container
      */
-    private function getMockContainer(string $connectionName, array $params): MockObject
+    private function getMockContainer(string $connectionName, array $params): Stub
     {
         // Mock the container and everything you'll need here
         $mockDoctrine = $this->createStub(ManagerRegistry::class);
@@ -148,18 +148,16 @@ class DropDatabaseDoctrineTest extends TestCase
 
         $config = (new Configuration())->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
-        $mockConnection = $this->createMock(Connection::class);
+        $mockConnection = $this->createStub(Connection::class);
         $mockConnection->method('getConfiguration')->willReturn($config);
         $mockConnection->method('getParams')->willReturn($params);
         $mockDoctrine->method('getConnection')->willReturn($mockConnection);
 
-        $mockContainer = $this->getMockBuilder(Container::class)
-            ->onlyMethods(['get'])
-            ->getMock();
+        $mockContainer = $this->createStub(Container::class);
 
         $mockContainer->method('get')
-            ->with('doctrine')
-            ->willReturn($mockDoctrine);
+           ->with('doctrine')
+           ->willReturn($mockDoctrine);
 
         return $mockContainer;
     }

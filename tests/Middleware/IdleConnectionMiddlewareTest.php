@@ -25,7 +25,7 @@ class IdleConnectionMiddlewareTest extends TestCase
         $middleware = new IdleConnectionMiddleware($connectionExpiries, $ttlByConnection);
         $middleware->setConnectionName('connectionone');
 
-        $driverMock    = $this->createMock(Driver::class);
+        $driverMock    = $this->createStub(Driver::class);
         $wrappedDriver = $middleware->wrap($driverMock);
 
         $this->assertInstanceOf(IdleConnectionDriver::class, $wrappedDriver);
