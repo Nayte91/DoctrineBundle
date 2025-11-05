@@ -11,7 +11,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\SchemaManagerFactory;
 use Doctrine\Persistence\ManagerRegistry;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
@@ -59,25 +59,23 @@ class CreateDatabaseDoctrineTest extends TestCase
      * @param mixed[]|null $params Connection parameters
      * @psalm-param Params $params
      *
-     * @return MockObject&Container
+     * @return Stub&Container
      */
-    private function getMockContainer(string $connectionName, array|null $params = null): MockObject
+    private function getMockContainer(string $connectionName, array|null $params = null): Stub
     {
         // Mock the container and everything you'll need here
         $mockDoctrine = $this->createStub(ManagerRegistry::class);
 
         $mockDoctrine->method('getDefaultConnectionName')->willReturn($connectionName);
 
-        $config = (new Configuration())->setSchemaManagerFactory($this->createMock(SchemaManagerFactory::class));
+        $config = (new Configuration())->setSchemaManagerFactory($this->createStub(SchemaManagerFactory::class));
 
         $mockConnection = $this->createStub(Connection::class);
         $mockConnection->method('getConfiguration')->willReturn($config);
         $mockConnection->method('getParams')->willReturn($params);
         $mockDoctrine->method('getConnection')->willReturn($mockConnection);
 
-        $mockContainer = $this->getMockBuilder(Container::class)
-            ->onlyMethods(['get'])
-            ->getMock();
+        $mockContainer = $this->createStub(Container::class);
 
         $mockContainer->method('get')->with('doctrine')->willReturn($mockDoctrine);
 

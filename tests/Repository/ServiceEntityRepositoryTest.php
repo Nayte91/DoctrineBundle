@@ -31,7 +31,7 @@ class ServiceEntityRepositoryTest extends TestCase
 
     public function testConstructorThrowsExceptionWhenNoManagerFound(): void
     {
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry = $this->createStub(ManagerRegistry::class);
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(<<<'EXCEPTION'
 Could not find the entity manager for class "Doctrine\Bundle\DoctrineBundle\Tests\Repository\TestEntity". Check your Doctrine configuration to make sure it is configured to load this entity’s metadata.
@@ -46,7 +46,7 @@ EXCEPTION);
     #[RequiresPhp('>= 8.4')]
     public function testConstructInitializesWhenImplementingLazyObjectInterface(): void
     {
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $registry = $this->createStub(ManagerRegistry::class);
         $this->expectException(LogicException::class);
 
         /* @phpstan-ignore class.notFound, expr.resultUnused */
