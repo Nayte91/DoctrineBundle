@@ -1507,6 +1507,71 @@ class DoctrineExtensionTest extends TestCase
         $this->assertEquals(new MapEntity(null, null, null, [], null, null, null, true, true), $container->get('controller_resolver_defaults'));
     }
 
+    #[TestWith(['AnnotationsBundle', 'attribute', 'Vendor'], 'Bundle without anything')]
+    #[TestWith(['AttributesBundle', 'attribute'], 'Bundle with attributes')]
+    #[TestWith(['RepositoryServiceBundle', 'attribute'], 'Bundle with both')]
+    #[TestWith(['AnnotationsBundle', 'annotation'], 'Bundle with annotations')]
+    #[TestWith(['AttributesWithPackageBundle', 'attribute'], 'Bundle with attributes and @package')]
+    public function testDetectMappingType(string $bundle, string $expectedType, string $vendor = '')
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        $container = $this->getContainer([$bundle], $vendor);
+        $extension = new DoctrineExtension();
+
+        $config = BundleConfigurationBuilder::createBuilder()
+            ->addBaseConnection()
+            ->addEntityManager([
+                'default_entity_manager' => 'default',
+                'entity_managers' => [
+                    'default' => [
+                        'mappings' => [
+                            $bundle => [],
+                        ],
+                    ],
+                ],
+            ])
+            ->build();
+
+        if (! class_exists(AnnotationDriver::class) && $expectedType === 'annotation') {
+            $this->expectException(LogicException::class);
+            $this->expectExceptionMessage('The annotation driver is only available in doctrine/orm v2.');
+        }
+
+        $extension->load([$config], $container);
+
+        $calls = $container->getDefinition('doctrine.orm.default_metadata_driver')->getMethodCalls();
+        $this->assertEquals(
+            sprintf('doctrine.orm.default_%s_metadata_driver', $expectedType),
+            (string) $calls[0][1][0],
+        );
+    }
+
+    #[TestWith([' * @Mapping\\Entity', true], 'Using the namespace without alias')]
+    #[TestWith([' * @ORM\\Entity', true], 'Using the namespace with alias')]
+    #[TestWith([' * @\\Doctrine\\ORM\\Mapping\\Entity', true], 'Complete namespace with starting slash')]
+    #[TestWith([' * @Doctrine\\ORM\\Mapping\\Entity', true], 'Complete namespace without starting slash')]
+    #[TestWith([' * @Entity', true], 'Use of the class')]
+    #[TestWith([' * @Entity()', true], 'With parentheses')]
+    #[TestWith(['/** @Entity */', true], 'Comment start')]
+    #[TestWith(["/**\n * @Entity\n */", true], 'Multiline phpdoc')]
+    #[TestWith([' * @orm\\Entity', true], 'namespace can start with lowercase')]
+    #[TestWith([' * @_ORM\\Entity', true], 'namespace can start with underscore')]
+    #[TestWith([" * @\x80ORM\\Entity", true], 'namespace can start with char from x80-Xff')]
+    #[TestWith([" * @orm0_\x80\\Entity", true], 'namespace can contain number, underscore and char from x80-Xff')]
+    #[TestWith([' * @ORMEntity', false], 'Use of the class with prefix')]
+    #[TestWith([' * @EntityORM', false], 'Use of the class with suffix')]
+    #[TestWith([' * @package testEntity', false], 'Annotation with Entity as value')]
+    #[TestWith([' * @entity', false], 'Lowercase use of the class')]
+    #[TestWith([' * @1ORMEntity', false], 'namespace can\'t start with number')]
+    #[TestWith([' * @extend<Entity>', false], 'The Entity is used inside < and >')]
+    public function testTextContainsAnnotation(string $input, bool $expected): void
+    {
+        self::assertEquals($expected, DoctrineExtension::textContainsAnnotation('Entity', $input));
+    }
+
     /** @param list<string> $bundles */
     private static function getContainer(array $bundles = ['XmlBundle'], string $vendor = ''): ContainerBuilder
     {
