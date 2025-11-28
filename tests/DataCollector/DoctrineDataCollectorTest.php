@@ -35,8 +35,8 @@ class DoctrineDataCollectorTest extends TestCase
         $manager    = $this->createStub(EntityManagerInterface::class);
         $config     = $this->createMock(Configuration::class);
         $factory    = $this->createMock(ClassMetadataFactory::class);
-        $collector  = $this->createCollector(['default' => $manager], true, $this->createMock(DebugDataHolder::class));
-        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $collector  = $this->createCollector(['default' => $manager], true, $this->createStub(DebugDataHolder::class));
+        $unitOfWork = $this->createStub(UnitOfWork::class);
 
         $manager->method('getMetadataFactory')->willReturn($factory);
         $manager->method('getConfiguration')->willReturn($config);
@@ -74,8 +74,8 @@ class DoctrineDataCollectorTest extends TestCase
         }
 
         $manager    = $this->createMock(EntityManager::class);
-        $config     = $this->createMock(Configuration::class);
-        $collector  = $this->createCollector(['default' => $manager], false, $this->createMock(DebugDataHolder::class));
+        $config     = $this->createStub(Configuration::class);
+        $collector  = $this->createCollector(['default' => $manager], false, $this->createStub(DebugDataHolder::class));
         $unitOfWork = $this->createStub(UnitOfWork::class);
 
         $manager->expects($this->never())->method('getMetadataFactory');
@@ -91,7 +91,7 @@ class DoctrineDataCollectorTest extends TestCase
 
     public function testGetGroupedQueries(): void
     {
-        $debugDataHolder = $this->createMock(DebugDataHolder::class);
+        $debugDataHolder = $this->createStub(DebugDataHolder::class);
 
         $queries = [
             'default' => [
