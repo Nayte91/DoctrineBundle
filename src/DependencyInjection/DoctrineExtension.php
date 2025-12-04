@@ -218,7 +218,10 @@ final class DoctrineExtension extends Extension
      *
      * Returns false when autodetection failed, an array of the completed information otherwise.
      *
-     * @param array<string, mixed> $bundleConfig
+     * @param array<string, mixed>    $bundleConfig
+     * @param ReflectionClass<object> $bundle
+     *
+     * @return array<string, mixed>|false
      */
     private function getMappingDriverBundleConfigDefaults(
         array $bundleConfig,
@@ -1368,6 +1371,8 @@ final class DoctrineExtension extends Extension
 
     /**
      * {@inheritDoc}
+     *
+     * @param array<string, mixed> $config
      */
     public function getConfiguration(array $config, ContainerBuilder $container): Configuration
     {

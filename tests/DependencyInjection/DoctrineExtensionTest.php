@@ -501,6 +501,7 @@ class DoctrineExtensionTest extends TestCase
         ]);
     }
 
+    /** @param array<mixed>|null $ormConfiguration */
     #[TestWith([[]])]
     #[TestWith([null])]
     public function testSingleEntityManagerWithEmptyConfiguration(array|null $ormConfiguration): void
