@@ -33,7 +33,9 @@ class ConnectionFactoryTest extends TestCase
         $connection    = $factory->createConnection($params, $this->configuration);
 
         $this->assertInstanceof(FakeConnection::class, $connection);
-        $this->assertSame('utf8', $connection->getParams()['charset']);
+        /** @var array{charset: string} $params */
+        $params = $connection->getParams();
+        $this->assertSame('utf8', $params['charset']);
         $this->assertSame(1 + $creationCount, FakeConnection::$creationCount);
     }
 
@@ -44,7 +46,9 @@ class ConnectionFactoryTest extends TestCase
 
         $connection = $factory->createConnection($params, $this->configuration);
 
-        $this->assertSame('utf8mb4', $connection->getParams()['charset']);
+        $params = $connection->getParams();
+        /** @var array{charset: string} $params */
+        $this->assertSame('utf8mb4', $params['charset']);
     }
 
     public function testDefaultCollationMySql(): void
@@ -52,9 +56,12 @@ class ConnectionFactoryTest extends TestCase
         $factory    = new ConnectionFactory([]);
         $connection = $factory->createConnection(['driver' => 'pdo_mysql', 'serverVersion' => '9.4.0'], $this->configuration);
 
+        $params = $connection->getParams();
+        /** @var array{defaultTableOptions: array{collation: string}} $params */
+        $defaultTableOptions = $params['defaultTableOptions'];
         $this->assertSame(
             'utf8mb4_unicode_ci',
-            $connection->getParams()['defaultTableOptions']['collation'],
+            $defaultTableOptions['collation'],
         );
     }
 
@@ -66,7 +73,9 @@ class ConnectionFactoryTest extends TestCase
             $this->configuration,
         );
 
-        $this->assertEquals('utf8mb4_unicode_ci', $connection->getParams()['charset']);
+        $params = $connection->getParams();
+        /** @var array{charset: string} $params */
+        $this->assertEquals('utf8mb4_unicode_ci', $params['charset']);
     }
 
     public function testDbnameSuffix(): void
@@ -80,7 +89,9 @@ class ConnectionFactoryTest extends TestCase
             $this->configuration,
         );
 
-        $this->assertSame('main_test', $connection->getParams()['dbname']);
+        $params = $connection->getParams();
+        /** @var array{dbname: string} $params */
+        $this->assertSame('main_test', $params['dbname']);
     }
 
     public function testDbnameSuffixForReplicas(): void
@@ -104,6 +115,7 @@ class ConnectionFactoryTest extends TestCase
             $this->configuration,
         );
 
+        /** @var array{primary: array{dbname: string}, replica: array{replica1: array{dbname: string}}} $parsedParams */
         $parsedParams = $connection->getParams();
         $this->assertArrayHasKey('primary', $parsedParams);
         $this->assertArrayHasKey('replica', $parsedParams);
@@ -120,6 +132,8 @@ class FakeConnection extends Connection
 
     /**
      * {@inheritDoc}
+     *
+     * @param array<string, mixed> $params
      */
     public function __construct(array $params, Driver $driver, Configuration|null $config = null)
     {

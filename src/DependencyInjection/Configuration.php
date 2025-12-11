@@ -12,7 +12,6 @@ use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -49,7 +48,6 @@ final class Configuration implements ConfigurationInterface
     {
     }
 
-    /** @return TreeBuilder<'array'> */
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('doctrine');
@@ -63,14 +61,13 @@ final class Configuration implements ConfigurationInterface
 
     /**
      * Add DBAL section to configuration tree
-     *
-     * @param ArrayNodeDefinition<TreeBuilder<'array'>> $node
      */
     private function addDbalSection(ArrayNodeDefinition $node): void
     {
         // Key that should not be rewritten to the connection config
         $excludedKeys = ['default_connection' => true, 'driver_schemes' => true, 'driver_scheme' => true, 'types' => true, 'type' => true];
 
+        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->children()
             ->arrayNode('dbal')
@@ -157,8 +154,6 @@ final class Configuration implements ConfigurationInterface
 
     /**
      * Return the dbal connections node
-     *
-     * @return ArrayNodeDefinition<TreeBuilder<'array'>>
      */
     private function getDbalConnectionsNode(): ArrayNodeDefinition
     {
@@ -172,6 +167,7 @@ final class Configuration implements ConfigurationInterface
 
         $this->configureDbalDriverNode($connectionNode);
 
+        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $connectionNode
             ->fixXmlConfig('option')
             ->fixXmlConfig('mapping_type')
@@ -218,6 +214,7 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('result_cache')->end()
             ->end();
 
+        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $replicaNode = $connectionNode
             ->children()
                 ->arrayNode('replicas')
@@ -232,13 +229,10 @@ final class Configuration implements ConfigurationInterface
      * Adds config keys related to params processed by the DBAL drivers
      *
      * These keys are available for replica configurations too.
-     *
-     * @param ArrayNodeDefinition<TP> $node
-     *
-     * @template TP of NodeParentInterface|null
-     **/
+     */
     private function configureDbalDriverNode(ArrayNodeDefinition $node): void
     {
+        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->validate()
             ->always(static function (array $values) {
@@ -364,8 +358,6 @@ final class Configuration implements ConfigurationInterface
 
     /**
      * Add the ORM section to configuration tree
-     *
-     * @param ArrayNodeDefinition<TreeBuilder<'array'>> $node
      */
     private function addOrmSection(ArrayNodeDefinition $node): void
     {
@@ -378,6 +370,7 @@ final class Configuration implements ConfigurationInterface
             'controller_resolver' => true,
         ];
 
+        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->children()
                 ->arrayNode('orm')
@@ -525,6 +518,7 @@ final class Configuration implements ConfigurationInterface
             return ['entities' => $entities];
         };
 
+        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->beforeNormalization()
                 // Yaml normalization
@@ -564,14 +558,13 @@ final class Configuration implements ConfigurationInterface
 
     /**
      * Return ORM entity manager node
-     *
-     * @return ArrayNodeDefinition<TreeBuilder<'array'>>
      */
     private function getOrmEntityManagersNode(): ArrayNodeDefinition
     {
         $treeBuilder = new TreeBuilder('entity_managers');
         $node        = $treeBuilder->getRootNode();
 
+        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
@@ -740,14 +733,13 @@ final class Configuration implements ConfigurationInterface
 
     /**
      * Return an ORM cache driver node for a given entity manager
-     *
-     * @return ArrayNodeDefinition<TreeBuilder<'array'>>
      */
     private function getOrmCacheDriverNode(string $name): ArrayNodeDefinition
     {
         $treeBuilder = new TreeBuilder($name);
         $node        = $treeBuilder->getRootNode();
 
+        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->beforeNormalization()
                 ->ifString()

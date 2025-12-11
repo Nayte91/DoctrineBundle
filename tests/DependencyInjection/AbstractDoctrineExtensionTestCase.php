@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPa
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\InvokableEntityListener;
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\Cache\DefaultCacheFactory;
@@ -602,6 +603,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->assertDICDefinitionMethodCallOnce($definition, 'setTypedFieldMapper', [0 => new Reference('doctrine.orm.typed_field_mapper.default')]);
     }
 
+    /** @param ?class-string $expectedClass */
     #[DataProvider('cacheConfigProvider')]
     #[IgnoreDeprecations]
     public function testCacheConfig(string|null $expectedClass, string $entityManagerName, string|null $cacheGetter): void
@@ -633,6 +635,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         }
     }
 
+    /** @return Generator<string, array{expectedClass: ?class-string, entityManagerName: string, cacheGetter: ?string}> */
     public static function cacheConfigProvider(): Generator
     {
         yield 'metadata_cache_none' => [
@@ -779,9 +782,7 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $definition = $container->getDefinition('doctrine.orm.default_manager_configurator');
         $this->assertDICConstructorArguments($definition, [['soft_delete', 'myFilter'], ['myFilter' => ['myParameter' => 'myValue', 'mySecondParameter' => 'mySecondValue']]]);
 
-        $entityManager = $container->get('doctrine.orm.entity_manager');
-        assert($entityManager instanceof EntityManagerInterface);
-        $this->assertCount(2, $entityManager->getFilters()->getEnabledFilters());
+        $this->assertCount(2, $container->get('doctrine.orm.entity_manager')->getFilters()->getEnabledFilters());
     }
 
     public function testResolveTargetEntity(): void
@@ -958,7 +959,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
         $this->compileContainer($container);
 
         $getConfiguration = static function (string $connectionName) use ($container): Configuration {
-            return $container->get(sprintf('doctrine.dbal.%s_connection', $connectionName))->getConfiguration();
+            $connection = $container->get(sprintf('doctrine.dbal.%s_connection', $connectionName));
+            assert($connection instanceof Connection);
+
+            return $connection->getConfiguration();
         };
 
         foreach ($expectedConnectionAssets as $connectionName => $expectedTables) {
@@ -1193,10 +1197,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container     = $this->loadContainer('orm_filters');
-        $entityManager = $container->get('doctrine.orm.entity_manager');
-
-        $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
+        $this->assertTrue(
+            $this->loadContainer('orm_filters')->get('doctrine.orm.entity_manager')
+                ->getConfiguration()->isNativeLazyObjectsEnabled(),
+        );
     }
 
     public function testNativeLazyObjectsWithConfigTrue(): void
@@ -1205,10 +1209,10 @@ abstract class AbstractDoctrineExtensionTestCase extends TestCase
             self::markTestSkipped('This test requires ORM');
         }
 
-        $container     = $this->loadContainer('orm_native_lazy_objects_enable');
-        $entityManager = $container->get('doctrine.orm.entity_manager');
-
-        $this->assertTrue($entityManager->getConfiguration()->isNativeLazyObjectsEnabled());
+        $this->assertTrue(
+            $this->loadContainer('orm_native_lazy_objects_enable')->get('doctrine.orm.entity_manager')
+            ->getConfiguration()->isNativeLazyObjectsEnabled(),
+        );
     }
 
     #[RequiresMethod(ProxyHelper::class, 'generateLazyGhost')]

@@ -1,8 +1,14 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
 parameters:
-   level: 6
+   level: 7
    reportUnmatchedIgnoredErrors: true
    paths:
       - config
       - src
       - tests
-   ignoreErrors:
+   scanFiles:
+      - vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php
+   symfony:
+       constantHassers: false
+       containerXmlPath: var/cache/test/Doctrine_Bundle_DoctrineBundle_Tests_DependencyInjection_Fixtures_TestKernelTestDebugContainer.xml
