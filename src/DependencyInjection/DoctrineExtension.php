@@ -35,6 +35,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\ORM\Proxy\Autoloader;
 use Doctrine\ORM\Tools\AttachEntityListenersListener;
+use Doctrine\ORM\Tools\Console\Command\Debug\DebugEventManagerDoctrineCommand;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
@@ -59,7 +60,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -71,12 +71,14 @@ use function array_keys;
 use function array_merge;
 use function array_replace;
 use function array_values;
+use function assert;
 use function class_exists;
 use function dirname;
 use function glob;
 use function in_array;
 use function interface_exists;
 use function is_dir;
+use function is_string;
 use function realpath;
 use function reset;
 use function sprintf;
@@ -121,7 +123,8 @@ final class DoctrineExtension extends Extension
     {
         if ($objectManager['auto_mapping']) {
             // automatically register bundle mappings
-            foreach (array_keys($container->getParameter('kernel.bundles')) as $bundle) {
+            $bundles = $container->getParameter('kernel.bundles');
+            foreach (array_keys($bundles) as $bundle) {
                 if (isset($objectManager['mappings'][$bundle])) {
                     continue;
                 }
@@ -153,10 +156,13 @@ final class DoctrineExtension extends Extension
             if ($mappingConfig['is_bundle']) {
                 $bundle         = null;
                 $bundleMetadata = null;
-                foreach ($container->getParameter('kernel.bundles') as $name => $class) {
+                /** @var array<string, class-string> $kernelBundles */
+                $kernelBundles         = $container->getParameter('kernel.bundles');
+                $kernelBundlesMetadata = $container->getParameter('kernel.bundles_metadata');
+                foreach ($kernelBundles as $name => $class) {
                     if ($mappingName === $name) {
                         $bundle         = new ReflectionClass($class);
-                        $bundleMetadata = $container->getParameter('kernel.bundles_metadata')[$name];
+                        $bundleMetadata = $kernelBundlesMetadata[$name];
 
                         break;
                     }
@@ -218,7 +224,10 @@ final class DoctrineExtension extends Extension
      *
      * Returns false when autodetection failed, an array of the completed information otherwise.
      *
-     * @param array<string, mixed> $bundleConfig
+     * @param array<string, mixed>    $bundleConfig
+     * @param ReflectionClass<object> $bundle
+     *
+     * @return array<string, mixed>|false
      */
     private function getMappingDriverBundleConfigDefaults(
         array $bundleConfig,
@@ -226,7 +235,9 @@ final class DoctrineExtension extends Extension
         ContainerBuilder $container,
         string|null $bundleDir = null,
     ): array|false {
-        $bundleClassDir = dirname($bundle->getFileName());
+        $fileName = $bundle->getFileName();
+        assert(is_string($fileName));
+        $bundleClassDir = dirname($fileName);
         $bundleDir    ??= $bundleClassDir;
 
         if (! $bundleConfig['type']) {
@@ -491,6 +502,7 @@ final class DoctrineExtension extends Extension
             $config['default_connection'] = reset($keys);
         }
 
+        assert(is_string($config['default_connection']));
         $this->defaultConnection = $config['default_connection'];
 
         $container->setAlias('database_connection', sprintf('doctrine.dbal.%s_connection', $this->defaultConnection));
@@ -765,6 +777,11 @@ final class DoctrineExtension extends Extension
             $container->removeDefinition('doctrine.orm.entity_value_resolver.expression_language');
         }
 
+        if (! class_exists(DebugEventManagerDoctrineCommand::class)) {
+            $container->removeDefinition('doctrine.event_manager_debug_command');
+            $container->removeDefinition('doctrine.entity_listeners_debug_command');
+        }
+
         $controllerResolverDefaults = [];
 
         if (! $config['controller_resolver']['enabled']) {
@@ -808,7 +825,8 @@ final class DoctrineExtension extends Extension
         $container->setAlias('doctrine.orm.entity_manager', $defaultEntityManagerDefinitionId = sprintf('doctrine.orm.%s_entity_manager', $config['default_entity_manager']));
         $container->getAlias('doctrine.orm.entity_manager')->setPublic(true);
 
-        $config['entity_managers'] = $this->fixManagersAutoMappings($config['entity_managers'], $container->getParameter('kernel.bundles'));
+        $bundles                   = $container->getParameter('kernel.bundles');
+        $config['entity_managers'] = $this->fixManagersAutoMappings($config['entity_managers'], $bundles);
 
         foreach ($config['entity_managers'] as $name => $entityManager) {
             $entityManager['name'] = $name;
@@ -1368,6 +1386,8 @@ final class DoctrineExtension extends Extension
 
     /**
      * {@inheritDoc}
+     *
+     * @param array<string, mixed> $config
      */
     public function getConfiguration(array $config, ContainerBuilder $container): Configuration
     {

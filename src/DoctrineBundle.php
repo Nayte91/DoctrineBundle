@@ -12,6 +12,8 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\MiddlewaresPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\RemoveLoggingMiddlewarePass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\RemoveProfilerControllerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\DoctrineValidationPass;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterDatePointTypePass;
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
@@ -24,6 +26,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+use function assert;
 use function class_exists;
 use function dirname;
 
@@ -82,7 +85,9 @@ class DoctrineBundle extends Bundle
                     continue;
                 }
 
-                $this->container->get($id)->clear();
+                $entityManager = $this->container->get($id);
+                assert($entityManager instanceof EntityManagerInterface);
+                $entityManager->clear();
             }
         }
 
@@ -96,7 +101,9 @@ class DoctrineBundle extends Bundle
                 continue;
             }
 
-            $this->container->get($id)->close();
+            $connection = $this->container->get($id);
+            assert($connection instanceof Connection);
+            $connection->close();
         }
     }
 
