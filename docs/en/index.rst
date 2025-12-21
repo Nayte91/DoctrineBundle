@@ -7,6 +7,7 @@ configuration options, console commands and even a web debug toolbar collector.
 .. toctree::
 
     installation
+    doctrine-console
     entity-listeners
     event-listeners
     custom-id-generators
