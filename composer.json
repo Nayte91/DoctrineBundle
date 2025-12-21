@@ -48,6 +48,7 @@
         "phpstan/phpstan": "2.1.1",
         "phpstan/phpstan-phpunit": "2.0.3",
         "phpstan/phpstan-strict-rules": "^2",
+        "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^12.3.10",
         "psr/log": "^3.0",
         "symfony/doctrine-messenger": "^6.4 || ^7.0 || ^8.0",
@@ -59,14 +60,12 @@
         "symfony/string": "^6.4 || ^7.0 || ^8.0",
         "symfony/twig-bridge": "^6.4 || ^7.0 || ^8.0",
         "symfony/validator": "^6.4 || ^7.0 || ^8.0",
-        "symfony/var-exporter": "^6.4.1 || ^7.0.1 || ^8.0",
         "symfony/web-profiler-bundle": "^6.4 || ^7.0 || ^8.0",
         "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
         "twig/twig": "^3.21.1"
     },
     "conflict": {
         "doctrine/orm": "<3.0 || >=4.0",
-        "symfony/var-exporter": "< 6.4.1 || 7.0.0",
         "twig/twig": "<3.0.4"
     },
     "suggest": {

@@ -13,6 +13,7 @@ use Doctrine\Bundle\DoctrineBundle\Tests\Builder\BundleConfigurationBuilder;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EntityListener;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EventListener;
 use Doctrine\DBAL\Connection;
+use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\ORM\Cache\DefaultCacheFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,6 +57,8 @@ use function sys_get_temp_dir;
 
 class DoctrineExtensionTest extends TestCase
 {
+    use VerifyDeprecations;
+
     public function testAutowiringAlias(): void
     {
         if (! interface_exists(EntityManagerInterface::class)) {
@@ -501,6 +504,7 @@ class DoctrineExtensionTest extends TestCase
         ]);
     }
 
+    /** @param array<mixed>|null $ormConfiguration */
     #[TestWith([[]])]
     #[TestWith([null])]
     public function testSingleEntityManagerWithEmptyConfiguration(array|null $ormConfiguration): void

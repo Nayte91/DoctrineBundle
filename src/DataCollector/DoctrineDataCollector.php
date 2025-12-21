@@ -25,14 +25,6 @@ use function count;
 use function usort;
 
 /**
- * @phpstan-type QueryType = array{
- *    executionMS: float,
- *    explainable: bool,
- *    sql: string,
- *    params: ?array<array-key, mixed>,
- *    runnable: bool,
- *    types: ?array<array-key, Type|int|string|null>,
- * }
  * @phpstan-type DataType = array{
  *    caches: array{
  *       enabled: bool,
@@ -44,10 +36,29 @@ use function usort;
  *    entities: array<string, array<class-string, array{class: class-string, file: false|string, line: false|int}>>,
  *    errors: array<string, array<class-string, list<string>>>,
  *    managers: list<string>,
- *    queries: array<string, list<QueryType>>,
+ *    queries: array<string, list<array{
+ *       executionMS: float,
+ *       explainable: bool,
+ *       sql: string,
+ *       params: ?array<array-key, mixed>,
+ *       runnable: bool,
+ *       types: ?array<array-key, Type|int|string|null>
+ *    }>>,
  *    entityCounts: array<string, array<class-string, int>>
  * }
- * @psalm-property DataType $data
+ * @phpstan-type GroupedQueryItemType = array{
+ *    executionMS: float,
+ *    explainable: bool,
+ *    sql: string,
+ *    params: ?array<array-key, mixed>,
+ *    runnable: bool,
+ *    types: ?array<array-key, Type|int|string|null>,
+ *    count: int,
+ *    index: int,
+ *    executionPercent?: float
+ * }
+ * @phpstan-type GroupedQueriesType = array<string, array<int, GroupedQueryItemType>>
+ * @phpstan-property DataType $data
  */
 class DoctrineDataCollector extends BaseCollector
 {
@@ -57,8 +68,7 @@ class DoctrineDataCollector extends BaseCollector
 
     /**
      * @var mixed[][]|null
-     * @phpstan-var ?array<string, list<QueryType&array{count: int, index: int, executionPercent?: float}>>
-     * @phpstan-ignore property.unusedType
+     * @phpstan-var ?GroupedQueriesType
      */
     private array|null $groupedQueries = null;
 
@@ -261,7 +271,7 @@ class DoctrineDataCollector extends BaseCollector
 
     /**
      * @return string[][]
-     * @phpstan-return array<string, list<QueryType&array{count: int, index: int, executionPercent?: float}>>
+     * @phpstan-return GroupedQueriesType
      */
     public function getGroupedQueries(): array
     {

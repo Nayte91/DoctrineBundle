@@ -51,8 +51,11 @@ class DoctrineDataCollectorTest extends TestCase
             ->willReturn(false);
 
         $metadatas = [
+            /** @phpstan-ignore argument.type */
             $this->createEntityMetadata(self::FIRST_ENTITY),
+            /** @phpstan-ignore argument.type */
             $this->createEntityMetadata(self::SECOND_ENTITY),
+            /** @phpstan-ignore argument.type */
             $this->createEntityMetadata(self::FIRST_ENTITY),
         ];
         $factory->expects($this->once())
@@ -136,6 +139,11 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertSame(1, $groupedQueries['default'][1]['count']);
     }
 
+    /**
+     * @param class-string $entityFQCN
+     *
+     * @return ClassMetadata<object>
+     */
     private function createEntityMetadata(string $entityFQCN): ClassMetadata
     {
         $metadata            = new ClassMetadata($entityFQCN);
