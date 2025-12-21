@@ -1,5 +1,4 @@
-
-name: "Continuous Integration"
+name: "CI: PHPUnit"
 
 on:
   pull_request:
@@ -27,7 +26,15 @@ on:
 
 jobs:
   phpunit:
-    name: "PHPUnit"
+    name: >
+      ${{ format('PHP {0} - Sf {1} - deps {2} - stab. {3}',
+        matrix.php-version || 'Ø',
+        matrix.symfony-require || 'Ø',
+        matrix.dependencies || 'Ø',
+        matrix.stability || 'Ø'
+      ) }}
+      ${{ matrix.remove-orm && ' - remove ORM' }}
+      ${{ matrix.remove-doctrine-messenger && ' - remove Messenger' }}
     runs-on: "ubuntu-latest"
     env:
       SYMFONY_REQUIRE: ${{matrix.symfony-require}}
@@ -80,7 +87,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
         with:
           fetch-depth: 2
 
@@ -115,7 +122,7 @@ jobs:
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
 
       - name: "Upload coverage file"
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v6"
         with:
           name: "phpunit-${{ matrix.php-version }}-${{ matrix.dependencies }}-${{ hashFiles('composer.lock') }}.coverage"
           path: "coverage.xml"
@@ -130,12 +137,12 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v6"
         with:
           fetch-depth: 2
 
       - name: "Download coverage files"
-        uses: "actions/download-artifact@v6"
+        uses: "actions/download-artifact@v7"
         with:
           path: "reports"
 
