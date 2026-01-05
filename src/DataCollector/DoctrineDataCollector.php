@@ -66,10 +66,7 @@ class DoctrineDataCollector extends BaseCollector
 
     private int|null $managedEntityCount = null;
 
-    /**
-     * @var mixed[][]|null
-     * @phpstan-var ?GroupedQueriesType
-     */
+    /** @var GroupedQueriesType|null */
     private array|null $groupedQueries = null;
 
     public function __construct(
@@ -77,6 +74,10 @@ class DoctrineDataCollector extends BaseCollector
         private readonly bool $shouldValidateSchema = true,
         DebugDataHolder|null $debugDataHolder = null,
     ) {
+        if ($debugDataHolder === null) {
+            $debugDataHolder = new DebugDataHolder();
+        }
+
         parent::__construct($registry, $debugDataHolder);
     }
 
@@ -307,10 +308,9 @@ class DoctrineDataCollector extends BaseCollector
             $this->groupedQueries[$connection] = $connectionGroupedQueries;
         }
 
-        foreach ($this->groupedQueries as $connection => $queries) {
-            foreach ($queries as $i => $query) {
-                $this->groupedQueries[$connection][$i]['executionPercent'] =
-                    $this->executionTimePercentage($query['executionMS'], $totalExecutionMS);
+        foreach ($this->groupedQueries as &$queries) {
+            foreach ($queries as &$query) {
+                $query['executionPercent'] = $this->executionTimePercentage($query['executionMS'], $totalExecutionMS);
             }
         }
 
