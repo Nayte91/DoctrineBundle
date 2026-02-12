@@ -19,7 +19,7 @@ use function uniqid;
 
 class TestCase extends BaseTestCase
 {
-    public function createXmlBundleTestContainer(): ContainerBuilder
+    public function createXmlBundleTestContainer(callable|null $func = null): ContainerBuilder
     {
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.debug' => false,
@@ -81,6 +81,11 @@ class TestCase extends BaseTestCase
         $compilerPassConfig->setRemovingPasses([]);
         // make all Doctrine services public, so we can fetch them in the test
         $compilerPassConfig->addPass(new TestCaseAllPublicCompilerPass());
+
+        if ($func !== null) {
+            $func($container);
+        }
+
         $container->compile();
 
         return $container;
