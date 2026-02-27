@@ -9,7 +9,6 @@ use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsMiddleware;
 use Doctrine\Bundle\DoctrineBundle\CacheWarmer\DoctrineMetadataCacheWarmer;
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
-use Doctrine\Bundle\DoctrineBundle\Dbal\ManagerRegistryAwareConnectionProvider;
 use Doctrine\Bundle\DoctrineBundle\Dbal\RegexSchemaAssetFilter;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\IdGeneratorPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
@@ -639,11 +638,6 @@ final class DoctrineExtension extends Extension
         if (isset($options['wrapperClass'])) {
             $def->setClass($options['wrapperClass']);
         }
-
-        $container->setDefinition(
-            ManagerRegistryAwareConnectionProvider::class,
-            new Definition(ManagerRegistryAwareConnectionProvider::class, [$container->getDefinition('doctrine')]),
-        );
 
         $configuration->addMethodCall('setSchemaManagerFactory', [new Reference($connection['schema_manager_factory'])]);
 
