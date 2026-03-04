@@ -65,6 +65,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('messenger.transport.doctrine.pg_notify_on_idle_listener', PostgreSqlNotifyOnIdleListener::class)
             ->args([
                 service('logger'),
+                service('clock')->ignoreOnInvalid(),
             ])
             ->tag('kernel.event_subscriber');
 };
