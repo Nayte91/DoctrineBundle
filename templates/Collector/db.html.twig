@@ -88,7 +88,7 @@
 
 {% block panel %}
     {% if 'explain' == page %}
-        {{ render(controller('Doctrine\\Bundle\\DoctrineBundle\\Controller\\ProfilerController::explainAction', {
+        {{ render(controller('doctrine.profiler_controller::explainAction', {
             token: token,
             panel: 'db',
             connectionName: request.query.get('connection'),

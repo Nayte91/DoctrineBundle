@@ -81,6 +81,11 @@ return static function (ContainerConfigurator $container): void {
         ->set('doctrine.dbal.schema_asset_filter_manager', SchemaAssetsFilterManager::class)
             ->abstract()
 
+        ->set('doctrine.manager_registry_aware_connection_provider', ManagerRegistryAwareConnectionProvider::class)
+            ->args([
+                service('doctrine'),
+            ])
+
         ->set('doctrine.database_create_command', CreateDatabaseDoctrineCommand::class)
             ->args([
                 service('doctrine'),
@@ -93,13 +98,13 @@ return static function (ContainerConfigurator $container): void {
             ])
             ->tag('console.command', ['command' => 'doctrine:database:drop'])
 
-        ->set(RunSqlCommand::class)
+        ->set('doctrine.run_sql_command', RunSqlCommand::class)
             ->args([
-                service(ManagerRegistryAwareConnectionProvider::class)->nullOnInvalid(),
+                service('doctrine.manager_registry_aware_connection_provider'),
             ])
             ->tag('console.command', ['command' => 'dbal:run-sql'])
 
-        ->set(ProfilerController::class)
+        ->set('doctrine.profiler_controller', ProfilerController::class)
             ->args([
                 service('twig'),
                 service('doctrine'),
