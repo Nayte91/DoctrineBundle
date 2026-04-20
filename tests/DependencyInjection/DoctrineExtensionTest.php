@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 use Closure;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDbalType;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\Bundle\DoctrineBundle\CacheWarmer\DoctrineMetadataCacheWarmer;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\Builder\BundleConfigurationBuilder;
+use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\DbalType;
+use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\DbalTypeNoName;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EntityListener;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EventListener;
 use Doctrine\DBAL\Connection;
@@ -945,6 +948,46 @@ class DoctrineExtensionTest extends TestCase
                 'cacheName' => 'metadata_cache_driver',
                 'cacheConfig' => ['type' => 'service', 'id' => 'service_target_metadata'],
             ],
+        ];
+    }
+
+    /** @param class-string $typeClassname */
+    #[DataProvider('provideDatabaseTypeAttribute')]
+    public function testAsDatabaseTypeAttribute(string $typeClassname, string $expectedTypeName): void
+    {
+        $container = $this->getContainer();
+        $extension = new DoctrineExtension();
+
+        $config = BundleConfigurationBuilder::createBuilder()
+            ->addBaseConnection()
+            ->build();
+
+        $extension->load([$config], $container);
+
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $attributes = method_exists($container, 'getAttributeAutoconfigurators')
+            ? array_map(static fn (array $arr) => $arr[0], $container->getAttributeAutoconfigurators())
+            /** @phpstan-ignore method.notFound */
+            : $container->getAutoconfiguredAttributes();
+        $this->assertInstanceOf(Closure::class, $attributes[AsDbalType::class]);
+
+        $reflector  = new ReflectionClass($typeClassname);
+        $definition = new ChildDefinition('');
+        $attribute  = $reflector->getAttributes(AsDbalType::class)[0]->newInstance();
+
+        $attributes[AsDbalType::class]($definition, $attribute, $reflector);
+
+        $expected = ['type_name' => $expectedTypeName];
+        $this->assertSame([$expected], $definition->getTag('doctrine.dbal.type'));
+        $this->assertSame([['source' => 'by tag "doctrine.dbal.type"']], $definition->getTag('container.excluded'));
+    }
+
+    /** @return array<array{0: class-string, 1: string}> */
+    public static function provideDatabaseTypeAttribute(): array
+    {
+        return [
+            'with type name' => [DbalType::class, 'dbal_type'],
+            'without type name' => [DbalTypeNoName::class, DbalTypeNoName::class],
         ];
     }
 
