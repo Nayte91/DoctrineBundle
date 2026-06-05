@@ -15,7 +15,7 @@ use function time;
 
 class IdleConnectionMiddlewareTest extends TestCase
 {
-    #[RequiresMethod(\Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver::class, '__construct')]
+    #[RequiresMethod(IdleConnectionDriver::class, '__construct')]
     public function testWrap(): void
     {
         /** @var ArrayObject<string, int> $connectionExpiries */
