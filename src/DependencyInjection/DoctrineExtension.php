@@ -63,6 +63,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Messenger\Bridge\Doctrine\EventListener\PostgreSqlNotifyOnIdleListener;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -782,6 +783,14 @@ final class DoctrineExtension extends Extension
         if (! class_exists(DebugEventManagerDoctrineCommand::class)) {
             $container->removeDefinition('doctrine.event_manager_debug_command');
             $container->removeDefinition('doctrine.entity_listeners_debug_command');
+        }
+
+        if (! interface_exists(FormTypeGuesserInterface::class)) {
+            $container->removeDefinition('form.type_guesser.doctrine');
+        }
+
+        if (! class_exists(AbstractType::class)) {
+            $container->removeDefinition('form.type.entity');
         }
 
         $controllerResolverDefaults = [];
