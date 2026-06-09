@@ -118,6 +118,16 @@ class DoctrineExtensionTest extends TestCase
     {
         $this->assertEquals(1.1, DoctrineExtension::escapeFunction(1.1));
     }
+
+    public function testReplaceBinaryParameterAfterEscaping(): void
+    {
+        $extension  = new DoctrineExtension();
+        $query      = 'column = ?';
+        $parameters = [pack('H*', '9d40b8c1417f42d099af4782ec4b20b6')];
+
+        $result = $extension->replaceQueryParameters($query, $parameters);
+        $this->assertEquals('column = 0x9D40B8C1417F42D099AF4782EC4B20B6', $result);
+    }
 }
 
 class DummyClass
