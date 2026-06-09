@@ -25,14 +25,12 @@ use function implode;
 use function is_array;
 use function is_bool;
 use function is_string;
+use function mb_check_encoding;
 use function preg_last_error;
-use function preg_match;
 use function preg_replace_callback;
 use function sprintf;
 use function strtoupper;
 use function substr;
-
-use const PREG_NO_ERROR;
 
 /**
  * This class contains the needed functions in order to do the query highlighting
@@ -68,8 +66,7 @@ class DoctrineExtension extends AbstractExtension
         $result = $parameter;
 
         switch (true) {
-            // Check if result is non-unicode string using PCRE_UTF8 modifier
-            case is_string($result) && ! preg_match('//u', $result):
+            case is_string($result) && ! mb_check_encoding($result, 'UTF-8'):
                 $result = '0x' . strtoupper(bin2hex($result));
                 break;
 
@@ -139,13 +136,11 @@ class DoctrineExtension extends AbstractExtension
             $query,
         );
 
-        $pregError = preg_last_error();
-        if ($pregError !== PREG_NO_ERROR) {
-            throw new RuntimeException(sprintf('Failed to replace query parameters: PCRE error %d', $pregError));
-        }
-
         if ($result === null) {
-            throw new RuntimeException('Failed to replace query parameters: unexpected null result');
+            throw new RuntimeException(sprintf(
+                'Failed to replace query parameters: PCRE error %d',
+                preg_last_error(),
+            ));
         }
 
         return $result;
