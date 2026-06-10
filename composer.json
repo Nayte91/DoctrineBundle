@@ -30,6 +30,7 @@
     "homepage": "https://www.doctrine-project.org",
     "require": {
         "php": "^8.4",
+        "ext-mbstring": "*",
         "doctrine/dbal": "^4.0",
         "doctrine/deprecations": "^1.0",
         "doctrine/persistence": "^4",
