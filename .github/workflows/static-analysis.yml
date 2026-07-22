@@ -24,7 +24,7 @@ on:
       - tests/**
 
 jobs:
-  phpstan:
+  static-analysis:
     name: "PHPStan"
     runs-on: "ubuntu-latest"
 
