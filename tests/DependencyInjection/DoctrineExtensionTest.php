@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection;
 
 use Closure;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDbalType;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\Bundle\DoctrineBundle\CacheWarmer\DoctrineMetadataCacheWarmer;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
 use Doctrine\Bundle\DoctrineBundle\Tests\Builder\BundleConfigurationBuilder;
+use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\DbalType;
+use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\DbalTypeNoName;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EntityListener;
 use Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Fixtures\Php8EventListener;
 use Doctrine\DBAL\Connection;
@@ -30,6 +33,7 @@ use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Symfony\Bridge\Doctrine\ArgumentResolver\Console\EntityValueResolver as ConsoleEntityValueResolver;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver;
@@ -809,8 +813,9 @@ class DoctrineExtensionTest extends TestCase
 
         $messengerTransportDoctrineFactory = $container->getDefinition('messenger.transport.doctrine.factory');
 
-        $this->assertCount(1, $messengerTransportDoctrineFactory->getArguments());
+        $this->assertCount(2, $messengerTransportDoctrineFactory->getArguments());
         $this->assertSame('doctrine', (string) $messengerTransportDoctrineFactory->getArgument(0));
+        $this->assertSame('messenger.transport.doctrine.pg_notify_on_idle_listener', (string) $messengerTransportDoctrineFactory->getArgument(1));
 
         $this->assertSame(DoctrineTransportFactory::class, $messengerTransportDoctrineFactory->getClass());
 
@@ -944,6 +949,46 @@ class DoctrineExtensionTest extends TestCase
                 'cacheName' => 'metadata_cache_driver',
                 'cacheConfig' => ['type' => 'service', 'id' => 'service_target_metadata'],
             ],
+        ];
+    }
+
+    /** @param class-string $typeClassname */
+    #[DataProvider('provideDatabaseTypeAttribute')]
+    public function testAsDatabaseTypeAttribute(string $typeClassname, string $expectedTypeName): void
+    {
+        $container = $this->getContainer();
+        $extension = new DoctrineExtension();
+
+        $config = BundleConfigurationBuilder::createBuilder()
+            ->addBaseConnection()
+            ->build();
+
+        $extension->load([$config], $container);
+
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $attributes = method_exists($container, 'getAttributeAutoconfigurators')
+            ? array_map(static fn (array $arr) => $arr[0], $container->getAttributeAutoconfigurators())
+            /** @phpstan-ignore method.notFound */
+            : $container->getAutoconfiguredAttributes();
+        $this->assertInstanceOf(Closure::class, $attributes[AsDbalType::class]);
+
+        $reflector  = new ReflectionClass($typeClassname);
+        $definition = new ChildDefinition('');
+        $attribute  = $reflector->getAttributes(AsDbalType::class)[0]->newInstance();
+
+        $attributes[AsDbalType::class]($definition, $attribute, $reflector);
+
+        $expected = ['type_name' => $expectedTypeName];
+        $this->assertSame([$expected], $definition->getTag('doctrine.dbal.type'));
+        $this->assertSame([['source' => 'by tag "doctrine.dbal.type"']], $definition->getTag('container.excluded'));
+    }
+
+    /** @return array<array{0: class-string, 1: string}> */
+    public static function provideDatabaseTypeAttribute(): array
+    {
+        return [
+            'with type name' => [DbalType::class, 'dbal_type'],
+            'without type name' => [DbalTypeNoName::class, DbalTypeNoName::class],
         ];
     }
 
@@ -1289,15 +1334,8 @@ class DoctrineExtensionTest extends TestCase
             0 => new Reference('doctrine'),
             1 => new Reference('doctrine.orm.entity_value_resolver.expression_language', $container::IGNORE_ON_INVALID_REFERENCE),
             2 => (new Definition(MapEntity::class))->setArguments([
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
+                '$evictCache' => null,
+                '$disabled' => false,
             ]),
             3 => ['Throwable' => 'stdClass'],
         ], $controllerResolver->getArguments());
@@ -1310,9 +1348,57 @@ class DoctrineExtensionTest extends TestCase
         ];
         $extension->load([$config], $container);
 
-        $container->setDefinition('controller_resolver_defaults', $container->getDefinition('doctrine.orm.entity_value_resolver')->getArgument(2))->setPublic(true);
-        $container->compile();
-        $this->assertEquals(new MapEntity(null, null, null, null, null, null, null, true, true), $container->get('controller_resolver_defaults'));
+        $this->assertEquals((new Definition(MapEntity::class))->setArguments([
+            '$evictCache' => true,
+            '$disabled' => true,
+        ]), $container->getDefinition('doctrine.orm.entity_value_resolver')->getArgument(2));
+    }
+
+    #[RequiresMethod(ConsoleEntityValueResolver::class, '__construct')]
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testConsoleCommandResolver(bool $simpleEntityManagerConfig): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        $container = $this->getContainer();
+        $extension = new DoctrineExtension();
+        $config    = BundleConfigurationBuilder::createBuilderWithBaseValues()->build();
+
+        if ($simpleEntityManagerConfig) {
+            $config['orm'] = [];
+        }
+
+        $config['orm']['resolve_target_entities'] = ['Throwable' => 'stdClass'];
+
+        $extension->load([$config], $container);
+
+        $consoleResolver = $container->getDefinition('doctrine.orm.entity_value_resolver.console');
+
+        $this->assertEquals([
+            0 => new Reference('doctrine'),
+            1 => new Reference('doctrine.orm.entity_value_resolver.expression_language', $container::IGNORE_ON_INVALID_REFERENCE),
+            2 => (new Definition(MapEntity::class))->setArguments([
+                '$evictCache' => null,
+                '$disabled' => false,
+            ]),
+            3 => ['Throwable' => 'stdClass'],
+        ], $consoleResolver->getArguments());
+
+        $container = $this->getContainer();
+
+        $config['orm']['controller_resolver'] = [
+            'enabled' => false,
+            'evict_cache' => true,
+        ];
+        $extension->load([$config], $container);
+
+        $this->assertEquals((new Definition(MapEntity::class))->setArguments([
+            '$evictCache' => true,
+            '$disabled' => true,
+        ]), $container->getDefinition('doctrine.orm.entity_value_resolver.console')->getArgument(2));
     }
 
     /** @param list<string> $bundles */

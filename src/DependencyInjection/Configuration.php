@@ -67,7 +67,6 @@ final class Configuration implements ConfigurationInterface
         // Key that should not be rewritten to the connection config
         $excludedKeys = ['default_connection' => true, 'driver_schemes' => true, 'driver_scheme' => true, 'types' => true, 'type' => true];
 
-        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->children()
             ->arrayNode('dbal')
@@ -167,7 +166,6 @@ final class Configuration implements ConfigurationInterface
 
         $this->configureDbalDriverNode($connectionNode);
 
-        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $connectionNode
             ->fixXmlConfig('option')
             ->fixXmlConfig('mapping_type')
@@ -214,7 +212,6 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('result_cache')->end()
             ->end();
 
-        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $replicaNode = $connectionNode
             ->children()
                 ->arrayNode('replicas')
@@ -232,7 +229,6 @@ final class Configuration implements ConfigurationInterface
      */
     private function configureDbalDriverNode(ArrayNodeDefinition $node): void
     {
-        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->validate()
             ->always(static function (array $values) {
@@ -288,7 +284,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('default_dbname')
                     ->info(
-                        'Override the default database (postgres) to connect to for PostgreSQL connexion.',
+                        'Override the default database (postgres) to connect to for PostgreSQL connection.',
                     )
                 ->end()
                 ->scalarNode('sslmode')
@@ -369,7 +365,6 @@ final class Configuration implements ConfigurationInterface
             'controller_resolver' => true,
         ];
 
-        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->children()
                 ->arrayNode('orm')
@@ -492,7 +487,6 @@ final class Configuration implements ConfigurationInterface
             return ['entities' => $entities];
         };
 
-        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->beforeNormalization()
                 // Yaml normalization
@@ -538,7 +532,6 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('entity_managers');
         $node        = $treeBuilder->getRootNode();
 
-        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey('name')
@@ -585,7 +578,7 @@ final class Configuration implements ConfigurationInterface
                                         ->scalarNode('lock_path')->defaultValue('%kernel.cache_dir%/doctrine/orm/slc/filelock')->end()
                                         ->scalarNode('lock_lifetime')->defaultValue(60)->end()
                                         ->scalarNode('type')->defaultValue('default')->end()
-                                        ->scalarNode('lifetime')->defaultValue(0)->end()
+                                        ->scalarNode('lifetime')->defaultNull()->end()
                                         ->scalarNode('service')->end()
                                         ->scalarNode('name')->end()
                                     ->end()
@@ -713,7 +706,6 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder($name);
         $node        = $treeBuilder->getRootNode();
 
-        /** @phpstan-ignore class.notFound (Phpstan Symfony extension does not know yet how to deal with these) */
         $node
             ->beforeNormalization()
                 ->ifString()

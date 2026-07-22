@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DbalSchemaFilter
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\IdGeneratorPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\MiddlewaresPass;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterDbalTypePass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\RemoveLoggingMiddlewarePass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\RemoveProfilerControllerPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
@@ -20,7 +21,6 @@ use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListen
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterUidTypePass;
 use Symfony\Bridge\Doctrine\DependencyInjection\Security\UserProvider\EntityFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
-use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -68,6 +68,7 @@ class DoctrineBundle extends Bundle
         $container->addCompilerPass(new RemoveLoggingMiddlewarePass());
         $container->addCompilerPass(new MiddlewaresPass());
         $container->addCompilerPass(new RegisterUidTypePass());
+        $container->addCompilerPass(new RegisterDbalTypePass());
 
         if (! class_exists(RegisterDatePointTypePass::class)) {
             return;
@@ -78,6 +79,10 @@ class DoctrineBundle extends Bundle
 
     public function shutdown(): void
     {
+        if ($this->container === null) {
+            return;
+        }
+
         // Clear all entity managers to clear references to entities for GC
         if ($this->container->hasParameter('doctrine.entity_managers')) {
             foreach ($this->container->getParameter('doctrine.entity_managers') as $id) {
@@ -105,10 +110,6 @@ class DoctrineBundle extends Bundle
             assert($connection instanceof Connection);
             $connection->close();
         }
-    }
-
-    public function registerCommands(Application $application): void
-    {
     }
 
     public function getPath(): string

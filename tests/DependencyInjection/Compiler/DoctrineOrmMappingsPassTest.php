@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\Compiler;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Doctrine\Bundle\DoctrineBundle\Tests\TestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
 use Doctrine\Persistence\Mapping\Driver\StaticPHPDriver;
 use Doctrine\Persistence\Mapping\Driver\SymfonyFileLocator;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
+use function assert;
 use function interface_exists;
 
 class DoctrineOrmMappingsPassTest extends TestCase
@@ -143,5 +145,38 @@ class DoctrineOrmMappingsPassTest extends TestCase
 
         $args = $driverDef->getArguments();
         $this->assertSame($directories, $args[0]);
+    }
+
+    public function testAttributeDriverIsRegistered(): void
+    {
+        if (! interface_exists(EntityManagerInterface::class)) {
+            self::markTestSkipped('This test requires ORM');
+        }
+
+        $driverNamespace = 'DoctrineBundle\Entity';
+        $container       = $this->createXmlBundleTestContainer(
+            static function (ContainerBuilder $containerBuilder) use ($driverNamespace): void {
+                $containerBuilder->addCompilerPass(DoctrineOrmMappingsPass::createAttributeMappingDriver(
+                    [$driverNamespace],
+                    ['dummy/path'],
+                ));
+            },
+        );
+
+        $metadataDriver = $container->get('doctrine.orm.default_metadata_driver');
+        /**
+         * @phpstan-ignore function.impossibleType, instanceof.alwaysFalse (
+         *    PHPStan analyzes against TestKernel container which includes
+         *    MappingDriver decorator,
+         *    but this test uses createXmlBundleTestContainer which doesn't run
+         *    IdGeneratorPass, so no decorator exists at runtime, and the type
+         *    of doctrine.orm.default_metadata_driver ends up being
+         *    Doctrine\Persistence\Mapping\Driver\MappingDriverChain, not
+         *    Doctrine\Bundle\DoctrineBundle\Mapping\MappingDriver)
+         */
+        assert($metadataDriver instanceof MappingDriverChain);
+
+        $driver = $metadataDriver->getDrivers()[$driverNamespace];
+        $this->assertTrue($driver instanceof AttributeDriver);
     }
 }

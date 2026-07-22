@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Doctrine\Bundle\DoctrineBundle\DependencyInjection;
 
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDbalType;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsMiddleware;
 use Doctrine\Bundle\DoctrineBundle\CacheWarmer\DoctrineMetadataCacheWarmer;
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
-use Doctrine\Bundle\DoctrineBundle\Dbal\ManagerRegistryAwareConnectionProvider;
 use Doctrine\Bundle\DoctrineBundle\Dbal\RegexSchemaAssetFilter;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\IdGeneratorPass;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\RegisterDbalTypePass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
 use Doctrine\Bundle\DoctrineBundle\Mapping\ContainerEntityListenerResolver;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
@@ -43,6 +44,7 @@ use Doctrine\Persistence\Mapping\Driver\StaticPHPDriver;
 use InvalidArgumentException;
 use LogicException;
 use ReflectionClass;
+use Symfony\Bridge\Doctrine\ArgumentResolver\Console\EntityValueResolver;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -53,6 +55,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -60,7 +63,10 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Messenger\Bridge\Doctrine\EventListener\PostgreSqlNotifyOnIdleListener;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -172,9 +178,11 @@ final class DoctrineExtension extends Extension
                     throw new InvalidArgumentException(sprintf('Bundle "%s" does not exist or it is not enabled.', $mappingName));
                 }
 
-                $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container, $bundleMetadata['path']);
-                if (! $mappingConfig) {
-                    continue;
+                if ($bundleMetadata !== null) {
+                    $mappingConfig = $this->getMappingDriverBundleConfigDefaults($mappingConfig, $bundle, $container, $bundleMetadata['path']);
+                    if (! $mappingConfig) {
+                        continue;
+                    }
                 }
             } elseif (! $mappingConfig['type']) {
                 $mappingConfig['type'] = 'attribute';
@@ -547,6 +555,9 @@ final class DoctrineExtension extends Extension
             $this->loadDbalConnection($name, $connection, $container);
         }
 
+        /** @phpstan-ignore argument.type (Needed for the $reflector parameter) */
+        $container->registerAttributeForAutoconfiguration(AsDbalType::class, RegisterDbalTypePass::autoconfigureFromAttribute(...));
+
         $container->registerForAutoconfiguration(MiddlewareInterface::class)->addTag('doctrine.middleware');
 
         $container->registerAttributeForAutoconfiguration(AsMiddleware::class, static function (ChildDefinition $definition, AsMiddleware $attribute): void {
@@ -628,18 +639,12 @@ final class DoctrineExtension extends Extension
             ]);
 
         $container
-            ->registerAliasForArgument($connectionId, Connection::class, sprintf('%s.connection', $name))
-            ->setPublic(false);
+            ->registerAliasForArgument($connectionId, Connection::class, sprintf('%s.connection', $name), $name);
 
         // Set class in case "wrapper_class" option was used to assist IDEs
         if (isset($options['wrapperClass'])) {
             $def->setClass($options['wrapperClass']);
         }
-
-        $container->setDefinition(
-            ManagerRegistryAwareConnectionProvider::class,
-            new Definition(ManagerRegistryAwareConnectionProvider::class, [$container->getDefinition('doctrine')]),
-        );
 
         $configuration->addMethodCall('setSchemaManagerFactory', [new Reference($connection['schema_manager_factory'])]);
 
@@ -782,6 +787,14 @@ final class DoctrineExtension extends Extension
             $container->removeDefinition('doctrine.entity_listeners_debug_command');
         }
 
+        if (! interface_exists(FormTypeGuesserInterface::class)) {
+            $container->removeDefinition('form.type_guesser.doctrine');
+        }
+
+        if (! class_exists(AbstractType::class)) {
+            $container->removeDefinition('form.type.entity');
+        }
+
         $controllerResolverDefaults = [];
 
         if (! $config['controller_resolver']['enabled']) {
@@ -792,21 +805,27 @@ final class DoctrineExtension extends Extension
             $controllerResolverDefaults['evict_cache'] = true;
         }
 
-        $valueResolverDefinition = $container->getDefinition('doctrine.orm.entity_value_resolver');
-        $valueResolverDefinition->setArgument(2, (new Definition(MapEntity::class))->setArguments([
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            $controllerResolverDefaults['evict_cache'] ?? null,
-            $controllerResolverDefaults['disabled'] ?? false,
+        $controllerValueResolverDefinition = $container->getDefinition('doctrine.orm.entity_value_resolver');
+        $controllerValueResolverDefinition->setArgument(2, (new Definition(MapEntity::class))->setArguments([
+            '$evictCache' => $controllerResolverDefaults['evict_cache'] ?? null,
+            '$disabled' => $controllerResolverDefaults['disabled'] ?? false,
         ]));
 
         // Symfony 7.3 and higher expose type alias support in the EntityValueResolver
-        $valueResolverDefinition->setArgument(3, $config['resolve_target_entities']);
+        $controllerValueResolverDefinition->setArgument(3, $config['resolve_target_entities']);
+
+        // The Console ValueResolverInterface and EntityValueResolver is available in Symfony 8.1 and higher
+        if (interface_exists(ValueResolverInterface::class) && class_exists(EntityValueResolver::class)) {
+            $consoleValueResolverDefinition = $container->getDefinition('doctrine.orm.entity_value_resolver.console');
+            $consoleValueResolverDefinition->setArgument(2, (new Definition(MapEntity::class))->setArguments([
+                '$evictCache' => $controllerResolverDefaults['evict_cache'] ?? null,
+                '$disabled' => $controllerResolverDefaults['disabled'] ?? false,
+            ]));
+
+            $consoleValueResolverDefinition->setArgument(3, $config['resolve_target_entities']);
+        } else {
+            $container->removeDefinition('doctrine.orm.entity_value_resolver.console');
+        }
 
         $entityManagers = [];
         foreach (array_keys($config['entity_managers']) as $name) {
@@ -1018,8 +1037,7 @@ final class DoctrineExtension extends Extension
             ->setConfigurator([new Reference($managerConfiguratorName), 'configure']);
 
         $container
-            ->registerAliasForArgument($entityManagerId, EntityManagerInterface::class, sprintf('%s.entity_manager', $entityManager['name']))
-            ->setPublic(false);
+            ->registerAliasForArgument($entityManagerId, EntityManagerInterface::class, sprintf('%s.entity_manager', $entityManager['name']), $entityManager['name']);
 
         $container->setAlias(
             sprintf('doctrine.orm.%s_entity_manager.event_manager', $entityManager['name']),
@@ -1188,7 +1206,7 @@ final class DoctrineExtension extends Extension
 
                     $container
                         ->setDefinition($regionId, new Definition(DefaultRegion::class))
-                        ->setArguments([$name, new Reference($driverId), $region['lifetime']]);
+                        ->setArguments([$name, new Reference($driverId), $region['lifetime'] ?? $entityManager['second_level_cache']['region_lifetime']]);
                 }
 
                 if ($regionType === 'filelock') {
@@ -1202,7 +1220,10 @@ final class DoctrineExtension extends Extension
                     $regionsDef->addMethodCall('getLockLifetime', [$name, $region['lock_lifetime']]);
                 }
 
-                $regionsDef->addMethodCall('setLifetime', [$name, $region['lifetime']]);
+                if ($region['lifetime'] !== null) {
+                    $regionsDef->addMethodCall('setLifetime', [$name, $region['lifetime']]);
+                }
+
                 $slcFactoryDef->addMethodCall('setRegion', [$regionRef]);
             }
         }
@@ -1430,6 +1451,10 @@ final class DoctrineExtension extends Extension
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('messenger.php');
+
+        if (! class_exists(PostgreSqlNotifyOnIdleListener::class)) {
+            $container->removeDefinition('messenger.transport.doctrine.pg_notify_on_idle_listener');
+        }
 
         /**
          * The Doctrine transport component (symfony/doctrine-messenger) is optional.
